@@ -14,7 +14,7 @@ import { useScrollAnimation } from '@/composables/useScrollAnimation';
 
 useScrollAnimation();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const props = defineProps({
     plans: Array,
@@ -108,11 +108,31 @@ const featureCards = computed(() => [
 ]);
 
 const stats = computed(() => [
-    { target: 800, suffix: '+', label: t('home.stats.features'), ring: 80 },
-    { target: 6, suffix: '', label: t('home.stats.portals'), ring: 100 },
-    { target: 3000, suffix: '+', label: t('home.stats.translations'), ring: 90 },
-    { target: 80, suffix: '+', label: t('home.stats.permissions'), ring: 75 },
-    { target: 157, suffix: '+', label: t('home.stats.tables'), ring: 85 },
+    {
+        target: 800, suffix: '+', label: t('home.stats.features'),
+        accent: '#C4A265', accentSoft: 'rgba(196,162,101,0.15)',
+        icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+    },
+    {
+        target: 6, suffix: '', label: t('home.stats.portals'),
+        accent: '#2E86C1', accentSoft: 'rgba(46,134,193,0.15)',
+        icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+    },
+    {
+        target: 3000, suffix: '+', label: t('home.stats.translations'),
+        accent: '#5DADE2', accentSoft: 'rgba(93,173,226,0.15)',
+        icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+    },
+    {
+        target: 80, suffix: '+', label: t('home.stats.permissions'),
+        accent: '#27AE60', accentSoft: 'rgba(39,174,96,0.15)',
+        icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+    },
+    {
+        target: 157, suffix: '+', label: t('home.stats.tables'),
+        accent: '#D4B87A', accentSoft: 'rgba(212,184,122,0.15)',
+        icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4',
+    },
 ]);
 
 const howItWorksSteps = computed(() => [
@@ -445,60 +465,152 @@ const howItWorksSteps = computed(() => [
             </div>
         </section>
 
-        <!-- 6. Stats Section - Redesigned with glass cards and radial rings -->
-        <section class="py-20 lg:py-28 bg-gradient-to-br from-[#1B4F72] via-[#1C2833] to-[#1B4F72] relative overflow-hidden">
-            <!-- Background pattern -->
-            <div class="absolute inset-0 opacity-5">
-                <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+        <!-- 6. Stats Section - Premium redesign with bento layout -->
+        <section class="py-20 lg:py-28 relative overflow-hidden bg-[#0A1F33]">
+            <!-- Animated mesh gradient background -->
+            <div class="absolute inset-0">
+                <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#1B4F72]/40 rounded-full blur-[120px] animate-pulse-slow"></div>
+                <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#C4A265]/15 rounded-full blur-[140px] animate-pulse-slow" style="animation-delay: 2s"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#2E86C1]/20 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 4s"></div>
             </div>
-            <!-- Glow orbs -->
-            <div class="absolute top-1/4 start-1/4 w-64 h-64 bg-[#C4A265]/10 rounded-full blur-[100px]"></div>
-            <div class="absolute bottom-1/4 end-1/4 w-72 h-72 bg-[#1B4F72]/20 rounded-full blur-[100px]"></div>
+
+            <!-- Diagonal lines pattern -->
+            <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(45deg, white 1px, transparent 1px), linear-gradient(-45deg, white 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+            <!-- Top + bottom border glow -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/40 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/40 to-transparent"></div>
 
             <div class="container mx-auto px-4 relative z-10">
-                <SectionTitle
-                    :title="t('home.stats.title')"
-                    :subtitle="t('home.stats.subtitle')"
-                    :light="true"
-                />
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-14">
-                    <div
-                        v-for="(stat, index) in stats"
-                        :key="index"
-                        class="relative group animate-fade-up"
-                    >
-                        <!-- Glass card -->
-                        <div class="relative bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-2xl p-6 text-center transition-all duration-500 hover:bg-white/[0.1] hover:border-white/20 hover:shadow-lg hover:shadow-[#C4A265]/5">
-                            <!-- Subtle glow on hover -->
-                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#C4A265]/0 to-[#C4A265]/0 group-hover:from-[#C4A265]/5 group-hover:to-transparent transition-all duration-500"></div>
+                <!-- Header -->
+                <div class="text-center max-w-2xl mx-auto mb-16 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 mb-5">
+                        <span class="relative flex w-1.5 h-1.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C4A265] opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#C4A265]"></span>
+                        </span>
+                        <span class="text-[#C4A265] text-xs font-semibold tracking-wider uppercase">{{ locale === 'ar' ? 'بالأرقام' : 'By the numbers' }}</span>
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
+                        {{ t('home.stats.title') }}
+                    </h2>
+                    <p class="text-base md:text-lg text-white/60 max-w-xl mx-auto">
+                        {{ t('home.stats.subtitle') }}
+                    </p>
+                </div>
 
-                            <!-- Circular progress ring -->
-                            <div class="relative w-24 h-24 mx-auto mb-4">
-                                <svg class="w-full h-full -rotate-90" viewBox="0 0 96 96">
-                                    <!-- Background ring -->
-                                    <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.06)" stroke-width="4" fill="none"/>
-                                    <!-- Progress ring -->
-                                    <circle
-                                        cx="48" cy="48" r="40"
-                                        stroke="#C4A265"
-                                        stroke-width="4"
-                                        fill="none"
-                                        stroke-linecap="round"
-                                        :stroke-dasharray="251.3"
-                                        :stroke-dashoffset="251.3 - (251.3 * stat.ring / 100)"
-                                        class="opacity-40 group-hover:opacity-70 transition-opacity duration-700"
-                                    />
-                                </svg>
-                                <!-- Number inside ring -->
-                                <div class="absolute inset-0 flex items-center justify-center text-2xl md:text-3xl font-extrabold text-white">
-                                    <AnimatedCounter :target="stat.target" :suffix="stat.suffix" />
+                <!-- Bento Grid Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-5 max-w-6xl mx-auto">
+                    <!-- Featured stat (Big) -->
+                    <div class="col-span-2 md:col-span-3 md:row-span-2 group relative animate-fade-up">
+                        <div
+                            class="relative h-full min-h-[280px] md:min-h-[360px] rounded-3xl p-8 md:p-10 overflow-hidden border border-white/10 transition-all duration-700 hover:border-[#C4A265]/30"
+                            style="background: linear-gradient(135deg, rgba(196,162,101,0.12) 0%, rgba(27,79,114,0.2) 100%);"
+                        >
+                            <!-- Animated gradient orbs inside -->
+                            <div class="absolute -top-20 -end-20 w-64 h-64 bg-[#C4A265]/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
+                            <div class="absolute -bottom-10 -start-10 w-48 h-48 bg-[#1B4F72]/30 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
+
+                            <!-- Decorative grid -->
+                            <svg class="absolute top-4 end-4 w-20 h-20 text-white/5" viewBox="0 0 80 80" fill="none">
+                                <pattern id="dots-bg" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                                    <circle cx="2" cy="2" r="1" fill="currentColor" />
+                                </pattern>
+                                <rect width="80" height="80" fill="url(#dots-bg)" />
+                            </svg>
+
+                            <div class="relative h-full flex flex-col">
+                                <!-- Icon -->
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center mb-6 shadow-2xl shadow-[#C4A265]/30 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" :d="stats[0].icon" />
+                                    </svg>
+                                </div>
+
+                                <!-- Number -->
+                                <div class="flex items-baseline gap-2 mb-2">
+                                    <div class="text-6xl md:text-7xl lg:text-8xl font-black bg-gradient-to-br from-white via-[#C4A265] to-[#D4B87A] bg-clip-text text-transparent leading-none">
+                                        <AnimatedCounter :target="stats[0].target" :suffix="stats[0].suffix" />
+                                    </div>
+                                </div>
+
+                                <!-- Label -->
+                                <div class="mt-auto">
+                                    <div class="h-px w-12 bg-gradient-to-r from-[#C4A265] to-transparent mb-3"></div>
+                                    <p class="text-[#C4A265] font-bold text-base md:text-lg uppercase tracking-wider">{{ stats[0].label }}</p>
+                                    <p class="text-white/50 text-xs md:text-sm mt-1.5 max-w-xs">{{ locale === 'ar' ? 'خواص شاملة لإدارة كل تفاصيل عيادتك' : 'Comprehensive features for every clinic detail' }}</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="relative text-[#C4A265] font-semibold text-[11px] sm:text-xs uppercase tracking-widest">
-                                {{ stat.label }}
+                    <!-- Smaller stats -->
+                    <div
+                        v-for="(stat, idx) in stats.slice(1)"
+                        :key="idx"
+                        class="col-span-1 md:col-span-3 lg:col-span-1 group relative animate-fade-up"
+                        :class="{ 'md:col-span-3 lg:col-span-1': idx === 0, 'md:col-span-3 lg:col-span-1': idx === 1 }"
+                        :style="{ animationDelay: `${(idx + 1) * 100}ms` }"
+                    >
+                        <div
+                            class="relative h-full min-h-[140px] md:min-h-[170px] rounded-2xl p-5 md:p-6 overflow-hidden border border-white/10 backdrop-blur-md bg-white/[0.03] transition-all duration-500 hover:bg-white/[0.06] hover:-translate-y-1"
+                            :style="{ '--accent': stat.accent }"
+                        >
+                            <!-- Hover glow -->
+                            <div
+                                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+                                :style="{ background: `radial-gradient(circle at 50% 0%, ${stat.accentSoft} 0%, transparent 70%)` }"
+                            ></div>
+
+                            <!-- Top accent line -->
+                            <div
+                                class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-px transition-all duration-700"
+                                :style="{ background: `linear-gradient(90deg, transparent, ${stat.accent}, transparent)` }"
+                            ></div>
+
+                            <!-- Floating accent dot -->
+                            <div class="absolute top-4 end-4 w-1.5 h-1.5 rounded-full opacity-50 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500" :style="{ background: stat.accent, boxShadow: `0 0 12px ${stat.accent}` }"></div>
+
+                            <div class="relative">
+                                <!-- Icon -->
+                                <div
+                                    class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
+                                    :style="{ background: stat.accentSoft, color: stat.accent }"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" :d="stat.icon" />
+                                    </svg>
+                                </div>
+
+                                <!-- Number -->
+                                <div class="text-3xl md:text-4xl font-black text-white leading-none mb-2">
+                                    <AnimatedCounter :target="stat.target" :suffix="stat.suffix" />
+                                </div>
+
+                                <!-- Label -->
+                                <p class="font-semibold text-[10px] sm:text-[11px] uppercase tracking-widest" :style="{ color: stat.accent }">
+                                    {{ stat.label }}
+                                </p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Bottom trust bar -->
+                <div class="mt-12 max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-white/40 text-xs animate-fade-up">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        <span>{{ locale === 'ar' ? 'بيانات محدّثة باستمرار' : 'Continuously updated' }}</span>
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-white/20"></div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        <span>{{ locale === 'ar' ? 'أداء عالي وسرعة استجابة' : 'High performance' }}</span>
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-white/20"></div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                        <span>{{ locale === 'ar' ? 'أمان على مستوى المؤسسات' : 'Enterprise-grade security' }}</span>
                     </div>
                 </div>
             </div>
@@ -824,3 +936,20 @@ const howItWorksSteps = computed(() => [
         <NewsletterSignup />
     </MainLayout>
 </template>
+
+<style scoped>
+@keyframes pulse-slow {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+}
+</style>
