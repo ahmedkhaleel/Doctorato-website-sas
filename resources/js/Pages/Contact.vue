@@ -10,15 +10,79 @@ useScrollAnimation();
 
 const showSuccess = ref(false);
 const mounted = ref(false);
+const countryDropdownOpen = ref(false);
+const countrySearch = ref('');
 
 onMounted(() => {
     setTimeout(() => (mounted.value = true), 50);
+});
+
+// Country codes (most relevant for the region first, then global)
+const countries = [
+    { code: 'EG', dial: '+20',  flag: '🇪🇬', name_ar: 'مصر',           name_en: 'Egypt' },
+    { code: 'AE', dial: '+971', flag: '🇦🇪', name_ar: 'الإمارات',        name_en: 'United Arab Emirates' },
+    { code: 'SA', dial: '+966', flag: '🇸🇦', name_ar: 'السعودية',        name_en: 'Saudi Arabia' },
+    { code: 'KW', dial: '+965', flag: '🇰🇼', name_ar: 'الكويت',          name_en: 'Kuwait' },
+    { code: 'QA', dial: '+974', flag: '🇶🇦', name_ar: 'قطر',            name_en: 'Qatar' },
+    { code: 'BH', dial: '+973', flag: '🇧🇭', name_ar: 'البحرين',         name_en: 'Bahrain' },
+    { code: 'OM', dial: '+968', flag: '🇴🇲', name_ar: 'عُمان',           name_en: 'Oman' },
+    { code: 'JO', dial: '+962', flag: '🇯🇴', name_ar: 'الأردن',          name_en: 'Jordan' },
+    { code: 'LB', dial: '+961', flag: '🇱🇧', name_ar: 'لبنان',           name_en: 'Lebanon' },
+    { code: 'PS', dial: '+970', flag: '🇵🇸', name_ar: 'فلسطين',          name_en: 'Palestine' },
+    { code: 'SY', dial: '+963', flag: '🇸🇾', name_ar: 'سوريا',           name_en: 'Syria' },
+    { code: 'IQ', dial: '+964', flag: '🇮🇶', name_ar: 'العراق',          name_en: 'Iraq' },
+    { code: 'YE', dial: '+967', flag: '🇾🇪', name_ar: 'اليمن',           name_en: 'Yemen' },
+    { code: 'LY', dial: '+218', flag: '🇱🇾', name_ar: 'ليبيا',           name_en: 'Libya' },
+    { code: 'TN', dial: '+216', flag: '🇹🇳', name_ar: 'تونس',            name_en: 'Tunisia' },
+    { code: 'DZ', dial: '+213', flag: '🇩🇿', name_ar: 'الجزائر',         name_en: 'Algeria' },
+    { code: 'MA', dial: '+212', flag: '🇲🇦', name_ar: 'المغرب',          name_en: 'Morocco' },
+    { code: 'SD', dial: '+249', flag: '🇸🇩', name_ar: 'السودان',         name_en: 'Sudan' },
+    { code: 'TR', dial: '+90',  flag: '🇹🇷', name_ar: 'تركيا',           name_en: 'Turkey' },
+    { code: 'US', dial: '+1',   flag: '🇺🇸', name_ar: 'الولايات المتحدة', name_en: 'United States' },
+    { code: 'GB', dial: '+44',  flag: '🇬🇧', name_ar: 'المملكة المتحدة',  name_en: 'United Kingdom' },
+    { code: 'DE', dial: '+49',  flag: '🇩🇪', name_ar: 'ألمانيا',          name_en: 'Germany' },
+    { code: 'FR', dial: '+33',  flag: '🇫🇷', name_ar: 'فرنسا',           name_en: 'France' },
+    { code: 'IT', dial: '+39',  flag: '🇮🇹', name_ar: 'إيطاليا',         name_en: 'Italy' },
+    { code: 'ES', dial: '+34',  flag: '🇪🇸', name_ar: 'إسبانيا',         name_en: 'Spain' },
+    { code: 'CA', dial: '+1',   flag: '🇨🇦', name_ar: 'كندا',            name_en: 'Canada' },
+    { code: 'IN', dial: '+91',  flag: '🇮🇳', name_ar: 'الهند',           name_en: 'India' },
+    { code: 'PK', dial: '+92',  flag: '🇵🇰', name_ar: 'باكستان',         name_en: 'Pakistan' },
+];
+
+const selectedCountry = ref(countries[0]);
+
+const filteredCountries = computed(() => {
+    if (!countrySearch.value) return countries;
+    const q = countrySearch.value.toLowerCase();
+    return countries.filter(c =>
+        c.name_ar.toLowerCase().includes(q) ||
+        c.name_en.toLowerCase().includes(q) ||
+        c.dial.includes(q) ||
+        c.code.toLowerCase().includes(q)
+    );
+});
+
+function selectCountry(c) {
+    selectedCountry.value = c;
+    countryDropdownOpen.value = false;
+    countrySearch.value = '';
+}
+
+function closeCountryDropdown(e) {
+    if (!e.target.closest('.country-selector')) {
+        countryDropdownOpen.value = false;
+    }
+}
+
+onMounted(() => {
+    document.addEventListener('click', closeCountryDropdown);
 });
 
 const form = useForm({
     name: '',
     email: '',
     phone: '',
+    country_code: '+20',
     subject: '',
     message: '',
 });
@@ -61,10 +125,12 @@ const socialLinks = [
 ];
 
 function submitForm() {
+    form.country_code = selectedCountry.value.dial;
     form.post(route('contact.store'), {
         onSuccess: () => {
             showSuccess.value = true;
             form.reset();
+            selectedCountry.value = countries[0];
         },
     });
 }
@@ -345,19 +411,84 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
                                             <p v-if="form.errors.email" class="text-red-500 text-xs mt-1.5 ms-2">{{ form.errors.email }}</p>
                                         </div>
 
-                                        <!-- Phone -->
+                                        <!-- Phone with Country Code -->
                                         <div class="floating-field">
-                                            <input
-                                                v-model="form.phone"
-                                                type="tel"
-                                                id="phone"
-                                                placeholder=" "
-                                                class="peer w-full px-4 pt-5 pb-2 rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus:border-[#1B4F72] focus:bg-white outline-none transition-all"
-                                                dir="ltr"
-                                            />
-                                            <label for="phone" class="absolute start-4 top-4 text-gray-400 text-sm pointer-events-none transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-[#1B4F72] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-xs">
-                                                {{ t('contact.phone') }}
-                                            </label>
+                                            <div class="flex items-stretch rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus-within:border-[#1B4F72] focus-within:bg-white transition-all overflow-visible relative">
+                                                <!-- Country Selector -->
+                                                <div class="country-selector relative">
+                                                    <button
+                                                        type="button"
+                                                        @click.stop="countryDropdownOpen = !countryDropdownOpen"
+                                                        class="h-full flex items-center gap-1.5 px-3 border-e-2 border-gray-200 hover:bg-gray-100/60 rounded-s-2xl transition-colors"
+                                                    >
+                                                        <span class="text-xl leading-none">{{ selectedCountry.flag }}</span>
+                                                        <span class="text-sm font-semibold text-gray-700" dir="ltr">{{ selectedCountry.dial }}</span>
+                                                        <svg class="w-3.5 h-3.5 text-gray-400 transition-transform" :class="{ 'rotate-180': countryDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                                    </button>
+
+                                                    <!-- Dropdown -->
+                                                    <Transition
+                                                        enter-active-class="transition duration-200 ease-out"
+                                                        enter-from-class="opacity-0 -translate-y-2 scale-95"
+                                                        enter-to-class="opacity-100 translate-y-0 scale-100"
+                                                        leave-active-class="transition duration-150 ease-in"
+                                                        leave-from-class="opacity-100 scale-100"
+                                                        leave-to-class="opacity-0 scale-95"
+                                                    >
+                                                        <div
+                                                            v-if="countryDropdownOpen"
+                                                            class="absolute top-full mt-2 start-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+                                                            @click.stop
+                                                        >
+                                                            <!-- Search -->
+                                                            <div class="p-3 border-b border-gray-100">
+                                                                <div class="relative">
+                                                                    <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                                                    <input
+                                                                        v-model="countrySearch"
+                                                                        type="text"
+                                                                        placeholder="ابحث عن دولة..."
+                                                                        class="w-full ps-9 pe-3 py-2 text-sm rounded-lg bg-gray-50 border border-gray-200 focus:border-[#1B4F72] focus:bg-white outline-none transition"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <!-- List -->
+                                                            <div class="max-h-64 overflow-y-auto custom-scroll">
+                                                                <button
+                                                                    v-for="c in filteredCountries"
+                                                                    :key="c.code"
+                                                                    type="button"
+                                                                    @click="selectCountry(c)"
+                                                                    class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[#1B4F72]/5 transition-colors text-start"
+                                                                    :class="{ 'bg-[#C4A265]/10': selectedCountry.code === c.code }"
+                                                                >
+                                                                    <span class="text-xl leading-none">{{ c.flag }}</span>
+                                                                    <span class="flex-1 text-gray-700 truncate">{{ c.name_ar }}</span>
+                                                                    <span class="text-gray-400 text-xs font-mono" dir="ltr">{{ c.dial }}</span>
+                                                                    <svg v-if="selectedCountry.code === c.code" class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                                </button>
+                                                                <div v-if="!filteredCountries.length" class="px-4 py-6 text-center text-sm text-gray-400">
+                                                                    لا توجد نتائج
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Transition>
+                                                </div>
+
+                                                <!-- Phone Input -->
+                                                <input
+                                                    v-model="form.phone"
+                                                    type="tel"
+                                                    id="phone"
+                                                    placeholder=" "
+                                                    class="peer flex-1 min-w-0 px-4 pt-5 pb-2 bg-transparent outline-none"
+                                                    dir="ltr"
+                                                />
+                                                <label for="phone" class="absolute start-[5.5rem] top-4 text-gray-400 text-sm pointer-events-none transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-[#1B4F72] peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-xs">
+                                                    {{ t('contact.phone') }}
+                                                </label>
+                                            </div>
+                                            <p v-if="form.errors.phone" class="text-red-500 text-xs mt-1.5 ms-2">{{ form.errors.phone }}</p>
                                         </div>
 
                                         <!-- Subject -->
@@ -606,5 +737,25 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
 [dir="rtl"] .floating-field label {
     right: 1rem;
     left: auto;
+}
+
+[dir="rtl"] .floating-field label[for="phone"] {
+    right: 5.5rem;
+    left: auto;
+}
+
+/* Custom scrollbar for country dropdown */
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #1B4F72;
+    border-radius: 3px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: #C4A265;
 }
 </style>
