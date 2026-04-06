@@ -78,7 +78,7 @@ const timeline = computed(() => [
                     <span class="text-sm text-white/70 font-medium">{{ t('about.hero_badge') }}</span>
                 </div>
 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight animate-fade-up">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight animate-fade-up">
                     {{ t('about.hero_title') }}
                 </h1>
                 <p class="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed animate-fade-up">

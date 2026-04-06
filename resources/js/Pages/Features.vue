@@ -182,7 +182,7 @@ const activeAdvantage = ref(0);
                     <span class="text-sm text-white/70 font-medium">{{ t('features_page.hero_badge') }}</span>
                 </div>
 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight animate-fade-up">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 leading-tight animate-fade-up">
                     {{ t('features_page.hero_title') }}
                 </h1>
                 <p class="text-lg md:text-xl text-white/60 max-w-3xl mx-auto leading-relaxed mb-10 animate-fade-up">

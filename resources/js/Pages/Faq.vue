@@ -34,7 +34,7 @@ defineProps({
                     <span class="text-sm text-white/70 font-medium">{{ t('faq.badge') || t('faq.title') }}</span>
                 </div>
 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 animate-fade-up">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 animate-fade-up">
                     {{ t('faq.title') }}
                 </h1>
                 <p class="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed animate-fade-up">

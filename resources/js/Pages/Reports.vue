@@ -176,7 +176,7 @@ const dashboardWidgets = computed(() => [
                     </svg>
                     {{ t('reports_page.hero_badge') }}
                 </div>
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 animate-fade-up">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 animate-fade-up">
                     {{ t('reports_page.hero_title') }}
                 </h1>
                 <p class="text-xl text-white/80 max-w-3xl mx-auto mb-8 animate-fade-up">

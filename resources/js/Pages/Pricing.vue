@@ -146,7 +146,7 @@ const showComparison = ref(false);
                     <span class="text-sm text-white/70 font-medium">{{ t('pricing.hero_badge') }}</span>
                 </div>
 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 animate-fade-up">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 animate-fade-up">
                     {{ t('pricing.hero_title') }}
                 </h1>
                 <p class="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-up">
