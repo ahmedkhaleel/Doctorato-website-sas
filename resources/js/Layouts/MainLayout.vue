@@ -11,7 +11,7 @@ const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
 </script>
 
 <template>
-    <div :dir="dir" :lang="locale" :class="locale === 'ar' ? 'font-[Tajawal]' : 'font-[Poppins]'">
+    <div :dir="dir" :lang="locale">
         <Navbar />
         <main>
             <slot />
