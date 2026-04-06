@@ -247,11 +247,11 @@ const showComparison = ref(false);
                             <!-- Price -->
                             <div class="mb-6">
                                 <template v-if="!plan.is_custom">
-                                    <div class="flex items-baseline gap-1.5">
-                                        <span class="text-4xl font-extrabold" :class="plan.is_popular ? 'text-white' : 'text-[#1B4F72]'">
+                                    <div class="flex items-baseline gap-1 flex-wrap">
+                                        <span class="text-2xl md:text-3xl font-extrabold whitespace-nowrap" :class="plan.is_popular ? 'text-white' : 'text-[#1B4F72]'">
                                             {{ getFormattedPrice(plan) }}
                                         </span>
-                                        <span class="text-sm" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">
+                                        <span class="text-xs whitespace-nowrap" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">
                                             / {{ isYearly ? t('pricing.year') : t('pricing.month') }}
                                         </span>
                                     </div>
@@ -260,7 +260,7 @@ const showComparison = ref(false);
                                     </p>
                                 </template>
                                 <template v-else>
-                                    <span class="text-3xl font-extrabold text-[#C4A265]">
+                                    <span class="text-xl md:text-2xl font-extrabold text-[#C4A265]">
                                         {{ t('pricing.custom_quote') }}
                                     </span>
                                 </template>
