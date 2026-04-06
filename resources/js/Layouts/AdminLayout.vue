@@ -1,10 +1,17 @@
 <script setup>
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, usePage, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
 const page = usePage();
 const sidebarOpen = ref(true);
 const flash = computed(() => page.props.flash || {});
+const authUser = computed(() => page.props.auth?.user);
+
+function logout() {
+    if (confirm('هل تريد تسجيل الخروج؟')) {
+        router.post('/admin/logout');
+    }
+}
 
 const menuItems = [
     { label: 'لوحة التحكم', icon: '📊', route: '/admin' },
@@ -77,7 +84,14 @@ function isActive(route) {
             <header class="bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-20">
                 <h2 class="text-lg font-semibold text-gray-700">لوحة تحكم دكتوراتو</h2>
                 <div class="flex items-center gap-4">
-                    <span class="text-sm text-gray-500">مرحباً، المدير</span>
+                    <span class="text-sm text-gray-500">مرحباً، {{ authUser?.name || 'المدير' }}</span>
+                    <button
+                        @click="logout"
+                        class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1"
+                    >
+                        <span>🚪</span>
+                        <span>خروج</span>
+                    </button>
                 </div>
             </header>
 
