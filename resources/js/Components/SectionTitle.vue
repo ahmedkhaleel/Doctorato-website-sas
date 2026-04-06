@@ -1,0 +1,23 @@
+<script setup>
+defineProps({
+    title: String,
+    subtitle: String,
+    light: { type: Boolean, default: false },
+});
+</script>
+
+<template>
+    <div class="text-center mb-16 animate-fade-up">
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-4" :class="light ? 'text-white' : 'text-dark'">
+            {{ title }}
+        </h2>
+        <p class="text-base md:text-lg leading-relaxed max-w-2xl mx-auto" :class="light ? 'text-white/70' : 'text-gray'">
+            {{ subtitle }}
+        </p>
+        <div class="flex items-center justify-center gap-3 mt-6">
+            <div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+            <div class="w-16 h-1 bg-secondary rounded-full"></div>
+            <div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+        </div>
+    </div>
+</template>
