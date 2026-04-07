@@ -31,8 +31,7 @@ const overviewItems = computed(() => [
         description: t('home.overview.portals_desc'),
         href: '/portals',
         icon: 'portal',
-        gradient: 'from-[#1B4F72] via-[#2471A3] to-[#1B6B93]',
-        accentColor: '#2471A3',
+        color: '#1B4F72',
     },
     {
         number: 95,
@@ -41,8 +40,7 @@ const overviewItems = computed(() => [
         description: t('home.overview.modules_desc'),
         href: '/features',
         icon: 'module',
-        gradient: 'from-[#C4A265] via-[#D4B876] to-[#E0CA8E]',
-        accentColor: '#C4A265',
+        color: '#C4A265',
     },
     {
         number: 157,
@@ -51,8 +49,34 @@ const overviewItems = computed(() => [
         description: t('home.overview.tables_desc'),
         href: '/technology',
         icon: 'database',
-        gradient: 'from-[#1C2833] via-[#2C3E50] to-[#34495E]',
-        accentColor: '#2C3E50',
+        color: '#2471A3',
+    },
+    {
+        number: 800,
+        suffix: '+',
+        label: t('home.overview.features'),
+        description: t('home.overview.features_desc'),
+        href: '/features',
+        icon: 'features',
+        color: '#C4A265',
+    },
+    {
+        number: 3000,
+        suffix: '+',
+        label: t('home.overview.translations'),
+        description: t('home.overview.translations_desc'),
+        href: '/technology',
+        icon: 'globe',
+        color: '#1B4F72',
+    },
+    {
+        number: 80,
+        suffix: '+',
+        label: t('home.overview.permissions'),
+        description: t('home.overview.permissions_desc'),
+        href: '/technology',
+        icon: 'shield',
+        color: '#1C2833',
     },
 ]);
 
@@ -166,110 +190,107 @@ const howItWorksSteps = computed(() => [
         <!-- 2. Trust Bar -->
         <TrustBar />
 
-        <!-- 3. Quick Overview - Redesigned with large gradient cards -->
-        <section class="py-20 lg:py-28 bg-white relative overflow-hidden">
-            <!-- Background decorative dots -->
-            <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, #1B4F72 1px, transparent 0); background-size: 32px 32px;"></div>
+        <!-- 3. System Overview - Refined 6-stat grid matching TrustBar -->
+        <section class="relative py-20 bg-gradient-to-b from-white via-[#EBF5FB]/40 to-white overflow-hidden">
+            <!-- Decorative background elements -->
+            <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, #1B4F72 1px, transparent 0); background-size: 40px 40px;"></div>
+            <div class="absolute top-0 end-0 w-96 h-96 bg-[#C4A265]/[0.04] rounded-full blur-3xl -translate-y-1/3 translate-x-1/3"></div>
+            <div class="absolute bottom-0 start-0 w-80 h-80 bg-[#1B4F72]/[0.04] rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
 
-            <div class="container mx-auto px-4 relative z-10">
-                <SectionTitle
-                    :title="t('home.overview.title')"
-                    :subtitle="t('home.overview.subtitle')"
-                />
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-12">
+            <!-- Top gradient line -->
+            <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/20 to-transparent" />
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <!-- Heading badge + title -->
+                <div class="text-center mb-12 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1B4F72]/5 border border-[#1B4F72]/10 mb-4">
+                        <span class="w-2 h-2 rounded-full bg-[#C4A265] animate-pulse"></span>
+                        <span class="text-sm font-medium text-[#1B4F72]">{{ t('home.overview.badge') }}</span>
+                    </div>
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-[#1C2833] mb-3">
+                        {{ t('home.overview.title') }}
+                    </h2>
+                    <p class="text-sm md:text-base leading-relaxed max-w-2xl mx-auto text-gray-500">
+                        {{ t('home.overview.subtitle') }}
+                    </p>
+                    <div class="flex items-center justify-center gap-3 mt-5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-[#C4A265]"></div>
+                        <div class="w-14 h-0.5 bg-[#C4A265] rounded-full"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-[#C4A265]"></div>
+                    </div>
+                </div>
+
+                <!-- 6-stat grid matching TrustBar card style -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 animate-stagger">
                     <a
                         v-for="(item, index) in overviewItems"
                         :key="index"
                         :href="item.href"
-                        class="group relative rounded-3xl p-1 animate-fade-up transition-all duration-500 hover:scale-[1.03] hover:shadow-2xl"
+                        class="group relative flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/70 backdrop-blur-sm border border-gray-100 hover:border-[#1B4F72]/20 hover:shadow-xl hover:shadow-[#1B4F72]/5 hover:-translate-y-1 transition-all duration-500 overflow-hidden"
                     >
-                        <!-- Animated gradient border -->
-                        <div class="absolute inset-0 rounded-3xl bg-gradient-to-br opacity-40 group-hover:opacity-100 transition-opacity duration-500 blur-[1px]" :class="item.gradient"></div>
+                        <!-- Hover gradient overlay -->
+                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#1B4F72]/[0.02] to-[#C4A265]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                        <!-- Card inner -->
-                        <div class="relative bg-white rounded-[1.35rem] p-8 pb-10 text-center overflow-hidden h-full">
-                            <!-- Decorative gradient background blob -->
-                            <div class="absolute top-0 end-0 w-40 h-40 rounded-full bg-gradient-to-br opacity-[0.07] -translate-y-10 translate-x-10 group-hover:opacity-[0.12] transition-opacity duration-500" :class="item.gradient"></div>
-                            <div class="absolute bottom-0 start-0 w-32 h-32 rounded-full bg-gradient-to-tr opacity-[0.05] translate-y-10 -translate-x-10" :class="item.gradient"></div>
-
-                            <!-- Decorative pattern inside card -->
-                            <div class="absolute top-4 end-4 opacity-[0.06] group-hover:opacity-[0.1] transition-opacity">
-                                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                                    <circle cx="10" cy="10" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="10" r="2" fill="currentColor"/>
-                                    <circle cx="50" cy="10" r="2" fill="currentColor"/>
-                                    <circle cx="70" cy="10" r="2" fill="currentColor"/>
-                                    <circle cx="10" cy="30" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="30" r="2" fill="currentColor"/>
-                                    <circle cx="50" cy="30" r="2" fill="currentColor"/>
-                                    <circle cx="70" cy="30" r="2" fill="currentColor"/>
-                                    <circle cx="10" cy="50" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="50" r="2" fill="currentColor"/>
-                                    <circle cx="50" cy="50" r="2" fill="currentColor"/>
-                                    <circle cx="70" cy="50" r="2" fill="currentColor"/>
-                                    <circle cx="10" cy="70" r="2" fill="currentColor"/>
-                                    <circle cx="30" cy="70" r="2" fill="currentColor"/>
-                                    <circle cx="50" cy="70" r="2" fill="currentColor"/>
-                                    <circle cx="70" cy="70" r="2" fill="currentColor"/>
-                                </svg>
-                            </div>
-
-                            <!-- Large illustrated SVG icon -->
-                            <div class="relative w-24 h-24 mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <!-- Icon container -->
+                        <div class="relative">
+                            <div class="absolute inset-0 rounded-xl scale-0 group-hover:scale-110 transition-transform duration-500 border-2 border-dashed opacity-20" :style="{ borderColor: item.color }"></div>
+                            <div
+                                class="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
+                                :style="{ backgroundColor: item.color + '0D', boxShadow: `0 0 0 1px ${item.color}15` }"
+                            >
                                 <!-- Portal icon -->
-                                <svg v-if="item.icon === 'portal'" viewBox="0 0 96 96" fill="none" class="w-full h-full">
-                                    <rect x="8" y="8" width="80" height="80" rx="20" class="fill-[#1B4F72]/5 group-hover:fill-[#1B4F72]/10 transition-colors duration-500"/>
-                                    <rect x="18" y="22" width="26" height="22" rx="4" stroke="#1B4F72" stroke-width="2.5" fill="#1B4F72" fill-opacity="0.1"/>
-                                    <rect x="52" y="22" width="26" height="22" rx="4" stroke="#2471A3" stroke-width="2.5" fill="#2471A3" fill-opacity="0.1"/>
-                                    <rect x="18" y="52" width="26" height="22" rx="4" stroke="#2471A3" stroke-width="2.5" fill="#2471A3" fill-opacity="0.1"/>
-                                    <rect x="52" y="52" width="26" height="22" rx="4" stroke="#1B4F72" stroke-width="2.5" fill="#1B4F72" fill-opacity="0.1"/>
-                                    <circle cx="31" cy="33" r="3" fill="#1B4F72" fill-opacity="0.4"/>
-                                    <circle cx="65" cy="33" r="3" fill="#2471A3" fill-opacity="0.4"/>
-                                    <circle cx="31" cy="63" r="3" fill="#2471A3" fill-opacity="0.4"/>
-                                    <circle cx="65" cy="63" r="3" fill="#1B4F72" fill-opacity="0.4"/>
+                                <svg v-if="item.icon === 'portal'" class="w-6 h-6" :style="{ color: item.color }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                                 </svg>
                                 <!-- Module icon -->
-                                <svg v-else-if="item.icon === 'module'" viewBox="0 0 96 96" fill="none" class="w-full h-full">
-                                    <rect x="8" y="8" width="80" height="80" rx="20" class="fill-[#C4A265]/5 group-hover:fill-[#C4A265]/10 transition-colors duration-500"/>
-                                    <path d="M48 18L78 35V65L48 82L18 65V35L48 18Z" stroke="#C4A265" stroke-width="2.5" fill="#C4A265" fill-opacity="0.05"/>
-                                    <path d="M48 18L78 35L48 50L18 35L48 18Z" stroke="#C4A265" stroke-width="2" fill="#C4A265" fill-opacity="0.1"/>
-                                    <line x1="48" y1="50" x2="48" y2="82" stroke="#C4A265" stroke-width="2" stroke-dasharray="4 3"/>
-                                    <circle cx="48" cy="35" r="4" fill="#C4A265" fill-opacity="0.3"/>
-                                    <circle cx="33" cy="43" r="3" fill="#D4B876" fill-opacity="0.3"/>
-                                    <circle cx="63" cy="43" r="3" fill="#D4B876" fill-opacity="0.3"/>
+                                <svg v-else-if="item.icon === 'module'" class="w-6 h-6" :style="{ color: item.color }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 </svg>
                                 <!-- Database icon -->
-                                <svg v-else viewBox="0 0 96 96" fill="none" class="w-full h-full">
-                                    <rect x="8" y="8" width="80" height="80" rx="20" class="fill-[#1C2833]/5 group-hover:fill-[#1C2833]/10 transition-colors duration-500"/>
-                                    <ellipse cx="48" cy="28" rx="24" ry="10" stroke="#2C3E50" stroke-width="2.5" fill="#2C3E50" fill-opacity="0.1"/>
-                                    <path d="M24 28V48C24 53.523 37.431 58 48 58C58.569 58 72 53.523 72 48V28" stroke="#2C3E50" stroke-width="2.5"/>
-                                    <path d="M24 48V68C24 73.523 37.431 78 48 78C58.569 78 72 73.523 72 68V48" stroke="#2C3E50" stroke-width="2.5"/>
-                                    <ellipse cx="48" cy="48" rx="24" ry="10" stroke="#34495E" stroke-width="1.5" fill="none" stroke-dasharray="4 3" opacity="0.4"/>
-                                    <circle cx="38" cy="28" r="2" fill="#2C3E50" fill-opacity="0.4"/>
-                                    <circle cx="48" cy="26" r="2" fill="#2C3E50" fill-opacity="0.4"/>
-                                    <circle cx="58" cy="28" r="2" fill="#2C3E50" fill-opacity="0.4"/>
+                                <svg v-else-if="item.icon === 'database'" class="w-6 h-6" :style="{ color: item.color }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                                 </svg>
-                            </div>
-
-                            <!-- Large animated counter -->
-                            <div class="relative text-4xl md:text-5xl font-extrabold mb-3 bg-gradient-to-r bg-clip-text text-transparent" :class="item.gradient">
-                                <AnimatedCounter :target="item.number" :suffix="item.suffix || ''" />
-                            </div>
-
-                            <h3 class="text-lg font-bold text-[#1C2833] mb-2">{{ item.label }}</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">{{ item.description }}</p>
-
-                            <!-- Hover explore link -->
-                            <div class="mt-6 text-[#C4A265] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center gap-1.5 text-sm font-semibold">
-                                {{ t('home.explore') }}
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                <!-- Features icon -->
+                                <svg v-else-if="item.icon === 'features'" class="w-6 h-6" :style="{ color: item.color }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <!-- Globe icon -->
+                                <svg v-else-if="item.icon === 'globe'" class="w-6 h-6" :style="{ color: item.color }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <!-- Shield icon -->
+                                <svg v-else class="w-6 h-6" :style="{ color: item.color }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                 </svg>
                             </div>
                         </div>
+
+                        <!-- Animated counter -->
+                        <div class="relative text-2xl md:text-[1.75rem] font-extrabold leading-none" :style="{ color: item.color }">
+                            <AnimatedCounter :target="item.number" :suffix="item.suffix || ''" />
+                        </div>
+
+                        <!-- Label -->
+                        <div class="relative text-center">
+                            <h3 class="text-xs md:text-sm font-bold text-[#1C2833] group-hover:text-[#1B4F72] transition-colors leading-snug">
+                                {{ item.label }}
+                            </h3>
+                            <p class="hidden sm:block text-[11px] text-gray-500 mt-1 leading-relaxed">
+                                {{ item.description }}
+                            </p>
+                        </div>
+
+                        <!-- Bottom accent line -->
+                        <div
+                            class="absolute bottom-0 inset-x-4 h-0.5 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"
+                            :style="{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)` }"
+                        ></div>
                     </a>
                 </div>
             </div>
+
+            <!-- Bottom gradient line -->
+            <div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1B4F72]/20 to-transparent" />
         </section>
 
         <!-- 4. Feature Cards - Bento Grid -->

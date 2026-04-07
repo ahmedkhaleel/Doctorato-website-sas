@@ -2,14 +2,21 @@
     "home": {
         "title": "Home",
         "overview": {
-            "title": "System Overview",
-            "subtitle": "A comprehensive platform covering all aspects of clinic management",
+            "badge": "System Overview",
+            "title": "Doctorato by the Numbers",
+            "subtitle": "A comprehensive platform built with precision to cover every aspect of clinic management",
             "portals": "Independent Portals",
-            "portals_desc": "Each user gets a customized experience based on their role",
+            "portals_desc": "Tailored per role",
             "modules": "Admin Modules",
-            "modules_desc": "Covering all medical, financial, and operational aspects",
+            "modules_desc": "Medical & operations",
             "tables": "Database Tables",
-            "tables_desc": "Carefully designed data structure with integrity"
+            "tables_desc": "Structured data integrity",
+            "features": "Built-in Features",
+            "features_desc": "Ready out of the box",
+            "translations": "Translation Keys",
+            "translations_desc": "Full Arabic & English",
+            "permissions": "Role Permissions",
+            "permissions_desc": "Granular access control"
         },
         "cards": {
             "title": "Explore Every Aspect of the System",
