@@ -555,72 +555,150 @@ const howItWorksSteps = computed(() => [
             </div>
         </section>
 
-        <!-- 5. How It Works - Horizontal Timeline -->
+        <!-- 5. How It Works - Premium Step Cards -->
         <section class="py-20 lg:py-28 bg-[#F8FAFC] relative overflow-hidden">
-            <div class="absolute inset-0 opacity-[0.02]" style="background-image: radial-gradient(circle at 1px 1px, #1B4F72 1px, transparent 0); background-size: 48px 48px;"></div>
+            <!-- Ambient background effects -->
+            <div class="absolute inset-0 opacity-[0.025]" style="background-image: radial-gradient(circle at 1px 1px, #1B4F72 1px, transparent 0); background-size: 48px 48px;"></div>
+            <div class="absolute top-0 start-1/4 w-[500px] h-[500px] bg-[#1B4F72]/5 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 end-1/4 w-[450px] h-[450px] bg-[#C4A265]/5 rounded-full blur-3xl"></div>
 
             <div class="container mx-auto px-4 relative z-10">
-                <SectionTitle
-                    :title="t('home.how_it_works.title')"
-                    :subtitle="t('home.how_it_works.subtitle')"
-                />
-
-                <div class="relative mt-16 max-w-5xl mx-auto">
-                    <!-- Connecting dashed line (horizontal on desktop) -->
-                    <div class="hidden md:block absolute top-24 start-[16.67%] end-[16.67%] h-[2px]">
-                        <div class="w-full h-full border-t-2 border-dashed border-[#C4A265]/30 animate-fade-up"></div>
+                <!-- Section Header -->
+                <div class="text-center max-w-2xl mx-auto mb-16 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 mb-5">
+                        <span class="relative flex w-1.5 h-1.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C4A265] opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#C4A265]"></span>
+                        </span>
+                        <span class="text-[#8B6B2F] text-xs font-bold tracking-wider uppercase">
+                            {{ locale === 'ar' ? 'ثلاث خطوات فقط' : 'Only 3 Steps' }}
+                        </span>
                     </div>
-                    <!-- Connecting dashed line (vertical on mobile) -->
-                    <div class="md:hidden absolute top-0 bottom-0 start-8 w-[2px]">
-                        <div class="w-full h-full border-s-2 border-dashed border-[#C4A265]/30"></div>
-                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#0D2B45] mb-4 leading-tight">
+                        {{ t('home.how_it_works.title') }}
+                    </h2>
+                    <p class="text-base md:text-lg text-gray-500">
+                        {{ t('home.how_it_works.subtitle') }}
+                    </p>
+                </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+                <!-- Steps Grid -->
+                <div class="relative max-w-6xl mx-auto">
+                    <!-- Connection Line (desktop only) -->
+                    <svg class="hidden lg:block absolute top-[88px] start-[12%] end-[12%] w-[76%] h-4 pointer-events-none" viewBox="0 0 800 16" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#1B4F72" stop-opacity="0"/>
+                                <stop offset="20%" stop-color="#1B4F72" stop-opacity="0.4"/>
+                                <stop offset="50%" stop-color="#C4A265" stop-opacity="0.6"/>
+                                <stop offset="80%" stop-color="#1B4F72" stop-opacity="0.4"/>
+                                <stop offset="100%" stop-color="#1B4F72" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M0 8 Q200 -8, 400 8 T800 8" stroke="url(#lineGradient)" stroke-width="2" stroke-dasharray="6 6" fill="none" class="animate-dash"/>
+                    </svg>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                         <div
                             v-for="(step, index) in howItWorksSteps"
                             :key="index"
-                            class="relative text-center animate-fade-up"
+                            class="how-step-card group animate-fade-up"
+                            :style="{ animationDelay: (index * 150) + 'ms' }"
                         >
-                            <!-- Step number bubble -->
-                            <div class="relative mx-auto md:mx-auto ms-8 md:ms-auto w-20 h-20 mb-6">
-                                <div class="absolute inset-0 rounded-full bg-gradient-to-br from-[#1B4F72] to-[#2471A3] opacity-10 animate-pulse"></div>
-                                <div class="relative w-full h-full rounded-full bg-white border-2 border-[#1B4F72]/20 flex items-center justify-center shadow-lg shadow-[#1B4F72]/5">
-                                    <!-- Register icon -->
-                                    <svg v-if="step.icon === 'register'" class="w-9 h-9 text-[#1B4F72]" viewBox="0 0 36 36" fill="none">
-                                        <circle cx="18" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.1"/>
-                                        <path d="M6 30C6 24.477 10.477 20 16 20H20C25.523 20 30 24.477 30 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-                                        <path d="M26 10L28 12L32 8" stroke="#C4A265" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Gradient border wrapper -->
+                            <div class="relative h-full rounded-3xl p-[1.5px] bg-gradient-to-br from-[#1B4F72]/10 via-[#C4A265]/20 to-[#1B4F72]/10 group-hover:from-[#1B4F72]/30 group-hover:via-[#C4A265]/50 group-hover:to-[#1B4F72]/30 transition-all duration-500">
+                                <div class="relative h-full rounded-3xl bg-white p-8 overflow-hidden">
+                                    <!-- Decorative corner SVG -->
+                                    <svg class="absolute -top-8 -end-8 w-48 h-48 text-[#1B4F72]/[0.03] group-hover:text-[#C4A265]/[0.07] transition-colors duration-700" viewBox="0 0 200 200" fill="none">
+                                        <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="1" stroke-dasharray="4 4"/>
+                                        <circle cx="100" cy="100" r="60" stroke="currentColor" stroke-width="1"/>
+                                        <circle cx="100" cy="100" r="40" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
                                     </svg>
-                                    <!-- Setup icon -->
-                                    <svg v-else-if="step.icon === 'setup'" class="w-9 h-9 text-[#1B4F72]" viewBox="0 0 36 36" fill="none">
-                                        <circle cx="18" cy="18" r="7" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.1"/>
-                                        <circle cx="18" cy="18" r="3" fill="currentColor" fill-opacity="0.3"/>
-                                        <path d="M18 7V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M18 26V29" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M7 18H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M26 18H29" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M10.2 10.2L12.3 12.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M23.7 23.7L25.8 25.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                    <!-- Manage icon -->
-                                    <svg v-else class="w-9 h-9 text-[#1B4F72]" viewBox="0 0 36 36" fill="none">
-                                        <rect x="4" y="6" width="28" height="20" rx="3" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.05"/>
-                                        <line x1="4" y1="12" x2="32" y2="12" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
-                                        <rect x="8" y="16" width="8" height="4" rx="1" fill="currentColor" fill-opacity="0.15"/>
-                                        <rect x="20" y="16" width="8" height="4" rx="1" fill="#C4A265" fill-opacity="0.2"/>
-                                        <path d="M12 30H24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M18 26V30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                </div>
-                                <!-- Step number badge -->
-                                <div class="absolute -top-1 -end-1 w-7 h-7 rounded-full bg-gradient-to-br from-[#C4A265] to-[#D4B876] text-white text-xs font-bold flex items-center justify-center shadow-md">
-                                    {{ step.number }}
+
+                                    <!-- Huge background number -->
+                                    <div class="absolute -top-4 end-6 text-[140px] font-black leading-none text-[#1B4F72]/[0.04] group-hover:text-[#C4A265]/[0.08] transition-colors duration-500 select-none pointer-events-none">
+                                        {{ step.number }}
+                                    </div>
+
+                                    <div class="relative">
+                                        <!-- Icon Container -->
+                                        <div class="relative inline-flex mb-6">
+                                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                            <div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] flex items-center justify-center shadow-xl shadow-[#1B4F72]/20 group-hover:-translate-y-1 group-hover:rotate-3 transition-all duration-500">
+                                                <!-- Register icon -->
+                                                <svg v-if="step.icon === 'register'" class="w-10 h-10 text-white" viewBox="0 0 36 36" fill="none">
+                                                    <circle cx="18" cy="12" r="6" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.2"/>
+                                                    <path d="M6 30C6 24.477 10.477 20 16 20H20C25.523 20 30 24.477 30 30" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                                                    <path d="M26 10L28 12L32 8" stroke="#C4A265" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                                <!-- Setup icon -->
+                                                <svg v-else-if="step.icon === 'setup'" class="w-10 h-10 text-white" viewBox="0 0 36 36" fill="none">
+                                                    <circle cx="18" cy="18" r="7" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.2"/>
+                                                    <circle cx="18" cy="18" r="3" fill="#C4A265"/>
+                                                    <path d="M18 7V10M18 26V29M7 18H10M26 18H29M10.2 10.2L12.3 12.3M23.7 23.7L25.8 25.8M10.2 25.8L12.3 23.7M23.7 12.3L25.8 10.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                </svg>
+                                                <!-- Manage icon -->
+                                                <svg v-else class="w-10 h-10 text-white" viewBox="0 0 36 36" fill="none">
+                                                    <rect x="4" y="6" width="28" height="22" rx="3" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.1"/>
+                                                    <line x1="4" y1="12" x2="32" y2="12" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+                                                    <circle cx="7" cy="9" r="0.8" fill="currentColor"/>
+                                                    <circle cx="10" cy="9" r="0.8" fill="currentColor"/>
+                                                    <rect x="8" y="16" width="8" height="3" rx="1" fill="currentColor" fill-opacity="0.4"/>
+                                                    <rect x="8" y="21" width="20" height="2" rx="1" fill="#C4A265"/>
+                                                    <rect x="8" y="25" width="14" height="2" rx="1" fill="currentColor" fill-opacity="0.3"/>
+                                                    <rect x="20" y="16" width="8" height="3" rx="1" fill="#C4A265" fill-opacity="0.6"/>
+                                                </svg>
+                                            </div>
+                                            <!-- Step badge -->
+                                            <div class="absolute -top-2 -end-2 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white text-[10px] font-black shadow-lg shadow-[#C4A265]/30 ring-2 ring-white">
+                                                {{ locale === 'ar' ? `خطوة ${step.number}` : `Step ${step.number}` }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Content -->
+                                        <h3 class="text-xl lg:text-2xl font-extrabold text-[#0D2B45] mb-3 leading-tight">
+                                            {{ step.title }}
+                                        </h3>
+                                        <p class="text-gray-500 text-sm leading-relaxed mb-6">
+                                            {{ step.description }}
+                                        </p>
+
+                                        <!-- Bottom row: arrow + duration hint -->
+                                        <div class="flex items-center justify-between pt-5 border-t border-dashed border-gray-200">
+                                            <div class="inline-flex items-center gap-1.5 text-[11px] text-gray-400">
+                                                <svg class="w-3.5 h-3.5 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="font-semibold">
+                                                    {{ index === 0 ? (locale === 'ar' ? '3 دقائق' : '3 min') : index === 1 ? (locale === 'ar' ? '5 دقائق' : '5 min') : (locale === 'ar' ? 'فوراً' : 'Instant') }}
+                                                </span>
+                                            </div>
+                                            <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FAF7F0] text-[#C4A265] group-hover:bg-[#C4A265] group-hover:text-white transition-all duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
+                                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
-                            <h3 class="text-lg font-bold text-[#1C2833] mb-3 md:text-center text-start ps-8 md:ps-0">{{ step.title }}</h3>
-                            <p class="text-gray-500 text-sm leading-relaxed max-w-xs mx-auto md:text-center text-start ps-8 md:ps-0">{{ step.description }}</p>
                         </div>
+                    </div>
+
+                    <!-- CTA below steps -->
+                    <div class="mt-14 text-center animate-fade-up" style="animation-delay: 500ms">
+                        <Link
+                            href="/demo"
+                            class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#1B4F72] to-[#0D2B45] text-white font-bold text-sm shadow-xl shadow-[#1B4F72]/20 hover:shadow-2xl hover:shadow-[#1B4F72]/30 hover:-translate-y-0.5 transition-all duration-300"
+                        >
+                            <span>{{ locale === 'ar' ? 'ابدأ الآن مجاناً' : 'Start Now for Free' }}</span>
+                            <svg class="w-4 h-4 rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </Link>
+                        <p class="text-xs text-gray-400 mt-3">
+                            {{ locale === 'ar' ? 'لا حاجة لبطاقة ائتمانية • تجربة 15 يوم مجاناً' : 'No credit card needed • 15-day free trial' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -1112,5 +1190,19 @@ const howItWorksSteps = computed(() => [
 
 .animate-pulse-slow {
     animation: pulse-slow 8s ease-in-out infinite;
+}
+
+@keyframes dash-flow {
+    to { stroke-dashoffset: -24; }
+}
+.animate-dash {
+    animation: dash-flow 1.5s linear infinite;
+}
+
+.how-step-card {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.how-step-card:hover {
+    transform: translateY(-6px);
 }
 </style>
