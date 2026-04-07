@@ -191,7 +191,7 @@ const howItWorksSteps = computed(() => [
         <TrustBar />
 
         <!-- 3. System Overview - Refined 6-stat grid matching TrustBar -->
-        <section class="relative py-20 bg-gradient-to-b from-white via-[#EBF5FB]/40 to-white overflow-hidden">
+        <section class="relative py-20 bg-[#F8FAFC] overflow-hidden">
             <!-- Decorative background elements -->
             <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 1px 1px, #1B4F72 1px, transparent 0); background-size: 40px 40px;"></div>
             <div class="absolute top-0 end-0 w-96 h-96 bg-[#C4A265]/[0.04] rounded-full blur-3xl -translate-y-1/3 translate-x-1/3"></div>
@@ -294,7 +294,7 @@ const howItWorksSteps = computed(() => [
         </section>
 
         <!-- 4. Feature Cards - Bento Grid -->
-        <section class="py-20 lg:py-28 bg-gradient-to-b from-gray-50/80 to-white relative overflow-hidden">
+        <section class="py-20 lg:py-28 bg-white relative overflow-hidden">
             <!-- Decorative orbs -->
             <div class="absolute top-20 start-10 w-72 h-72 bg-[#1B4F72]/[0.03] rounded-full blur-3xl"></div>
             <div class="absolute bottom-20 end-10 w-80 h-80 bg-[#C4A265]/[0.03] rounded-full blur-3xl"></div>
@@ -416,7 +416,7 @@ const howItWorksSteps = computed(() => [
         </section>
 
         <!-- 5. How It Works - Horizontal Timeline -->
-        <section class="py-20 lg:py-28 bg-white relative overflow-hidden">
+        <section class="py-20 lg:py-28 bg-[#F8FAFC] relative overflow-hidden">
             <div class="absolute inset-0 opacity-[0.02]" style="background-image: radial-gradient(circle at 1px 1px, #1B4F72 1px, transparent 0); background-size: 48px 48px;"></div>
 
             <div class="container mx-auto px-4 relative z-10">
@@ -638,7 +638,7 @@ const howItWorksSteps = computed(() => [
         </section>
 
         <!-- 7. Dashboard Preview -->
-        <section class="py-20 lg:py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        <section class="py-20 lg:py-28 bg-white relative overflow-hidden">
             <!-- Background gradient orbs -->
             <div class="absolute top-0 start-1/3 w-[600px] h-[600px] bg-[#1B4F72]/[0.03] rounded-full blur-[120px]"></div>
             <div class="absolute bottom-0 end-1/4 w-[400px] h-[400px] bg-[#C4A265]/[0.03] rounded-full blur-[100px]"></div>
@@ -822,7 +822,7 @@ const howItWorksSteps = computed(() => [
         </section>
 
         <!-- 8. Testimonials Carousel - with decorative background -->
-        <section id="testimonials" class="py-20 lg:py-28 bg-white relative overflow-hidden">
+        <section id="testimonials" class="py-20 lg:py-28 bg-gradient-to-b from-[#FAF7F0] via-[#FAF7F0] to-white relative overflow-hidden">
             <!-- Decorative elements -->
             <div class="absolute top-0 end-0 w-96 h-96 bg-[#1B4F72]/[0.02] rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3"></div>
             <div class="absolute bottom-0 start-0 w-80 h-80 bg-[#C4A265]/[0.03] rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3"></div>
