@@ -234,12 +234,6 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
                 </div>
             </div>
 
-            <!-- Wave Divider -->
-            <div class="absolute bottom-0 left-0 right-0">
-                <svg class="w-full" viewBox="0 0 1440 80" fill="none" preserveAspectRatio="none">
-                    <path d="M0 40L80 35C160 30 320 20 480 25C640 30 800 50 960 55C1120 60 1280 50 1360 45L1440 40V80H0V40Z" fill="white" />
-                </svg>
-            </div>
         </section>
 
         <!-- ===== QUICK CONTACT CARDS ===== -->
