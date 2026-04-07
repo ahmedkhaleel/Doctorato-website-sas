@@ -4,7 +4,7 @@ import { useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 useScrollAnimation();
 
 const showSuccess = ref(false);
@@ -37,6 +37,35 @@ const countryCodes = [
     { code: '+216', flag: '\u{1F1F9}\u{1F1F3}', label: 'TN' },
     { code: '+1', flag: '\u{1F1FA}\u{1F1F8}', label: 'US' },
     { code: '+44', flag: '\u{1F1EC}\u{1F1E7}', label: 'GB' },
+];
+
+const countryList = [
+    { value: 'SA', flag: '\u{1F1F8}\u{1F1E6}', ar: 'المملكة العربية السعودية', en: 'Saudi Arabia' },
+    { value: 'AE', flag: '\u{1F1E6}\u{1F1EA}', ar: 'الإمارات العربية المتحدة', en: 'United Arab Emirates' },
+    { value: 'EG', flag: '\u{1F1EA}\u{1F1EC}', ar: 'مصر', en: 'Egypt' },
+    { value: 'KW', flag: '\u{1F1F0}\u{1F1FC}', ar: 'الكويت', en: 'Kuwait' },
+    { value: 'QA', flag: '\u{1F1F6}\u{1F1E6}', ar: 'قطر', en: 'Qatar' },
+    { value: 'BH', flag: '\u{1F1E7}\u{1F1ED}', ar: 'البحرين', en: 'Bahrain' },
+    { value: 'OM', flag: '\u{1F1F4}\u{1F1F2}', ar: 'عُمان', en: 'Oman' },
+    { value: 'JO', flag: '\u{1F1EF}\u{1F1F4}', ar: 'الأردن', en: 'Jordan' },
+    { value: 'LB', flag: '\u{1F1F1}\u{1F1E7}', ar: 'لبنان', en: 'Lebanon' },
+    { value: 'IQ', flag: '\u{1F1EE}\u{1F1F6}', ar: 'العراق', en: 'Iraq' },
+    { value: 'SY', flag: '\u{1F1F8}\u{1F1FE}', ar: 'سوريا', en: 'Syria' },
+    { value: 'PS', flag: '\u{1F1F5}\u{1F1F8}', ar: 'فلسطين', en: 'Palestine' },
+    { value: 'YE', flag: '\u{1F1FE}\u{1F1EA}', ar: 'اليمن', en: 'Yemen' },
+    { value: 'SD', flag: '\u{1F1F8}\u{1F1E9}', ar: 'السودان', en: 'Sudan' },
+    { value: 'LY', flag: '\u{1F1F1}\u{1F1FE}', ar: 'ليبيا', en: 'Libya' },
+    { value: 'TN', flag: '\u{1F1F9}\u{1F1F3}', ar: 'تونس', en: 'Tunisia' },
+    { value: 'DZ', flag: '\u{1F1E9}\u{1F1FF}', ar: 'الجزائر', en: 'Algeria' },
+    { value: 'MA', flag: '\u{1F1F2}\u{1F1E6}', ar: 'المغرب', en: 'Morocco' },
+    { value: 'MR', flag: '\u{1F1F2}\u{1F1F7}', ar: 'موريتانيا', en: 'Mauritania' },
+    { value: 'SO', flag: '\u{1F1F8}\u{1F1F4}', ar: 'الصومال', en: 'Somalia' },
+    { value: 'DJ', flag: '\u{1F1E9}\u{1F1EF}', ar: 'جيبوتي', en: 'Djibouti' },
+    { value: 'KM', flag: '\u{1F1F0}\u{1F1F2}', ar: 'جزر القمر', en: 'Comoros' },
+    { value: 'TR', flag: '\u{1F1F9}\u{1F1F7}', ar: 'تركيا', en: 'Turkey' },
+    { value: 'US', flag: '\u{1F1FA}\u{1F1F8}', ar: 'الولايات المتحدة', en: 'United States' },
+    { value: 'GB', flag: '\u{1F1EC}\u{1F1E7}', ar: 'المملكة المتحدة', en: 'United Kingdom' },
+    { value: 'OTHER', flag: '\u{1F310}', ar: 'دولة أخرى', en: 'Other' },
 ];
 
 const doctorCountOptions = ['1-5', '6-15', '16-50', '50+'];
@@ -199,12 +228,24 @@ function toggleModule(moduleValue) {
                         <!-- Country -->
                         <div>
                             <label class="block text-sm font-medium text-dark mb-1.5">{{ $t('demo.country') }}</label>
-                            <input
-                                v-model="form.country"
-                                type="text"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-light/50 bg-white focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
-                                :placeholder="$t('demo.country_placeholder')"
-                            />
+                            <div class="relative">
+                                <select
+                                    v-model="form.country"
+                                    class="w-full appearance-none px-4 py-3 pe-10 rounded-xl border border-gray-light/50 bg-white focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all cursor-pointer"
+                                >
+                                    <option value="" disabled>{{ $t('demo.country_placeholder') }}</option>
+                                    <option
+                                        v-for="c in countryList"
+                                        :key="c.value"
+                                        :value="c.value"
+                                    >
+                                        {{ c.flag }}  {{ locale === 'ar' ? c.ar : c.en }}
+                                    </option>
+                                </select>
+                                <svg class="absolute end-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
                             <p v-if="form.errors.country" class="text-danger text-xs mt-1">{{ form.errors.country }}</p>
                         </div>
 
