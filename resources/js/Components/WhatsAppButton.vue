@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 
 const isHovered = ref(false);
-const phoneNumber = '966500000000';
+const phoneNumber = '201012967285';
 const message = encodeURIComponent('مرحباً، أريد الاستفسار عن نظام دكتوراتو');
 </script>
 

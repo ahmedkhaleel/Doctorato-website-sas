@@ -13,7 +13,7 @@ const form = useForm({
     clinic_name: '',
     full_name: '',
     email: '',
-    country_code: '+966',
+    country_code: '+20',
     phone: '',
     country: '',
     doctors_count: '',

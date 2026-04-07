@@ -98,20 +98,29 @@ const features = computed(() => [
                 <div class="max-w-2xl mx-auto">
                     <h2 class="text-2xl font-bold text-dark mb-4">{{ t('demo.bottom_title') }}</h2>
                     <p class="text-gray mb-4">{{ t('demo.bottom_subtitle') }}</p>
-                    <div class="flex items-center justify-center gap-4 text-sm text-gray">
-                        <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-sm text-gray">
+                        <a href="tel:+201012967285" class="flex items-center gap-2 hover:text-primary transition-colors">
+                            <span class="text-lg leading-none">🇪🇬</span>
                             <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
-                            <span>+966 50 000 0000</span>
-                        </div>
-                        <span class="text-gray-light">|</span>
-                        <div class="flex items-center gap-2">
+                            <span dir="ltr">+20 101 296 7285</span>
+                        </a>
+                        <span class="text-gray-light hidden sm:inline">|</span>
+                        <a href="tel:+971557961688" class="flex items-center gap-2 hover:text-primary transition-colors">
+                            <span class="text-lg leading-none">🇦🇪</span>
+                            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span dir="ltr">+971 55 796 1688</span>
+                        </a>
+                        <span class="text-gray-light hidden sm:inline">|</span>
+                        <a href="mailto:info@markeza-group.com" class="flex items-center gap-2 hover:text-primary transition-colors">
                             <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
-                            <span>info@doctorato.com</span>
-                        </div>
+                            <span dir="ltr">info@markeza-group.com</span>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -237,52 +237,81 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
         </section>
 
         <!-- ===== QUICK CONTACT CARDS ===== -->
-        <section class="relative -mt-8 z-20 pb-16">
+        <section class="relative -mt-12 z-20 pb-20">
             <div class="container mx-auto px-4">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Phone Egypt -->
                     <a
                         :href="`tel:${phones[0].raw}`"
-                        class="group relative bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-[#1B4F72]/20 transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100 reveal"
+                        class="contact-card reveal group relative rounded-[28px] p-8 overflow-hidden"
                     >
-                        <div class="absolute inset-0 bg-gradient-to-br from-[#1B4F72]/0 via-[#1B4F72]/0 to-[#1B4F72]/0 group-hover:from-[#1B4F72]/5 group-hover:to-[#2E86C1]/5 transition-all duration-500"></div>
-                        <div class="absolute -top-10 -end-10 w-32 h-32 bg-[#1B4F72]/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                        <!-- Layered background -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-white to-[#F8FAFC]"></div>
+                        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#1B4F72] via-[#2E86C1] to-[#1B4F72]"></div>
+
+                        <!-- Corner flag -->
+                        <div class="absolute top-5 end-5 text-2xl opacity-90 group-hover:scale-110 transition-transform duration-500">{{ phones[0].flag }}</div>
+
+                        <!-- Decorative ring -->
+                        <div class="absolute -bottom-16 -end-16 w-48 h-48 rounded-full border border-[#1B4F72]/10 group-hover:scale-110 transition-transform duration-700"></div>
+                        <div class="absolute -bottom-8 -end-8 w-32 h-32 rounded-full border border-[#1B4F72]/10 group-hover:scale-110 transition-transform duration-700 delay-75"></div>
+
                         <div class="relative">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#2E86C1] flex items-center justify-center group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg shadow-[#1B4F72]/30">
-                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                                </div>
-                                <span class="text-3xl">{{ phones[0].flag }}</span>
+                            <!-- Icon -->
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] flex items-center justify-center shadow-lg shadow-[#1B4F72]/25 mb-5 group-hover:scale-105 transition-transform duration-500">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                             </div>
-                            <p class="text-xs uppercase tracking-wider text-gray-400 mb-1 font-semibold">{{ phones[0].country }} · Egypt</p>
-                            <p class="text-lg font-bold text-[#1C2833] mb-3" dir="ltr">{{ phones[0].number }}</p>
-                            <div class="flex items-center gap-2 text-xs text-[#1B4F72] font-semibold">
-                                <span>اتصل الآن</span>
-                                <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#1B4F72] mb-1.5 font-bold">{{ phones[0].country }} — Egypt</p>
+                            <p class="text-xl font-bold text-[#1C2833] mb-5 tracking-tight" dir="ltr">{{ phones[0].number }}</p>
+
+                            <div class="flex items-center justify-between pt-5 border-t border-gray-100">
+                                <span class="text-xs text-gray-500 font-medium">اتصل مباشرة</span>
+                                <div class="w-9 h-9 rounded-full bg-[#1B4F72]/5 flex items-center justify-center group-hover:bg-[#1B4F72] transition-all duration-500">
+                                    <svg class="w-4 h-4 text-[#1B4F72] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                                </div>
                             </div>
                         </div>
                     </a>
 
-                    <!-- Phone UAE -->
+                    <!-- Phone UAE (Featured - Gold) -->
                     <a
                         :href="`tel:${phones[1].raw}`"
-                        class="group relative bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-[#C4A265]/20 transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100 reveal"
+                        class="contact-card reveal group relative rounded-[28px] p-8 overflow-hidden md:-mt-4 md:mb-4"
                         style="animation-delay: 100ms"
                     >
-                        <div class="absolute inset-0 bg-gradient-to-br from-[#C4A265]/0 to-[#D4B87A]/0 group-hover:from-[#C4A265]/5 group-hover:to-[#D4B87A]/5 transition-all duration-500"></div>
-                        <div class="absolute -top-10 -end-10 w-32 h-32 bg-[#C4A265]/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-                        <div class="relative">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg shadow-[#C4A265]/30">
-                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                                </div>
-                                <span class="text-3xl">{{ phones[1].flag }}</span>
+                        <!-- Layered background - Dark premium -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#0D2B45] via-[#1B4F72] to-[#0D2B45]"></div>
+                        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#C4A265] via-[#D4B87A] to-[#C4A265]"></div>
+
+                        <!-- Subtle pattern -->
+                        <div class="absolute inset-0 opacity-[0.06]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 20px 20px;"></div>
+
+                        <!-- Corner flag -->
+                        <div class="absolute top-5 end-5 text-2xl opacity-90 group-hover:scale-110 transition-transform duration-500">{{ phones[1].flag }}</div>
+
+                        <!-- Glow -->
+                        <div class="absolute -top-20 -start-20 w-64 h-64 bg-[#C4A265]/20 rounded-full blur-3xl group-hover:bg-[#C4A265]/30 transition-all duration-700"></div>
+
+                        <!-- "Preferred" badge -->
+                        <div class="absolute top-5 start-5 px-2.5 py-1 rounded-full bg-[#C4A265]/20 border border-[#C4A265]/30">
+                            <span class="text-[9px] uppercase tracking-wider text-[#D4B87A] font-bold">⭐ الأفضل</span>
+                        </div>
+
+                        <div class="relative mt-10">
+                            <!-- Icon -->
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center shadow-lg shadow-[#C4A265]/30 mb-5 group-hover:scale-105 transition-transform duration-500">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                             </div>
-                            <p class="text-xs uppercase tracking-wider text-gray-400 mb-1 font-semibold">{{ phones[1].country }} · UAE</p>
-                            <p class="text-lg font-bold text-[#1C2833] mb-3" dir="ltr">{{ phones[1].number }}</p>
-                            <div class="flex items-center gap-2 text-xs text-[#C4A265] font-semibold">
-                                <span>اتصل الآن</span>
-                                <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1.5 font-bold">{{ phones[1].country }} — UAE</p>
+                            <p class="text-xl font-bold text-white mb-5 tracking-tight" dir="ltr">{{ phones[1].number }}</p>
+
+                            <div class="flex items-center justify-between pt-5 border-t border-white/10">
+                                <span class="text-xs text-white/60 font-medium">اتصل مباشرة</span>
+                                <div class="w-9 h-9 rounded-full bg-[#C4A265]/20 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
+                                    <svg class="w-4 h-4 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                                </div>
                             </div>
                         </div>
                     </a>
@@ -290,23 +319,34 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
                     <!-- Email -->
                     <a
                         :href="`mailto:${email}`"
-                        class="group relative bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-gray-100 reveal"
+                        class="contact-card reveal group relative rounded-[28px] p-8 overflow-hidden"
                         style="animation-delay: 200ms"
                     >
-                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 group-hover:from-emerald-500/5 group-hover:to-teal-500/5 transition-all duration-500"></div>
-                        <div class="absolute -top-10 -end-10 w-32 h-32 bg-emerald-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                        <!-- Layered background -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-white to-[#F8FAFC]"></div>
+                        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#C4A265] via-[#1B4F72] to-[#C4A265]"></div>
+
+                        <!-- Corner icon -->
+                        <div class="absolute top-5 end-5 text-xl opacity-60 group-hover:scale-110 transition-transform duration-500">@</div>
+
+                        <!-- Decorative ring -->
+                        <div class="absolute -bottom-16 -end-16 w-48 h-48 rounded-full border border-[#C4A265]/10 group-hover:scale-110 transition-transform duration-700"></div>
+                        <div class="absolute -bottom-8 -end-8 w-32 h-32 rounded-full border border-[#C4A265]/10 group-hover:scale-110 transition-transform duration-700 delay-75"></div>
+
                         <div class="relative">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg shadow-emerald-500/30">
-                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                </div>
-                                <span class="text-2xl">✉️</span>
+                            <!-- Icon -->
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#2E86C1] flex items-center justify-center shadow-lg shadow-[#1B4F72]/25 mb-5 group-hover:scale-105 transition-transform duration-500">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             </div>
-                            <p class="text-xs uppercase tracking-wider text-gray-400 mb-1 font-semibold">البريد الإلكتروني</p>
-                            <p class="text-sm md:text-base font-bold text-[#1C2833] mb-3 break-all" dir="ltr">{{ email }}</p>
-                            <div class="flex items-center gap-2 text-xs text-emerald-600 font-semibold">
-                                <span>راسلنا</span>
-                                <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1.5 font-bold">البريد الإلكتروني</p>
+                            <p class="text-base font-bold text-[#1C2833] mb-5 tracking-tight break-all" dir="ltr">{{ email }}</p>
+
+                            <div class="flex items-center justify-between pt-5 border-t border-gray-100">
+                                <span class="text-xs text-gray-500 font-medium">راسلنا الآن</span>
+                                <div class="w-9 h-9 rounded-full bg-[#C4A265]/10 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
+                                    <svg class="w-4 h-4 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                                </div>
                             </div>
                         </div>
                     </a>
@@ -647,6 +687,18 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
 </template>
 
 <style scoped>
+/* Contact cards */
+.contact-card {
+    box-shadow: 0 1px 2px rgba(28, 40, 51, 0.04), 0 8px 24px -8px rgba(27, 79, 114, 0.1);
+    border: 1px solid rgba(27, 79, 114, 0.08);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 1px 2px rgba(28, 40, 51, 0.04), 0 24px 48px -12px rgba(27, 79, 114, 0.25);
+}
+
 /* Reveal Animation */
 .reveal {
     animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
