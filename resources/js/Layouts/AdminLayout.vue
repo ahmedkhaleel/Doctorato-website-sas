@@ -111,14 +111,11 @@ const roleLabels = {
             <div class="relative h-full flex flex-col">
                 <!-- Logo -->
                 <div class="px-4 py-5 border-b border-white/10 flex items-center justify-between">
-                    <div v-if="sidebarOpen" class="flex items-center gap-3">
-                        <div class="bg-white rounded-xl p-1.5 shadow-lg shadow-black/20">
-                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-9 w-auto" />
-                        </div>
-                        <div class="text-[10px] text-[#C4A265] uppercase tracking-widest">Admin Panel</div>
+                    <div v-if="sidebarOpen" class="flex items-center gap-2">
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 h-auto logo-white" />
                     </div>
-                    <div v-else class="mx-auto bg-white rounded-xl p-1 shadow-lg shadow-black/20">
-                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-8 w-8 object-contain" />
+                    <div v-else class="mx-auto">
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-10 h-10 object-contain logo-white" />
                     </div>
 
                     <button

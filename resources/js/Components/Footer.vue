@@ -72,7 +72,7 @@ const socialLinks = [
                 <!-- Column 1: Logo & About -->
                 <div>
                     <Link href="/" class="inline-block mb-4">
-                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-14 w-auto bg-white rounded-xl p-2" />
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-44 h-auto logo-white" />
                     </Link>
                     <p class="text-white/60 text-sm leading-relaxed mb-6">
                         {{ $t('footer.description') }}

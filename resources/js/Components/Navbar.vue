@@ -70,7 +70,7 @@ onUnmounted(() => {
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
                 <Link href="/" class="flex items-center shrink-0">
-                    <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-12 lg:h-14 w-auto" />
+                    <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 lg:w-40 h-auto" />
                 </Link>
 
                 <!-- Desktop Nav Links -->

@@ -77,3 +77,8 @@ a, button {
     outline-offset: 2px;
     border-radius: 4px;
 }
+
+/* Logo white variant — use on dark backgrounds */
+.logo-white {
+    filter: brightness(0) invert(1);
+}
