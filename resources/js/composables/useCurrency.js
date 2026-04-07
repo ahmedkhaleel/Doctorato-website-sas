@@ -7,7 +7,7 @@ export function useCurrency() {
     const { locale } = useI18n();
 
     const currencies = computed(() => page.props.currencies || []);
-    const currentCurrencyCode = computed(() => page.props.currentCurrency || 'SAR');
+    const currentCurrencyCode = computed(() => page.props.currentCurrency || 'EGP');
     const currentCurrency = computed(() =>
         currencies.value.find(c => c.code === currentCurrencyCode.value) || currencies.value[0]
     );

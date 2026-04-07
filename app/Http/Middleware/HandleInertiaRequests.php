@@ -21,7 +21,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'currencies' => fn () => Currency::where('is_active', true)->orderBy('display_order')->get(),
-            'currentCurrency' => fn () => session('currency', 'SAR'),
+            'currentCurrency' => fn () => session('currency', 'EGP'),
             'auth' => [
                 'user' => $request->user(),
             ],
