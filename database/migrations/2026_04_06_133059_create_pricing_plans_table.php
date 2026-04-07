@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description_en')->nullable();
             $table->decimal('monthly_price', 10, 2);
             $table->decimal('yearly_price', 10, 2);
-            $table->string('currency', 10)->default('SAR');
+            $table->string('currency', 10)->default('EGP');
             $table->boolean('is_popular')->default(false);
             $table->boolean('is_custom')->default(false);
             $table->json('features_ar');

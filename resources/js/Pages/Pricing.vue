@@ -23,7 +23,7 @@ const props = defineProps({
 
 const billingCycle = ref('monthly');
 const isYearly = computed(() => billingCycle.value === 'yearly');
-const isApproximate = computed(() => currentCurrencyCode.value !== 'SAR');
+const isApproximate = computed(() => currentCurrencyCode.value !== 'EGP');
 
 function toggleBilling() {
     billingCycle.value = billingCycle.value === 'monthly' ? 'yearly' : 'monthly';
@@ -125,7 +125,7 @@ const guarantees = computed(() => [
 
 const showComparison = ref(false);
 
-// Add-ons (prices stored in SAR; convert cleanly to target EGP amounts via rate 13.1)
+// Add-ons — prices stored natively in EGP (the base currency)
 const addons = ref([
     {
         icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
@@ -133,7 +133,7 @@ const addons = ref([
         name_en: 'Extra user',
         desc_ar: 'أضف مستخدماً جديداً فوق حد الخطة',
         desc_en: 'Add a user above your plan limit',
-        price_sar: 7.56, // ≈ 99 EGP
+        price_egp: 99,
         period_ar: 'شهرياً',
         period_en: 'month',
     },
@@ -143,7 +143,7 @@ const addons = ref([
         name_en: '1,000 SMS messages',
         desc_ar: 'رسائل تذكير ومواعيد للمرضى',
         desc_en: 'Reminders & appointment SMS',
-        price_sar: 19.00, // ≈ 249 EGP
+        price_egp: 249,
         period_ar: 'الباقة',
         period_en: 'bundle',
     },
@@ -153,7 +153,7 @@ const addons = ref([
         name_en: 'WhatsApp Business API',
         desc_ar: 'إرسال تذكيرات ومواعيد عبر واتساب',
         desc_en: 'Send reminders & notifications via WhatsApp',
-        price_sar: 30.46, // ≈ 399 EGP
+        price_egp: 399,
         period_ar: 'شهرياً',
         period_en: 'month',
     },
@@ -163,7 +163,7 @@ const addons = ref([
         name_en: 'Custom domain + email',
         desc_ar: 'نطاق خاص وبريد باسم عيادتك',
         desc_en: 'Your own domain & branded email',
-        price_sar: 15.19, // ≈ 199 EGP
+        price_egp: 199,
         period_ar: 'شهرياً',
         period_en: 'month',
     },
@@ -173,7 +173,7 @@ const addons = ref([
         name_en: 'Hourly backup',
         desc_ar: 'نسخ احتياطي متكرر وحماية قصوى',
         desc_en: 'Frequent backups, maximum protection',
-        price_sar: 22.82, // ≈ 299 EGP
+        price_egp: 299,
         period_ar: 'شهرياً',
         period_en: 'month',
     },
@@ -183,7 +183,7 @@ const addons = ref([
         name_en: 'Full White-Label',
         desc_ar: 'شعارك وهويتك بدلاً من دكتوراتو',
         desc_en: 'Your branding instead of Doctorato',
-        price_sar: 152.60, // ≈ 1,999 EGP
+        price_egp: 1999,
         period_ar: 'شهرياً',
         period_en: 'month',
     },
@@ -487,7 +487,7 @@ const addons = ref([
                                     {{ locale === 'ar' ? addon.desc_ar : addon.desc_en }}
                                 </p>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatPrice(addon.price_sar) }}</span>
+                                    <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatPrice(addon.price_egp) }}</span>
                                     <span class="text-xs text-gray-400">/ {{ locale === 'ar' ? addon.period_ar : addon.period_en }}</span>
                                 </div>
                             </div>

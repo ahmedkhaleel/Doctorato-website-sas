@@ -15,7 +15,7 @@ const billingView = ref('monthly'); // monthly | yearly
 
 const form = useForm({
     name_ar: '', name_en: '', slug: '', description_ar: '', description_en: '',
-    monthly_price: 0, yearly_price: 0, currency: 'SAR',
+    monthly_price: 0, yearly_price: 0, currency: 'EGP',
     is_popular: false, is_custom: false, is_active: true,
     features_ar: [], features_en: [],
     max_users: null, max_patients: null, support_level: 'email', display_order: 0,

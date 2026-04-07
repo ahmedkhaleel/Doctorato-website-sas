@@ -15,7 +15,7 @@ class PricingController extends Controller
             'plans' => PricingPlan::where('is_active', true)->orderBy('display_order')->get(),
             'faqs' => Faq::where('is_active', true)->where('category', 'pricing')->orderBy('display_order')->get(),
             'currencies' => Currency::where('is_active', true)->orderBy('display_order')->get(),
-            'currentCurrency' => session('currency', 'SAR'),
+            'currentCurrency' => session('currency', 'EGP'),
         ]);
     }
 }

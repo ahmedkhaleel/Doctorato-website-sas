@@ -12,16 +12,17 @@ export function useCurrency() {
         currencies.value.find(c => c.code === currentCurrencyCode.value) || currencies.value[0]
     );
 
-    function convertPrice(amountInSar) {
-        if (!currentCurrency.value) return amountInSar;
-        const converted = amountInSar * currentCurrency.value.rate_to_sar;
+    // Base currency is EGP. rate_to_sar column is reused as "rate_from_egp".
+    function convertPrice(amountInEgp) {
+        if (!currentCurrency.value) return amountInEgp;
+        const converted = amountInEgp * currentCurrency.value.rate_to_sar;
         return Number(converted.toFixed(currentCurrency.value.decimal_places));
     }
 
-    function formatPrice(amountInSar, options = {}) {
+    function formatPrice(amountInEgp, options = {}) {
         const currency = options.currency || currentCurrency.value;
-        if (!currency) return `${amountInSar}`;
-        const converted = convertPrice(amountInSar);
+        if (!currency) return `${amountInEgp}`;
+        const converted = convertPrice(amountInEgp);
         const isArabic = locale.value === 'ar';
         const formattedNumber = new Intl.NumberFormat(
             isArabic ? 'ar-SA' : 'en-US',

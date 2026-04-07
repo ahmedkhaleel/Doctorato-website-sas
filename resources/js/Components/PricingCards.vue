@@ -19,7 +19,7 @@ useScrollAnimation();
 
 const billingCycle = ref('monthly');
 const isYearly = computed(() => billingCycle.value === 'yearly');
-const isApproximate = computed(() => currentCurrencyCode.value !== 'SAR');
+const isApproximate = computed(() => currentCurrencyCode.value !== 'EGP');
 
 function toggleBilling() {
     billingCycle.value = billingCycle.value === 'monthly' ? 'yearly' : 'monthly';
