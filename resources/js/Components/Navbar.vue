@@ -63,18 +63,15 @@ onUnmounted(() => {
 
 <template>
     <nav
-        class="fixed top-0 inset-x-0 z-50 transition-all duration-300"
-        :class="isScrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-lg'
-            : 'bg-transparent'"
+        class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md"
+        :class="isScrolled ? 'shadow-lg' : 'shadow-sm border-b border-gray-100'"
     >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
                 <Link href="/" class="flex items-center gap-2 shrink-0">
                     <span
-                        class="text-xl lg:text-2xl font-bold tracking-tight transition-colors duration-300"
-                        :class="isScrolled ? 'text-primary' : 'text-white'"
+                        class="text-xl lg:text-2xl font-bold tracking-tight transition-colors duration-300 text-primary"
                     >
                         <span class="bg-gradient-to-r from-secondary to-secondary-light bg-clip-text text-transparent">D</span>octorato
                     </span>
@@ -91,10 +88,7 @@ onUnmounted(() => {
                             @mouseleave="closeDropdown"
                         >
                             <button
-                                class="px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 hover:bg-white/10 flex items-center gap-1"
-                                :class="isScrolled
-                                    ? 'text-dark hover:text-primary hover:bg-light-blue'
-                                    : 'text-white/90 hover:text-white'"
+                                class="px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 flex items-center gap-1 text-dark hover:text-primary hover:bg-light-blue"
                             >
                                 {{ link.label }}
                                 <svg class="w-4 h-4 transition-transform" :class="isProductDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,10 +131,7 @@ onUnmounted(() => {
                         <Link
                             v-else
                             :href="link.href"
-                            class="px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 hover:bg-white/10"
-                            :class="isScrolled
-                                ? 'text-dark hover:text-primary hover:bg-light-blue'
-                                : 'text-white/90 hover:text-white'"
+                            class="px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 text-dark hover:text-primary hover:bg-light-blue"
                         >
                             {{ link.label }}
                         </Link>
@@ -151,7 +142,7 @@ onUnmounted(() => {
                 <div class="hidden lg:flex items-center gap-3">
                     <CurrencySwitcher />
 
-                    <LanguageSwitcher :variant="isScrolled ? 'default' : 'light'" />
+                    <LanguageSwitcher variant="default" />
 
                     <Link
                         href="/demo"
@@ -164,8 +155,7 @@ onUnmounted(() => {
                 <!-- Mobile Hamburger -->
                 <button
                     @click="isMobileMenuOpen = !isMobileMenuOpen"
-                    class="lg:hidden p-2 rounded-lg transition-colors"
-                    :class="isScrolled ? 'text-dark hover:bg-gray-100' : 'text-white hover:bg-white/10'"
+                    class="lg:hidden p-2 rounded-lg transition-colors text-dark hover:bg-gray-100"
                     :aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

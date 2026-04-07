@@ -13,7 +13,7 @@ const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
 <template>
     <div :dir="dir" :lang="locale">
         <Navbar />
-        <main>
+        <main class="pt-20">
             <slot />
         </main>
         <Footer />

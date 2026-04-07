@@ -407,16 +407,16 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
 
                                         <!-- Phone with Country Code -->
                                         <div>
-                                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 ms-1">
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1.5 px-1">
                                                 {{ t('contact.phone') }}
                                             </label>
-                                            <div class="phone-wrapper group flex items-center h-[52px] rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus-within:border-[#1B4F72] focus-within:bg-white focus-within:shadow-sm transition-all relative">
+                                            <div dir="ltr" class="phone-wrapper flex items-center h-[52px] rounded-2xl border-2 border-gray-200 bg-gray-50/50 focus-within:border-[#1B4F72] focus-within:bg-white focus-within:shadow-sm transition-all relative">
                                                 <!-- Country Selector Button -->
                                                 <div class="country-selector relative h-full">
                                                     <button
                                                         type="button"
                                                         @click.stop="countryDropdownOpen = !countryDropdownOpen"
-                                                        class="h-full flex items-center gap-2 ps-4 pe-3 hover:bg-gray-100/70 rounded-s-[14px] transition-colors"
+                                                        class="h-full flex items-center gap-2 pl-4 pr-3 hover:bg-gray-100/70 rounded-l-[14px] transition-colors"
                                                     >
                                                         <span class="text-2xl leading-none">{{ selectedCountry.flag }}</span>
                                                         <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180 text-[#1B4F72]': countryDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
@@ -433,7 +433,8 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
                                                     >
                                                         <div
                                                             v-if="countryDropdownOpen"
-                                                            class="absolute top-full mt-2 start-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden origin-top"
+                                                            dir="rtl"
+                                                            class="absolute top-full mt-2 left-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden origin-top"
                                                             @click.stop
                                                         >
                                                             <!-- Search -->
@@ -475,7 +476,7 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
                                                 <div class="h-7 w-px bg-gray-200"></div>
 
                                                 <!-- Dial Code (visual, not editable) -->
-                                                <span class="ps-3 pe-1 text-sm font-semibold text-gray-600 select-none" dir="ltr">
+                                                <span class="pl-3 text-sm font-semibold text-gray-600 select-none">
                                                     {{ selectedCountry.dial }}
                                                 </span>
 
@@ -485,11 +486,10 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
                                                     type="tel"
                                                     id="phone"
                                                     placeholder="1012345678"
-                                                    class="flex-1 min-w-0 h-full ps-2 pe-4 bg-transparent outline-none text-[#1C2833] placeholder:text-gray-300"
-                                                    dir="ltr"
+                                                    class="flex-1 min-w-0 h-full pl-2 pr-4 bg-transparent outline-none text-[#1C2833] placeholder:text-gray-300"
                                                 />
                                             </div>
-                                            <p v-if="form.errors.phone" class="text-red-500 text-xs mt-1.5 ms-2">{{ form.errors.phone }}</p>
+                                            <p v-if="form.errors.phone" class="text-red-500 text-xs mt-1.5 px-1">{{ form.errors.phone }}</p>
                                         </div>
 
                                         <!-- Subject -->
