@@ -86,48 +86,49 @@ const featureCards = computed(() => [
         description: t('home.cards.features.description'),
         href: '/features',
         icon: 'features',
-        color: 'from-[#1B4F72] to-[#2471A3]',
-        glassColor: 'bg-[#1B4F72]/10',
+        color: 'from-[#1B4F72] to-[#0D2B45]',
+        iconBg: 'from-[#1B4F72]/10 to-[#2471A3]/10',
+        stat: '800+ ' + t('home.cards.stat_features'),
     },
     {
         title: t('home.cards.portals.title'),
         description: t('home.cards.portals.description'),
         href: '/portals',
         icon: 'portals',
-        color: 'from-[#C4A265] to-[#D4B876]',
-        glassColor: 'bg-[#C4A265]/10',
+        color: 'from-[#C4A265] to-[#a1864e]',
+        iconBg: 'from-[#C4A265]/15 to-[#D4B876]/15',
     },
     {
         title: t('home.cards.dental.title'),
         description: t('home.cards.dental.description'),
         href: '/dental',
         icon: 'dental',
-        color: 'from-[#1C2833] to-[#2C3E50]',
-        glassColor: 'bg-[#1C2833]/10',
+        color: 'from-[#1C2833] to-[#0D2B45]',
+        iconBg: 'from-[#1C2833]/10 to-[#2C3E50]/10',
     },
     {
         title: t('home.cards.solutions.title'),
         description: t('home.cards.solutions.description'),
         href: '/solutions',
         icon: 'solutions',
-        color: 'from-[#1B4F72] to-[#1A5276]',
-        glassColor: 'bg-[#1B4F72]/10',
+        color: 'from-[#1B4F72] to-[#0D2B45]',
+        iconBg: 'from-[#1B4F72]/10 to-[#2471A3]/10',
     },
     {
         title: t('home.cards.technology.title'),
         description: t('home.cards.technology.description'),
         href: '/technology',
         icon: 'technology',
-        color: 'from-[#C4A265] to-[#B8965A]',
-        glassColor: 'bg-[#C4A265]/10',
+        color: 'from-[#C4A265] to-[#8b6f3d]',
+        iconBg: 'from-[#C4A265]/15 to-[#D4B876]/15',
     },
     {
         title: t('home.cards.reports.title'),
         description: t('home.cards.reports.description'),
         href: '/reports',
         icon: 'reports',
-        color: 'from-[#1C2833] to-[#34495E]',
-        glassColor: 'bg-[#1C2833]/10',
+        color: 'from-[#1C2833] to-[#0D2B45]',
+        iconBg: 'from-[#1C2833]/10 to-[#34495E]/10',
     },
 ]);
 
@@ -293,121 +294,120 @@ const howItWorksSteps = computed(() => [
             <div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1B4F72]/20 to-transparent" />
         </section>
 
-        <!-- 4. Feature Cards - Bento Grid -->
-        <section class="py-20 lg:py-28 bg-white relative overflow-hidden">
+        <!-- 4. Explore System — Premium Bento Grid -->
+        <section class="py-20 lg:py-24 bg-white relative overflow-hidden">
             <!-- Decorative orbs -->
-            <div class="absolute top-20 start-10 w-72 h-72 bg-[#1B4F72]/[0.03] rounded-full blur-3xl"></div>
-            <div class="absolute bottom-20 end-10 w-80 h-80 bg-[#C4A265]/[0.03] rounded-full blur-3xl"></div>
+            <div class="absolute top-10 start-0 w-[500px] h-[500px] bg-[#1B4F72]/[0.035] rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 end-0 w-[450px] h-[450px] bg-[#C4A265]/[0.04] rounded-full blur-3xl"></div>
+            <!-- Subtle dot grid -->
+            <div class="absolute inset-0 opacity-[0.025]" style="background-image: radial-gradient(#1B4F72 1px, transparent 1px); background-size: 28px 28px;"></div>
 
             <div class="container mx-auto px-4 relative z-10">
-                <SectionTitle
-                    :title="t('home.cards.title')"
-                    :subtitle="t('home.cards.subtitle')"
-                />
-                <!-- Bento Grid: first 2 large, remaining 4 standard -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 animate-stagger">
+                <!-- Compact refined header -->
+                <div class="text-center mb-12 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1B4F72]/5 border border-[#1B4F72]/10 mb-4">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#C4A265] animate-pulse"></span>
+                        <span class="text-[11px] font-semibold text-[#1B4F72] tracking-wide uppercase">{{ t('home.cards.badge') }}</span>
+                    </div>
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-[#0D2B45] mb-3 leading-tight">
+                        {{ t('home.cards.title') }}
+                    </h2>
+                    <p class="text-sm md:text-base text-gray-500 max-w-xl mx-auto leading-relaxed">
+                        {{ t('home.cards.subtitle') }}
+                    </p>
+                    <div class="flex items-center justify-center gap-2 mt-5">
+                        <div class="w-1 h-1 rounded-full bg-[#C4A265]"></div>
+                        <div class="w-12 h-0.5 bg-gradient-to-r from-transparent via-[#C4A265] to-transparent rounded-full"></div>
+                        <div class="w-1 h-1 rounded-full bg-[#C4A265]"></div>
+                    </div>
+                </div>
+
+                <!-- Premium asymmetric bento -->
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5 animate-stagger">
                     <a
                         v-for="(card, index) in featureCards"
                         :key="index"
                         :href="card.href"
-                        class="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
+                        class="feature-card group relative rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-1.5"
                         :class="[
-                            index < 2 ? 'lg:col-span-2 lg:row-span-2 min-h-[320px]' : 'lg:col-span-1 min-h-[220px]',
+                            index === 0 ? 'md:col-span-4 md:row-span-2 min-h-[260px] md:min-h-[340px]' : '',
+                            index === 1 ? 'md:col-span-2 min-h-[200px] md:min-h-[165px]' : '',
+                            index === 2 ? 'md:col-span-2 min-h-[200px] md:min-h-[165px]' : '',
+                            index > 2 ? 'md:col-span-2 min-h-[180px]' : '',
                         ]"
                     >
-                        <!-- Animated gradient border -->
-                        <div class="absolute inset-0 rounded-3xl p-[1.5px]">
-                            <div class="absolute inset-0 rounded-3xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-700" :class="card.color"></div>
+                        <!-- Base card -->
+                        <div class="absolute inset-0 rounded-2xl bg-white border border-gray-100 shadow-sm group-hover:shadow-2xl group-hover:shadow-[#1B4F72]/10 transition-all duration-500"></div>
+
+                        <!-- Hover gradient layer -->
+                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" :class="card.color"></div>
+
+                        <!-- Decorative corner accent -->
+                        <div class="absolute top-0 end-0 w-24 h-24 opacity-[0.04] group-hover:opacity-[0.12] transition-opacity duration-500" :class="card.color.replace('from-', 'bg-gradient-to-br from-')">
+                            <div class="absolute inset-0 rounded-bl-[100%]" :class="card.color"></div>
                         </div>
 
-                        <!-- Glass morphism card -->
-                        <div class="relative h-full rounded-3xl border border-gray-200/80 bg-white/80 backdrop-blur-xl p-8 flex flex-col group-hover:border-transparent transition-colors duration-500">
-                            <!-- Colored glass overlay -->
-                            <div class="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" :class="card.glassColor"></div>
+                        <!-- Number badge -->
+                        <div class="absolute top-4 end-4 text-[10px] font-bold tracking-widest text-gray-300 group-hover:text-white/40 transition-colors duration-500">
+                            {{ String(index + 1).padStart(2, '0') }} / 06
+                        </div>
 
-                            <!-- SVG Illustration per card -->
-                            <div class="relative mb-6" :class="index < 2 ? 'w-20 h-20' : 'w-14 h-14'">
-                                <!-- Features illustration -->
-                                <svg v-if="card.icon === 'features'" viewBox="0 0 80 80" fill="none" class="w-full h-full">
-                                    <circle cx="40" cy="40" r="36" stroke="#1B4F72" stroke-width="1.5" fill="#1B4F72" fill-opacity="0.05" stroke-dasharray="4 6"/>
-                                    <path d="M40 16L44 28H56L46 36L50 48L40 40L30 48L34 36L24 28H36L40 16Z" stroke="#1B4F72" stroke-width="2" fill="#1B4F72" fill-opacity="0.1"/>
-                                    <circle cx="40" cy="34" r="3" fill="#2471A3" fill-opacity="0.4"/>
-                                    <path d="M28 55L40 48L52 55" stroke="#1B4F72" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
-                                    <circle cx="58" cy="22" r="5" stroke="#2471A3" stroke-width="1.5" fill="#2471A3" fill-opacity="0.1"/>
-                                    <path d="M56 22L58 24L61 20" stroke="#2471A3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <!-- Portals illustration -->
-                                <svg v-else-if="card.icon === 'portals'" viewBox="0 0 80 80" fill="none" class="w-full h-full">
-                                    <rect x="6" y="14" width="30" height="24" rx="4" stroke="#C4A265" stroke-width="2" fill="#C4A265" fill-opacity="0.07"/>
-                                    <rect x="44" y="14" width="30" height="24" rx="4" stroke="#C4A265" stroke-width="2" fill="#C4A265" fill-opacity="0.07"/>
-                                    <rect x="6" y="44" width="30" height="24" rx="4" stroke="#D4B876" stroke-width="2" fill="#D4B876" fill-opacity="0.07"/>
-                                    <rect x="44" y="44" width="30" height="24" rx="4" stroke="#D4B876" stroke-width="2" fill="#D4B876" fill-opacity="0.07"/>
-                                    <circle cx="21" cy="26" r="4" fill="#C4A265" fill-opacity="0.2"/>
-                                    <circle cx="59" cy="26" r="4" fill="#C4A265" fill-opacity="0.2"/>
-                                    <path d="M36 26H44" stroke="#C4A265" stroke-width="1.5" stroke-dasharray="2 2"/>
-                                    <path d="M21 38V44" stroke="#C4A265" stroke-width="1.5" stroke-dasharray="2 2"/>
-                                    <path d="M59 38V44" stroke="#C4A265" stroke-width="1.5" stroke-dasharray="2 2"/>
-                                </svg>
-                                <!-- Dental illustration -->
-                                <svg v-else-if="card.icon === 'dental'" viewBox="0 0 80 80" fill="none" class="w-full h-full">
-                                    <path d="M40 12C32 12 20 18 20 32C20 52 33 68 36 68C39 68 40 56 40 56C40 56 41 68 44 68C47 68 60 52 60 32C60 18 48 12 40 12Z" stroke="#1C2833" stroke-width="2" fill="#1C2833" fill-opacity="0.05"/>
-                                    <path d="M34 28C34 28 37 32 40 32C43 32 46 28 46 28" stroke="#2C3E50" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-                                    <circle cx="32" cy="24" r="2" fill="#2C3E50" fill-opacity="0.2"/>
-                                    <circle cx="48" cy="24" r="2" fill="#2C3E50" fill-opacity="0.2"/>
-                                    <path d="M26 40C30 44 36 46 40 46C44 46 50 44 54 40" stroke="#34495E" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
-                                </svg>
-                                <!-- Solutions illustration -->
-                                <svg v-else-if="card.icon === 'solutions'" viewBox="0 0 80 80" fill="none" class="w-full h-full">
-                                    <circle cx="40" cy="30" r="18" stroke="#1B4F72" stroke-width="2" fill="#1B4F72" fill-opacity="0.05"/>
-                                    <path d="M33 30C33 26.134 36.134 23 40 23C43.866 23 47 26.134 47 30C47 33 45 35 44 36C43 37 43 38 43 39H37C37 38 37 37 36 36C35 35 33 33 33 30Z" stroke="#1B4F72" stroke-width="2" fill="#1B4F72" fill-opacity="0.1"/>
-                                    <line x1="37" y1="42" x2="43" y2="42" stroke="#1B4F72" stroke-width="2" stroke-linecap="round"/>
-                                    <line x1="38" y1="45" x2="42" y2="45" stroke="#1B4F72" stroke-width="2" stroke-linecap="round"/>
-                                    <path d="M40 12V16" stroke="#C4A265" stroke-width="1.5" stroke-linecap="round"/>
-                                    <path d="M54 18L51 21" stroke="#C4A265" stroke-width="1.5" stroke-linecap="round"/>
-                                    <path d="M26 18L29 21" stroke="#C4A265" stroke-width="1.5" stroke-linecap="round"/>
-                                    <path d="M20 55H60" stroke="#1B4F72" stroke-width="1" stroke-dasharray="4 3" opacity="0.2"/>
-                                    <rect x="28" y="58" width="24" height="12" rx="3" stroke="#1B4F72" stroke-width="1.5" fill="#1B4F72" fill-opacity="0.05"/>
-                                </svg>
-                                <!-- Technology illustration -->
-                                <svg v-else-if="card.icon === 'technology'" viewBox="0 0 80 80" fill="none" class="w-full h-full">
-                                    <rect x="10" y="14" width="60" height="42" rx="6" stroke="#C4A265" stroke-width="2" fill="#C4A265" fill-opacity="0.05"/>
-                                    <line x1="10" y1="24" x2="70" y2="24" stroke="#C4A265" stroke-width="1" opacity="0.3"/>
-                                    <circle cx="18" cy="19" r="2" fill="#C4A265" fill-opacity="0.3"/>
-                                    <circle cx="24" cy="19" r="2" fill="#D4B876" fill-opacity="0.3"/>
-                                    <circle cx="30" cy="19" r="2" fill="#B8965A" fill-opacity="0.3"/>
-                                    <text x="18" y="36" font-size="8" fill="#C4A265" font-family="monospace" opacity="0.5">&lt;/&gt;</text>
-                                    <rect x="18" y="40" width="20" height="2" rx="1" fill="#C4A265" fill-opacity="0.2"/>
-                                    <rect x="18" y="44" width="30" height="2" rx="1" fill="#D4B876" fill-opacity="0.15"/>
-                                    <rect x="18" y="48" width="14" height="2" rx="1" fill="#C4A265" fill-opacity="0.2"/>
-                                    <rect x="26" y="60" width="28" height="8" rx="3" stroke="#C4A265" stroke-width="1.5" fill="none" opacity="0.3"/>
-                                </svg>
-                                <!-- Reports illustration -->
-                                <svg v-else viewBox="0 0 80 80" fill="none" class="w-full h-full">
-                                    <rect x="14" y="10" width="52" height="60" rx="6" stroke="#1C2833" stroke-width="2" fill="#1C2833" fill-opacity="0.03"/>
-                                    <rect x="22" y="22" width="36" height="4" rx="2" fill="#2C3E50" fill-opacity="0.15"/>
-                                    <rect x="22" y="30" width="24" height="3" rx="1.5" fill="#34495E" fill-opacity="0.1"/>
-                                    <rect x="22" y="42" width="8" height="18" rx="2" fill="#1C2833" fill-opacity="0.1" stroke="#1C2833" stroke-width="1"/>
-                                    <rect x="34" y="36" width="8" height="24" rx="2" fill="#2C3E50" fill-opacity="0.1" stroke="#2C3E50" stroke-width="1"/>
-                                    <rect x="46" y="46" width="8" height="14" rx="2" fill="#34495E" fill-opacity="0.1" stroke="#34495E" stroke-width="1"/>
-                                    <path d="M22 55L30 48L38 42L46 50L54 38" stroke="#1C2833" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
-                                </svg>
+                        <!-- Content -->
+                        <div class="relative h-full p-5 md:p-6 flex flex-col">
+                            <!-- Icon -->
+                            <div class="mb-auto">
+                                <div class="relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-white/10 group-hover:backdrop-blur-sm"
+                                    :class="[
+                                        index === 0 ? 'w-16 h-16 md:w-[72px] md:h-[72px]' : 'w-12 h-12',
+                                        card.iconBg
+                                    ]">
+                                    <svg v-if="card.icon === 'features'" class="text-[#1B4F72] group-hover:text-white transition-colors duration-500" :class="index === 0 ? 'w-8 h-8 md:w-10 md:h-10' : 'w-6 h-6'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+                                    </svg>
+                                    <svg v-else-if="card.icon === 'portals'" class="text-[#C4A265] group-hover:text-white transition-colors duration-500 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+                                    </svg>
+                                    <svg v-else-if="card.icon === 'dental'" class="text-[#1C2833] group-hover:text-white transition-colors duration-500 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+                                    </svg>
+                                    <svg v-else-if="card.icon === 'solutions'" class="text-[#1B4F72] group-hover:text-white transition-colors duration-500 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
+                                    </svg>
+                                    <svg v-else-if="card.icon === 'technology'" class="text-[#C4A265] group-hover:text-white transition-colors duration-500 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"/>
+                                    </svg>
+                                    <svg v-else class="text-[#1C2833] group-hover:text-white transition-colors duration-500 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+                                    </svg>
+                                </div>
                             </div>
 
-                            <!-- Content -->
-                            <div class="relative flex-1 flex flex-col">
-                                <h3 class="font-bold text-[#1C2833] mb-3 group-hover:text-[#1B4F72] transition-colors duration-300" :class="index < 2 ? 'text-2xl' : 'text-lg'">
+                            <!-- Text + stat pill for large card -->
+                            <div class="mt-5 md:mt-8">
+                                <div v-if="index === 0 && card.stat" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 group-hover:bg-white/15 group-hover:border-white/30 transition-all duration-500 mb-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#C4A265] group-hover:bg-white transition-colors duration-500"></span>
+                                    <span class="text-[10px] font-bold text-[#C4A265] group-hover:text-white transition-colors duration-500 tracking-wide">{{ card.stat }}</span>
+                                </div>
+                                <h3 class="font-bold text-[#0D2B45] group-hover:text-white transition-colors duration-500 mb-2 leading-snug"
+                                    :class="index === 0 ? 'text-lg md:text-2xl' : 'text-base md:text-[17px]'">
                                     {{ card.title }}
                                 </h3>
-                                <p class="text-gray-500 leading-relaxed mb-6 flex-1" :class="index < 2 ? 'text-base' : 'text-sm'">
+                                <p class="text-gray-500 group-hover:text-white/80 transition-colors duration-500 leading-relaxed"
+                                    :class="index === 0 ? 'text-sm md:text-[15px] line-clamp-3' : 'text-xs md:text-[13px] line-clamp-2'">
                                     {{ card.description }}
                                 </p>
+                            </div>
 
-                                <span class="inline-flex items-center gap-2 text-[#C4A265] font-semibold text-sm group-hover:gap-3 transition-all duration-300">
+                            <!-- Footer arrow -->
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 group-hover:border-white/20 transition-colors duration-500">
+                                <span class="text-[11px] md:text-xs font-semibold text-[#C4A265] group-hover:text-white transition-colors duration-500">
                                     {{ t('home.learn_more') }}
-                                    <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                                    </svg>
                                 </span>
+                                <div class="w-7 h-7 rounded-lg bg-[#C4A265]/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-500 group-hover:translate-x-0 rtl:group-hover:-translate-x-0">
+                                    <svg class="w-3.5 h-3.5 text-[#C4A265] group-hover:text-white rtl:rotate-180 transition-all duration-500 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </a>

@@ -19,8 +19,10 @@
             "permissions_desc": "Granular access control"
         },
         "cards": {
+            "badge": "Explore the System",
             "title": "Explore Every Aspect of the System",
             "subtitle": "Dedicated pages for each section of Doctorato",
+            "stat_features": "Features",
             "features": { "title": "Features & Capabilities", "description": "Over 800 integrated features to manage every aspect of your clinic" },
             "portals": { "title": "The Six Portals", "description": "6 independent portals designed specifically for each role in the healthcare facility" },
             "dental": { "title": "Dental Module", "description": "Interactive dental chart, treatment plans, lab orders, X-rays, and periodontal chart" },
