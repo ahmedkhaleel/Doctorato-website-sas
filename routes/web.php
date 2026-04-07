@@ -80,4 +80,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/demos', [\App\Http\Controllers\Admin\DemoController::class, 'index'])->name('demos.index');
     Route::put('/demos/{demo}/status', [\App\Http\Controllers\Admin\DemoController::class, 'updateStatus'])->name('demos.status');
     Route::delete('/demos/{demo}', [\App\Http\Controllers\Admin\DemoController::class, 'destroy'])->name('demos.destroy');
+
+    Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
+    Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
+    Route::put('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UsersController::class, 'toggleActive'])->name('users.toggle');
 });

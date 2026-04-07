@@ -16,6 +16,9 @@ class AdminUserSeeder extends Seeder
                 'name' => 'Doctorato Admin',
                 'password' => Hash::make('Doctorato@2026'),
                 'email_verified_at' => now(),
+                'role' => 'super_admin',
+                'permissions' => User::defaultPermissionsForRole('super_admin'),
+                'is_active' => true,
             ]
         );
     }
