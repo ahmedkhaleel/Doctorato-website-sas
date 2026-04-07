@@ -9,7 +9,7 @@ import { useCurrency } from '@/composables/useCurrency';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { localizedField } = useLocale();
 const { formatPrice, currentCurrencyCode } = useCurrency();
 useScrollAnimation();
@@ -124,6 +124,70 @@ const guarantees = computed(() => [
 ]);
 
 const showComparison = ref(false);
+
+// Add-ons (prices stored in SAR; convert cleanly to target EGP amounts via rate 13.1)
+const addons = ref([
+    {
+        icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+        name_ar: 'مستخدم إضافي',
+        name_en: 'Extra user',
+        desc_ar: 'أضف مستخدماً جديداً فوق حد الخطة',
+        desc_en: 'Add a user above your plan limit',
+        price_sar: 7.56, // ≈ 99 EGP
+        period_ar: 'شهرياً',
+        period_en: 'month',
+    },
+    {
+        icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+        name_ar: '1000 رسالة SMS',
+        name_en: '1,000 SMS messages',
+        desc_ar: 'رسائل تذكير ومواعيد للمرضى',
+        desc_en: 'Reminders & appointment SMS',
+        price_sar: 19.00, // ≈ 249 EGP
+        period_ar: 'الباقة',
+        period_en: 'bundle',
+    },
+    {
+        icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
+        name_ar: 'واتساب بزنس API',
+        name_en: 'WhatsApp Business API',
+        desc_ar: 'إرسال تذكيرات ومواعيد عبر واتساب',
+        desc_en: 'Send reminders & notifications via WhatsApp',
+        price_sar: 30.46, // ≈ 399 EGP
+        period_ar: 'شهرياً',
+        period_en: 'month',
+    },
+    {
+        icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
+        name_ar: 'دومين وبريد احترافي',
+        name_en: 'Custom domain + email',
+        desc_ar: 'نطاق خاص وبريد باسم عيادتك',
+        desc_en: 'Your own domain & branded email',
+        price_sar: 15.19, // ≈ 199 EGP
+        period_ar: 'شهرياً',
+        period_en: 'month',
+    },
+    {
+        icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+        name_ar: 'نسخ احتياطي كل ساعة',
+        name_en: 'Hourly backup',
+        desc_ar: 'نسخ احتياطي متكرر وحماية قصوى',
+        desc_en: 'Frequent backups, maximum protection',
+        price_sar: 22.82, // ≈ 299 EGP
+        period_ar: 'شهرياً',
+        period_en: 'month',
+    },
+    {
+        icon: 'M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z',
+        name_ar: 'White-Label كامل',
+        name_en: 'Full White-Label',
+        desc_ar: 'شعارك وهويتك بدلاً من دكتوراتو',
+        desc_en: 'Your branding instead of Doctorato',
+        price_sar: 152.60, // ≈ 1,999 EGP
+        period_ar: 'شهرياً',
+        period_en: 'month',
+    },
+]);
 </script>
 
 <template>
@@ -212,6 +276,51 @@ const showComparison = ref(false);
                 <p v-if="isApproximate" class="text-center text-sm text-gray-400 mb-8 animate-fade-up">
                     {{ t('pricing.approximate_note') }}
                 </p>
+
+                <!-- Launch Offer Banner -->
+                <div class="max-w-4xl mx-auto mb-10 animate-fade-up">
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#C4A265] via-[#D4B876] to-[#C4A265] p-[1.5px] shadow-xl shadow-[#C4A265]/20">
+                        <div class="relative rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] px-6 py-5 md:px-8 md:py-6 overflow-hidden">
+                            <!-- Decorative glows -->
+                            <div class="absolute -top-10 end-0 w-40 h-40 bg-[#C4A265]/20 rounded-full blur-3xl"></div>
+                            <div class="absolute -bottom-10 start-0 w-40 h-40 bg-[#2471A3]/20 rounded-full blur-3xl"></div>
+
+                            <div class="relative flex flex-col md:flex-row items-center gap-5 md:gap-6">
+                                <!-- Fire icon -->
+                                <div class="shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/30 animate-pulse">
+                                    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+                                    </svg>
+                                </div>
+
+                                <!-- Text -->
+                                <div class="flex-1 text-center md:text-start">
+                                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#C4A265] text-white uppercase tracking-wide">{{ locale === 'ar' ? 'عرض الإطلاق' : 'Launch Offer' }}</span>
+                                        <span class="text-xs text-white/50">{{ locale === 'ar' ? 'لفترة محدودة' : 'Limited time' }}</span>
+                                    </div>
+                                    <h3 class="text-lg md:text-xl font-extrabold text-white mb-1">
+                                        {{ locale === 'ar' ? 'خصم 30% لأول 50 عيادة' : '30% off for first 50 clinics' }}
+                                    </h3>
+                                    <p class="text-sm text-white/60 leading-relaxed">
+                                        {{ locale === 'ar' ? 'اشترك الآن واحصل على خصم 30% لمدة 6 أشهر + تجهيز ونقل بيانات مجاني + تدريب كامل لفريقك' : 'Subscribe now, get 30% off for 6 months + free onboarding, data migration & team training' }}
+                                    </p>
+                                </div>
+
+                                <!-- CTA -->
+                                <Link
+                                    href="/demo"
+                                    class="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-white text-[#1B4F72] hover:bg-[#C4A265] hover:text-white transition-all duration-300 shadow-lg hover:-translate-y-0.5"
+                                >
+                                    {{ locale === 'ar' ? 'احجز الآن' : 'Claim now' }}
+                                    <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                    </svg>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-5 animate-stagger">
@@ -334,6 +443,61 @@ const showComparison = ref(false);
 
                 <!-- VAT Note -->
                 <p class="text-center text-xs text-gray-400 mt-8">{{ t('pricing.vat_note') }}</p>
+            </div>
+        </section>
+
+        <!-- Add-ons Section -->
+        <section class="py-20 lg:py-28 bg-[#F8FAFC] relative overflow-hidden">
+            <div class="absolute top-0 end-0 w-96 h-96 bg-[#C4A265]/5 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-0 start-0 w-96 h-96 bg-[#1B4F72]/5 rounded-full blur-[120px]"></div>
+
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div class="text-center mb-14 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 mb-5">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="2 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        <span class="text-sm text-[#C4A265] font-bold">{{ locale === 'ar' ? 'إضافات اختيارية' : 'Optional Add-ons' }}</span>
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#1C2833] mb-4">
+                        {{ locale === 'ar' ? 'خصّص خطتك كما تريد' : 'Customize your plan' }}
+                    </h2>
+                    <p class="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                        {{ locale === 'ar' ? 'أضف المزايا التي تحتاجها فقط إلى أي خطة اشتراك' : 'Add only the features you need to any subscription plan' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-stagger">
+                    <div
+                        v-for="(addon, idx) in addons"
+                        :key="idx"
+                        class="group relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#C4A265]/30 hover:-translate-y-1 transition-all duration-300 animate-fade-up"
+                    >
+                        <div class="flex items-start gap-4">
+                            <div class="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#1B4F72]/10 to-[#C4A265]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-[#1B4F72]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="addon.icon"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-base font-bold text-[#1C2833] mb-1">
+                                    {{ locale === 'ar' ? addon.name_ar : addon.name_en }}
+                                </h3>
+                                <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                                    {{ locale === 'ar' ? addon.desc_ar : addon.desc_en }}
+                                </p>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatPrice(addon.price_sar) }}</span>
+                                    <span class="text-xs text-gray-400">/ {{ locale === 'ar' ? addon.period_ar : addon.period_en }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-sm text-gray-400 mt-10">
+                    {{ locale === 'ar' ? '* جميع الإضافات يمكن تفعيلها أو إلغاؤها في أي وقت من لوحة التحكم' : '* All add-ons can be enabled or disabled anytime from your dashboard' }}
+                </p>
             </div>
         </section>
 
