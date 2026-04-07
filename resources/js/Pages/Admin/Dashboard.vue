@@ -8,7 +8,24 @@ const props = defineProps({
     trend: Array,
     recentDemos: Array,
     recentContacts: Array,
+    recentPayments: { type: Array, default: () => [] },
+    expiringSoon: { type: Array, default: () => [] },
 });
+
+function fmtMoney(v) {
+    return new Intl.NumberFormat('ar-EG').format(Math.round(v || 0));
+}
+
+function fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('ar-EG', { day: '2-digit', month: 'short' });
+}
+
+function daysUntil(d) {
+    if (!d) return null;
+    const diff = Math.ceil((new Date(d).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return diff;
+}
 
 const page = usePage();
 const authUser = computed(() => page.props.auth?.user);
@@ -133,6 +150,75 @@ const statusColors = {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Revenue & Subscription cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- MRR -->
+            <div class="relative bg-gradient-to-br from-[#1B4F72] via-[#0D2B45] to-[#0A1628] text-white rounded-2xl p-5 shadow-lg overflow-hidden">
+                <div class="absolute top-0 end-0 w-32 h-32 bg-[#C4A265]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#C4A265]/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                        <span class="text-xs text-white/60 font-medium">MRR</span>
+                    </div>
+                    <div class="text-3xl font-extrabold tabular-nums mb-1">{{ fmtMoney(stats.mrr) }}</div>
+                    <div class="text-xs text-white/60">جنيه مصري شهرياً</div>
+                </div>
+            </div>
+
+            <!-- Month revenue -->
+            <Link href="/admin/analytics" class="group bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium">إيراد آخر 30 يوم</span>
+                </div>
+                <div class="text-3xl font-extrabold text-[#1C2833] tabular-nums mb-1">{{ fmtMoney(stats.month_revenue) }}</div>
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="text-gray-400">ج.م</span>
+                    <span v-if="stats.revenue_delta !== null"
+                          :class="stats.revenue_delta >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'"
+                          class="px-2 py-0.5 rounded-full font-semibold">
+                        {{ stats.revenue_delta >= 0 ? '▲' : '▼' }} {{ Math.abs(stats.revenue_delta) }}%
+                    </span>
+                </div>
+            </Link>
+
+            <!-- Active subscriptions -->
+            <Link href="/admin/subscriptions?status=active" class="group bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#C4A265]/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium">اشتراكات نشطة</span>
+                </div>
+                <div class="text-3xl font-extrabold text-[#1C2833] tabular-nums mb-1">{{ stats.active_subscriptions || 0 }}</div>
+                <div class="text-xs text-gray-400">+{{ stats.new_subs_this_month || 0 }} هذا الشهر</div>
+            </Link>
+
+            <!-- Pending checkouts -->
+            <Link href="/admin/subscriptions?status=pending" class="group bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium">بانتظار الدفع</span>
+                </div>
+                <div class="text-3xl font-extrabold text-amber-700 tabular-nums mb-1">{{ stats.pending_subscriptions || 0 }}</div>
+                <div class="text-xs text-gray-400">إجمالي مدفوع: {{ fmtMoney(stats.total_revenue) }} ج.م</div>
+            </Link>
         </div>
 
         <!-- Main stat cards -->
@@ -332,6 +418,81 @@ const statusColors = {
                         </div>
                         <div class="text-[10px] text-gray-400 shrink-0">{{ formatDate(contact.created_at) }}</div>
                     </Link>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <!-- Recent payments -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="text-base font-bold text-[#1C2833]">آخر المدفوعات</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">آخر 5 دفعات ناجحة</p>
+                    </div>
+                    <Link href="/admin/subscriptions" class="text-xs text-emerald-600 hover:underline font-semibold">عرض الكل ←</Link>
+                </div>
+
+                <div v-if="recentPayments.length === 0" class="text-center py-8 text-gray-400 text-sm">
+                    لا توجد دفعات بعد
+                </div>
+
+                <div v-else class="space-y-2">
+                    <div
+                        v-for="p in recentPayments"
+                        :key="p.id"
+                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50/50 transition-all border border-transparent hover:border-emerald-100"
+                    >
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-bold text-[#1C2833] truncate">{{ p.subscription?.customer_name || 'عميل' }}</div>
+                            <div class="text-[11px] text-gray-500 font-mono">{{ p.subscription?.reference }}</div>
+                        </div>
+                        <div class="text-end shrink-0">
+                            <div class="text-sm font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(p.amount) }} {{ p.currency }}</div>
+                            <div class="text-[10px] text-gray-400">{{ fmtDate(p.processed_at) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiring soon -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="text-base font-bold text-[#1C2833]">اشتراكات على وشك الانتهاء</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">خلال الـ 7 أيام القادمة</p>
+                    </div>
+                    <Link href="/admin/subscriptions?status=active" class="text-xs text-amber-600 hover:underline font-semibold">عرض الكل ←</Link>
+                </div>
+
+                <div v-if="expiringSoon.length === 0" class="text-center py-8 text-gray-400 text-sm">
+                    🎉 لا توجد اشتراكات على وشك الانتهاء
+                </div>
+
+                <div v-else class="space-y-2">
+                    <div
+                        v-for="sub in expiringSoon"
+                        :key="sub.id"
+                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50/50 transition-all border border-transparent hover:border-amber-100"
+                    >
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                            {{ daysUntil(sub.ends_at) }}d
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-bold text-[#1C2833] truncate">{{ sub.customer_name }}</div>
+                            <div class="text-[11px] text-gray-500 truncate">{{ sub.plan?.name_ar || sub.plan?.name_en }} · {{ sub.billing_cycle === 'yearly' ? 'سنوي' : 'شهري' }}</div>
+                        </div>
+                        <div class="text-end shrink-0">
+                            <div class="text-sm font-bold text-amber-700 tabular-nums">{{ fmtMoney(sub.amount) }}</div>
+                            <div class="text-[10px] text-gray-400">{{ fmtDate(sub.ends_at) }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

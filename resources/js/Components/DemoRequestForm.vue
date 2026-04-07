@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
+import { useTracking } from '@/composables/useTracking';
 
 const { t, locale } = useI18n();
 useScrollAnimation();
@@ -103,9 +104,12 @@ const benefits = computed(() => [
     { icon: 'cancel', text: t('demo.benefit_cancel') },
 ]);
 
+const track = useTracking();
+
 function submitForm() {
     form.post(route('demo.store'), {
         onSuccess: () => {
+            track.lead({ form: 'demo_request', clinic: form.clinic_name });
             showSuccess.value = true;
             form.reset();
         },

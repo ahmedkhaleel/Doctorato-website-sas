@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/paymob',
+        ]);
+
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {

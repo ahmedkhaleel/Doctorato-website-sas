@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{HomeController, DemoRequestController, ContactController, NewsletterController, BlogController, PricingController, PageController};
+use App\Http\Controllers\{HomeController, DemoRequestController, ContactController, NewsletterController, BlogController, PricingController, PageController, CheckoutController, PaymobWebhookController, SitemapController};
 use Illuminate\Support\Facades\Route;
 
 // Language switcher
@@ -20,6 +20,9 @@ Route::get('/currency/{code}', function ($code) {
     }
     return back();
 })->name('currency.switch');
+
+// SEO
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Main pages
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -43,6 +46,15 @@ Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsle
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Checkout
+Route::get('/checkout/{planSlug}', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout/start', [CheckoutController::class, 'start'])->name('checkout.start')->middleware('throttle:6,1');
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('checkout.failed');
+
+// Paymob webhook (CSRF-exempt — see bootstrap/app.php)
+Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])->name('webhooks.paymob');
 
 // Admin Auth
 Route::get('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('admin.login');
@@ -82,6 +94,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/demos/{demo}/extend-trial', [\App\Http\Controllers\Admin\DemoController::class, 'extendTrial'])->name('demos.extend');
     Route::post('/demos/{demo}/seen', [\App\Http\Controllers\Admin\DemoController::class, 'markReminderSeen'])->name('demos.seen');
     Route::delete('/demos/{demo}', [\App\Http\Controllers\Admin\DemoController::class, 'destroy'])->name('demos.destroy');
+
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
+
+    Route::get('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'tracking'])->name('settings.tracking');
+    Route::put('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'updateTracking'])->name('settings.tracking.update');
+
+    Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::get('/subscriptions/{subscription}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'show'])->name('subscriptions.show');
+    Route::post('/subscriptions/{subscription}/cancel', [\App\Http\Controllers\Admin\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');

@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import { useCurrency } from '@/composables/useCurrency';
 import { Head, Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { ref, computed } from 'vue';
 
 const { t, locale } = useI18n();
@@ -188,10 +189,46 @@ const addons = ref([
         period_en: 'month',
     },
 ]);
+
+const pricingJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@graph': [
+        {
+            '@type': 'Product',
+            name: 'Doctorato — نظام إدارة العيادات',
+            description: t('pricing.subtitle') || 'نظام متكامل لإدارة العيادات الطبية',
+            brand: { '@type': 'Brand', name: 'Doctorato' },
+            offers: (props.plans || []).filter(p => !p.is_custom).map(plan => ({
+                '@type': 'Offer',
+                name: locale.value === 'ar' ? plan.name_ar : plan.name_en,
+                price: String(plan.monthly_price),
+                priceCurrency: plan.currency || 'EGP',
+                availability: 'https://schema.org/InStock',
+                priceValidUntil: '2026-12-31',
+                url: `${typeof window !== 'undefined' ? window.location.origin : ''}/checkout/${plan.slug}`,
+            })),
+        },
+        ...((props.faqs || []).length ? [{
+            '@type': 'FAQPage',
+            mainEntity: (props.faqs || []).map(f => ({
+                '@type': 'Question',
+                name: locale.value === 'ar' ? f.question_ar : f.question_en,
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: locale.value === 'ar' ? f.answer_ar : f.answer_en,
+                },
+            })),
+        }] : []),
+    ],
+}));
 </script>
 
 <template>
-    <Head :title="t('pricing.page_title') || t('pricing.title')" />
+    <SeoHead
+        :title="t('pricing.page_title') || t('pricing.title')"
+        :description="t('pricing.subtitle') || 'خطط مرنة بالجنيه المصري — ابدأ من 799 ج.م شهرياً'"
+        :json-ld="pricingJsonLd"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative pt-32 pb-20 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
@@ -422,7 +459,7 @@ const addons = ref([
                             <!-- CTA Button -->
                             <Link
                                 v-if="!plan.is_custom"
-                                href="/demo"
+                                :href="`/checkout/${plan.slug}?cycle=${billingCycle}`"
                                 class="block w-full text-center py-3.5 px-6 rounded-xl font-semibold text-sm transition-all duration-300 hover:-translate-y-0.5"
                                 :class="plan.is_popular
                                     ? 'bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white shadow-lg shadow-[#C4A265]/25 hover:shadow-xl'
@@ -611,7 +648,7 @@ const addons = ref([
                                     <td class="p-5"></td>
                                     <td v-for="plan in plans" :key="plan.id" class="p-5 text-center" :class="{ 'bg-[#1B4F72]/[0.02]': plan.is_popular }">
                                         <Link
-                                            :href="plan.is_custom ? '/contact' : '/demo'"
+                                            :href="plan.is_custom ? '/contact' : `/checkout/${plan.slug}?cycle=${billingCycle}`"
                                             class="inline-block px-5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 hover:-translate-y-0.5"
                                             :class="plan.is_popular
                                                 ? 'bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white shadow-md hover:shadow-lg'

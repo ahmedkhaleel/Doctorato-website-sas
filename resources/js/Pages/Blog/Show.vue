@@ -4,6 +4,7 @@ import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { computed } from 'vue';
 
 const { t } = useI18n();
@@ -64,17 +65,45 @@ function getExcerpt(post) {
     const body = localizedField(post, 'body') || '';
     return body.substring(0, 120) + '...';
 }
+
+const articleJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: pageTitle.value,
+    description: excerpt.value,
+    image: props.post.featured_image
+        ? (props.post.featured_image.startsWith('http')
+            ? props.post.featured_image
+            : (typeof window !== 'undefined' ? window.location.origin : '') + props.post.featured_image)
+        : undefined,
+    datePublished: props.post.published_at || props.post.created_at,
+    dateModified: props.post.updated_at || props.post.published_at,
+    author: {
+        '@type': 'Organization',
+        name: 'Doctorato',
+    },
+    publisher: {
+        '@type': 'Organization',
+        name: 'Doctorato',
+        logo: {
+            '@type': 'ImageObject',
+            url: (typeof window !== 'undefined' ? window.location.origin : '') + '/images/doctorato-logo.png',
+        },
+    },
+    mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': typeof window !== 'undefined' ? window.location.href : '',
+    },
+}));
 </script>
 
 <template>
-    <Head>
-        <title>{{ pageTitle }}</title>
-        <meta name="description" :content="excerpt" />
-        <meta property="og:title" :content="pageTitle" />
-        <meta property="og:description" :content="excerpt" />
-        <meta v-if="post.featured_image" property="og:image" :content="post.featured_image" />
-        <meta property="og:type" content="article" />
-    </Head>
+    <SeoHead
+        :title="pageTitle"
+        :description="excerpt"
+        :image="post.featured_image"
+        :json-ld="articleJsonLd"
+    />
     <MainLayout>
         <!-- Article Header -->
         <section class="relative py-20 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">

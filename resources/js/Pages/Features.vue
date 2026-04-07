@@ -4,6 +4,7 @@ import AnimatedCounter from '@/Components/AnimatedCounter.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { computed, ref } from 'vue';
 
 const { t } = useI18n();
@@ -162,7 +163,10 @@ const activeAdvantage = ref(0);
 </script>
 
 <template>
-    <Head :title="t('features.page_title')" />
+    <SeoHead
+        :title="t('features.page_title')"
+        :description="t('features.hero_subtitle') || 'أكثر من 800 خاصية في نظام واحد لإدارة كل جانب من جوانب عيادتك'"
+    />
     <MainLayout>
         <!-- ═══════ 1. HERO SECTION ═══════ -->
         <section class="relative pt-32 pb-24 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">

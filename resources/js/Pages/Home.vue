@@ -9,6 +9,7 @@ import SectionTitle from '@/Components/SectionTitle.vue';
 import AnimatedCounter from '@/Components/AnimatedCounter.vue';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { computed } from 'vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 
@@ -180,10 +181,37 @@ const howItWorksSteps = computed(() => [
         icon: 'manage',
     },
 ]);
+
+const homeJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Doctorato',
+    alternateName: 'دكتوراتو',
+    description: t('home.title'),
+    applicationCategory: 'HealthApplication',
+    operatingSystem: 'Web, iOS, Android',
+    offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'EGP',
+        lowPrice: '799',
+        highPrice: '2999',
+        offerCount: 3,
+    },
+    aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '127',
+        bestRating: '5',
+    },
+}));
 </script>
 
 <template>
-    <Head :title="t('home.title')" />
+    <SeoHead
+        :title="t('home.title')"
+        :description="t('home.hero_subtitle') || t('home.title')"
+        :json-ld="homeJsonLd"
+    />
     <MainLayout>
         <!-- 1. Hero -->
         <Hero />

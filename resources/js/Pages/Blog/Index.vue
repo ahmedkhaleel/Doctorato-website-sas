@@ -5,6 +5,7 @@ import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useLocale } from '@/composables/useLocale';
 import { useI18n } from 'vue-i18n';
 import { Head, Link, router } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { ref, computed, watch } from 'vue';
 
 const { t } = useI18n();
@@ -44,7 +45,10 @@ function getExcerpt(post) {
 </script>
 
 <template>
-    <Head :title="t('blog.page_title')" />
+    <SeoHead
+        :title="t('blog.page_title')"
+        :description="t('blog.subtitle') || 'مقالات ونصائح لإدارة العيادات الطبية بذكاء'"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">

@@ -5,6 +5,7 @@ import Navbar from '@/Components/Navbar.vue';
 import Footer from '@/Components/Footer.vue';
 import WhatsAppButton from '@/Components/WhatsAppButton.vue';
 import ScrollToTop from '@/Components/ScrollToTop.vue';
+import TrackingScripts from '@/Components/TrackingScripts.vue';
 
 const { locale } = useI18n();
 const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
@@ -19,5 +20,6 @@ const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
         <Footer />
         <WhatsAppButton />
         <ScrollToTop />
+        <TrackingScripts />
     </div>
 </template>

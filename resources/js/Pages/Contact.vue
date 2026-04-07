@@ -4,6 +4,9 @@ import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref, computed, onMounted } from 'vue';
+import { useTracking } from '@/composables/useTracking';
+
+const track = useTracking();
 
 const { t } = useI18n();
 useScrollAnimation();
@@ -128,6 +131,7 @@ function submitForm() {
     form.country_code = selectedCountry.value.dial;
     form.post(route('contact.store'), {
         onSuccess: () => {
+            track.lead({ form: 'contact' });
             showSuccess.value = true;
             form.reset();
             selectedCountry.value = countries[0];

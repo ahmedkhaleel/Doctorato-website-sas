@@ -3,19 +3,38 @@ import MainLayout from '@/Layouts/MainLayout.vue';
 import FaqAccordion from '@/Components/FaqAccordion.vue';
 import { useI18n } from 'vue-i18n';
 import { Head } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
+import { computed } from 'vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 
 useScrollAnimation();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
-defineProps({
+const props = defineProps({
     faqs: { type: Array, default: () => [] },
 });
+
+const faqJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: (props.faqs || []).map(f => ({
+        '@type': 'Question',
+        name: locale.value === 'ar' ? f.question_ar : f.question_en,
+        acceptedAnswer: {
+            '@type': 'Answer',
+            text: locale.value === 'ar' ? f.answer_ar : f.answer_en,
+        },
+    })),
+}));
 </script>
 
 <template>
-    <Head :title="t('faq.title')" />
+    <SeoHead
+        :title="t('faq.title')"
+        :description="t('faq.subtitle') || 'الإجابة على أكثر الأسئلة شيوعاً حول دكتوراتو'"
+        :json-ld="faqJsonLd"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative pt-32 pb-20 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">

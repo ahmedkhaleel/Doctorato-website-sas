@@ -4,6 +4,7 @@ import SectionTitle from '@/Components/SectionTitle.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
+import SeoHead from '@/Components/SeoHead.vue';
 import { computed } from 'vue';
 
 const { t } = useI18n();
@@ -106,7 +107,10 @@ const notificationFeatures = computed(() => [
 </script>
 
 <template>
-    <Head :title="t('dental_page.page_title')" />
+    <SeoHead
+        :title="t('dental_page.page_title')"
+        :description="t('dental_page.hero_subtitle') || 'وحدة طب الأسنان المتكاملة: مخطط أسنان تفاعلي، علاجات، تركيبات، تقويم'"
+    />
     <MainLayout>
         <!-- ============================================================ -->
         <!-- HERO SECTION                                                  -->
