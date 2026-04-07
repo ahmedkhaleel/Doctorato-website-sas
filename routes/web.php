@@ -79,6 +79,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('/demos', [\App\Http\Controllers\Admin\DemoController::class, 'index'])->name('demos.index');
     Route::put('/demos/{demo}/status', [\App\Http\Controllers\Admin\DemoController::class, 'updateStatus'])->name('demos.status');
+    Route::post('/demos/{demo}/extend-trial', [\App\Http\Controllers\Admin\DemoController::class, 'extendTrial'])->name('demos.extend');
+    Route::post('/demos/{demo}/seen', [\App\Http\Controllers\Admin\DemoController::class, 'markReminderSeen'])->name('demos.seen');
     Route::delete('/demos/{demo}', [\App\Http\Controllers\Admin\DemoController::class, 'destroy'])->name('demos.destroy');
 
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Currency;
+use App\Models\DemoRequest;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -24,6 +25,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'trialReminders' => fn () => $request->user()
+                ? DemoRequest::where('trial_status', 'expired')
+                    ->where('admin_reminder_seen', false)
+                    ->count()
+                : 0,
         ];
     }
 }
