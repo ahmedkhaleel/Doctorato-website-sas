@@ -328,40 +328,180 @@ const howItWorksSteps = computed(() => [
                         v-for="(card, index) in featureCards"
                         :key="index"
                         :href="card.href"
-                        class="feature-card group relative rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-1.5"
+                        class="feature-card group relative rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-1.5 bg-white border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-[#1B4F72]/10 hover:border-transparent"
                         :class="[
-                            index === 0 ? 'md:col-span-4 md:row-span-2 min-h-[260px] md:min-h-[340px]' : '',
-                            index === 1 ? 'md:col-span-2 min-h-[200px] md:min-h-[165px]' : '',
-                            index === 2 ? 'md:col-span-2 min-h-[200px] md:min-h-[165px]' : '',
-                            index > 2 ? 'md:col-span-2 min-h-[180px]' : '',
+                            index === 0 ? 'md:col-span-4 md:row-span-2 min-h-[320px] md:min-h-[380px]' : '',
+                            index === 1 ? 'md:col-span-2 min-h-[200px] md:min-h-[185px]' : '',
+                            index === 2 ? 'md:col-span-2 min-h-[200px] md:min-h-[185px]' : '',
+                            index > 2 ? 'md:col-span-2 min-h-[200px]' : '',
                         ]"
                     >
-                        <!-- Base card -->
-                        <div class="absolute inset-0 rounded-2xl bg-white border border-gray-100 shadow-sm group-hover:shadow-2xl group-hover:shadow-[#1B4F72]/10 transition-all duration-500"></div>
-
                         <!-- Hover gradient layer -->
-                        <div class="absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" :class="card.color"></div>
+                        <div class="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500" :class="card.color"></div>
 
-                        <!-- Decorative corner accent -->
-                        <div class="absolute top-0 end-0 w-24 h-24 opacity-[0.04] group-hover:opacity-[0.12] transition-opacity duration-500" :class="card.color.replace('from-', 'bg-gradient-to-br from-')">
-                            <div class="absolute inset-0 rounded-bl-[100%]" :class="card.color"></div>
-                        </div>
+                        <!-- ===== BACKGROUND ILLUSTRATIONS (per card) ===== -->
+
+                        <!-- FEATURES (large card) - Rich constellation illustration -->
+                        <template v-if="card.icon === 'features'">
+                            <!-- Huge "800+" background number -->
+                            <div class="absolute top-1/2 end-8 -translate-y-1/2 pointer-events-none select-none hidden md:block">
+                                <div class="text-[200px] font-black leading-none text-[#1B4F72]/[0.04] group-hover:text-white/[0.08] transition-colors duration-500" style="font-variant-numeric: tabular-nums;">
+                                    800
+                                </div>
+                            </div>
+                            <!-- Floating feature dots/sparkles -->
+                            <svg class="absolute top-8 end-8 w-48 h-48 md:w-56 md:h-56 opacity-[0.35] group-hover:opacity-60 transition-opacity duration-700" viewBox="0 0 240 240" fill="none">
+                                <!-- Connecting lines -->
+                                <g class="text-[#1B4F72] group-hover:text-white transition-colors duration-500" stroke="currentColor" stroke-width="1" stroke-dasharray="3 4" opacity="0.5">
+                                    <line x1="60" y1="40" x2="140" y2="80"/>
+                                    <line x1="140" y1="80" x2="200" y2="50"/>
+                                    <line x1="140" y1="80" x2="180" y2="150"/>
+                                    <line x1="140" y1="80" x2="80" y2="160"/>
+                                    <line x1="180" y1="150" x2="80" y2="160"/>
+                                    <line x1="60" y1="40" x2="80" y2="160"/>
+                                </g>
+                                <!-- Feature cards (small boxes) -->
+                                <g class="text-[#1B4F72] group-hover:text-white transition-all duration-500">
+                                    <rect x="48" y="28" width="28" height="24" rx="4" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.5"/>
+                                    <rect x="52" y="34" width="14" height="2" rx="1" fill="currentColor" opacity="0.5"/>
+                                    <rect x="52" y="40" width="10" height="2" rx="1" fill="currentColor" opacity="0.3"/>
+
+                                    <rect x="128" y="68" width="28" height="24" rx="4" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="136" cy="78" r="3" fill="currentColor" opacity="0.5"/>
+                                    <rect x="143" y="76" width="10" height="2" rx="1" fill="currentColor" opacity="0.4"/>
+                                    <rect x="143" y="80" width="8" height="2" rx="1" fill="currentColor" opacity="0.3"/>
+
+                                    <rect x="188" y="38" width="28" height="24" rx="4" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M194 50 L200 44 L206 50 L212 42" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+                                    <rect x="168" y="138" width="28" height="24" rx="4" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="1.5"/>
+                                    <circle cx="182" cy="150" r="5" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+                                    <rect x="68" y="148" width="28" height="24" rx="4" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="1.5"/>
+                                    <rect x="73" y="154" width="18" height="2" rx="1" fill="currentColor" opacity="0.4"/>
+                                    <rect x="73" y="158" width="12" height="2" rx="1" fill="currentColor" opacity="0.3"/>
+                                    <rect x="73" y="162" width="8" height="2" rx="1" fill="currentColor" opacity="0.3"/>
+                                </g>
+                                <!-- Glowing dots -->
+                                <g class="text-[#C4A265] group-hover:text-white transition-colors duration-500">
+                                    <circle cx="62" cy="40" r="3" fill="currentColor"/>
+                                    <circle cx="142" cy="80" r="3" fill="currentColor"/>
+                                    <circle cx="200" cy="50" r="3" fill="currentColor"/>
+                                    <circle cx="180" cy="150" r="3" fill="currentColor"/>
+                                    <circle cx="80" cy="160" r="3" fill="currentColor"/>
+                                </g>
+                            </svg>
+                            <!-- Sparkle accents -->
+                            <div class="absolute top-16 start-20 w-3 h-3 text-[#C4A265] group-hover:text-white opacity-60">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l1.5 9L24 12l-10.5 3L12 24l-1.5-9L0 12l10.5-3L12 0z"/></svg>
+                            </div>
+                            <div class="absolute bottom-24 end-32 w-2 h-2 text-[#1B4F72] group-hover:text-white opacity-40">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l1.5 9L24 12l-10.5 3L12 24l-1.5-9L0 12l10.5-3L12 0z"/></svg>
+                            </div>
+                        </template>
+
+                        <!-- PORTALS - 6 grid boxes illustration -->
+                        <template v-else-if="card.icon === 'portals'">
+                            <svg class="absolute -top-4 -end-4 w-40 h-40 opacity-[0.12] group-hover:opacity-30 transition-opacity duration-500" viewBox="0 0 160 160" fill="none">
+                                <g class="text-[#C4A265] group-hover:text-white transition-colors duration-500">
+                                    <rect x="16" y="16" width="36" height="36" rx="6" fill="currentColor" fill-opacity="0.3"/>
+                                    <rect x="62" y="16" width="36" height="36" rx="6" fill="currentColor" fill-opacity="0.5"/>
+                                    <rect x="108" y="16" width="36" height="36" rx="6" fill="currentColor" fill-opacity="0.3"/>
+                                    <rect x="16" y="62" width="36" height="36" rx="6" fill="currentColor" fill-opacity="0.5"/>
+                                    <rect x="62" y="62" width="36" height="36" rx="6" fill="currentColor" fill-opacity="0.7"/>
+                                    <rect x="108" y="62" width="36" height="36" rx="6" fill="currentColor" fill-opacity="0.3"/>
+                                </g>
+                            </svg>
+                        </template>
+
+                        <!-- DENTAL - Tooth + pattern -->
+                        <template v-else-if="card.icon === 'dental'">
+                            <svg class="absolute -top-6 -end-6 w-40 h-40 opacity-[0.12] group-hover:opacity-25 transition-opacity duration-500" viewBox="0 0 160 160" fill="none">
+                                <g class="text-[#1C2833] group-hover:text-white transition-colors duration-500">
+                                    <path d="M80 20C60 20 36 32 36 60C36 100 62 132 68 132C74 132 76 108 76 108C76 108 78 132 84 132C90 132 116 100 116 60C116 32 100 20 80 20Z" fill="currentColor" fill-opacity="0.4"/>
+                                    <circle cx="60" cy="48" r="3" fill="currentColor" opacity="0.6"/>
+                                    <circle cx="100" cy="48" r="3" fill="currentColor" opacity="0.6"/>
+                                    <path d="M52 72 Q80 90 108 72" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5" stroke-dasharray="3 3"/>
+                                </g>
+                            </svg>
+                        </template>
+
+                        <!-- SOLUTIONS - Lightbulb + rays -->
+                        <template v-else-if="card.icon === 'solutions'">
+                            <svg class="absolute -top-4 -end-4 w-40 h-40 opacity-[0.12] group-hover:opacity-25 transition-opacity duration-500" viewBox="0 0 160 160" fill="none">
+                                <g class="text-[#1B4F72] group-hover:text-white transition-colors duration-500">
+                                    <!-- Rays -->
+                                    <line x1="80" y1="20" x2="80" y2="32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                                    <line x1="40" y1="60" x2="52" y2="60" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                                    <line x1="108" y1="60" x2="120" y2="60" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                                    <line x1="50" y1="30" x2="58" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                                    <line x1="110" y1="30" x2="102" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                                    <!-- Bulb -->
+                                    <circle cx="80" cy="70" r="24" fill="currentColor" fill-opacity="0.4"/>
+                                    <path d="M68 88 L92 88 M70 96 L90 96 M74 104 L86 104" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+                                </g>
+                            </svg>
+                        </template>
+
+                        <!-- TECHNOLOGY - Circuit lines -->
+                        <template v-else-if="card.icon === 'technology'">
+                            <svg class="absolute -top-4 -end-4 w-44 h-44 opacity-[0.14] group-hover:opacity-30 transition-opacity duration-500" viewBox="0 0 160 160" fill="none">
+                                <g class="text-[#C4A265] group-hover:text-white transition-colors duration-500" stroke="currentColor" stroke-width="2" fill="none">
+                                    <path d="M20 40 L60 40 L60 80 L100 80 L100 40 L140 40"/>
+                                    <path d="M20 100 L40 100 L40 120 L80 120 L80 60"/>
+                                    <path d="M140 100 L110 100 L110 140 L60 140"/>
+                                </g>
+                                <g class="text-[#C4A265] group-hover:text-white transition-colors duration-500" fill="currentColor">
+                                    <circle cx="20" cy="40" r="4"/>
+                                    <circle cx="60" cy="40" r="4"/>
+                                    <circle cx="60" cy="80" r="4"/>
+                                    <circle cx="100" cy="80" r="4"/>
+                                    <circle cx="100" cy="40" r="4"/>
+                                    <circle cx="140" cy="40" r="4"/>
+                                    <circle cx="20" cy="100" r="4"/>
+                                    <circle cx="40" cy="120" r="4"/>
+                                    <circle cx="80" cy="60" r="4"/>
+                                    <circle cx="140" cy="100" r="4"/>
+                                    <circle cx="110" cy="140" r="4"/>
+                                </g>
+                            </svg>
+                        </template>
+
+                        <!-- REPORTS - Bar chart + line -->
+                        <template v-else>
+                            <svg class="absolute -top-4 -end-4 w-44 h-44 opacity-[0.12] group-hover:opacity-25 transition-opacity duration-500" viewBox="0 0 160 160" fill="none">
+                                <g class="text-[#1C2833] group-hover:text-white transition-colors duration-500">
+                                    <rect x="24" y="80" width="18" height="60" rx="3" fill="currentColor" fill-opacity="0.3"/>
+                                    <rect x="52" y="50" width="18" height="90" rx="3" fill="currentColor" fill-opacity="0.5"/>
+                                    <rect x="80" y="70" width="18" height="70" rx="3" fill="currentColor" fill-opacity="0.4"/>
+                                    <rect x="108" y="30" width="18" height="110" rx="3" fill="currentColor" fill-opacity="0.6"/>
+                                    <path d="M24 100 L52 70 L80 85 L108 45 L136 60" stroke="currentColor" stroke-width="2.5" fill="none" opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <circle cx="24" cy="100" r="3" fill="currentColor"/>
+                                    <circle cx="52" cy="70" r="3" fill="currentColor"/>
+                                    <circle cx="80" cy="85" r="3" fill="currentColor"/>
+                                    <circle cx="108" cy="45" r="3" fill="currentColor"/>
+                                </g>
+                            </svg>
+                        </template>
+
+                        <!-- Subtle grid pattern overlay -->
+                        <div class="absolute inset-0 opacity-[0.02] group-hover:opacity-[0.06] transition-opacity duration-500" style="background-image: linear-gradient(#1B4F72 1px, transparent 1px), linear-gradient(90deg, #1B4F72 1px, transparent 1px); background-size: 32px 32px;"></div>
 
                         <!-- Number badge -->
-                        <div class="absolute top-4 end-4 text-[10px] font-bold tracking-widest text-gray-300 group-hover:text-white/40 transition-colors duration-500">
+                        <div class="absolute top-4 end-4 text-[10px] font-bold tracking-widest text-gray-300 group-hover:text-white/40 transition-colors duration-500 z-10">
                             {{ String(index + 1).padStart(2, '0') }} / 06
                         </div>
 
                         <!-- Content -->
-                        <div class="relative h-full p-5 md:p-6 flex flex-col">
+                        <div class="relative h-full p-5 md:p-6 flex flex-col z-[1]">
                             <!-- Icon -->
                             <div class="mb-auto">
-                                <div class="relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-white/10 group-hover:backdrop-blur-sm"
+                                <div class="relative inline-flex items-center justify-center rounded-xl bg-gradient-to-br transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-white/15 group-hover:backdrop-blur-sm group-hover:border-white/20 border border-transparent shadow-sm"
                                     :class="[
-                                        index === 0 ? 'w-16 h-16 md:w-[72px] md:h-[72px]' : 'w-12 h-12',
+                                        index === 0 ? 'w-14 h-14 md:w-16 md:h-16' : 'w-12 h-12',
                                         card.iconBg
                                     ]">
-                                    <svg v-if="card.icon === 'features'" class="text-[#1B4F72] group-hover:text-white transition-colors duration-500" :class="index === 0 ? 'w-8 h-8 md:w-10 md:h-10' : 'w-6 h-6'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
+                                    <svg v-if="card.icon === 'features'" class="text-[#1B4F72] group-hover:text-white transition-colors duration-500" :class="index === 0 ? 'w-7 h-7 md:w-8 md:h-8' : 'w-6 h-6'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
                                     </svg>
                                     <svg v-else-if="card.icon === 'portals'" class="text-[#C4A265] group-hover:text-white transition-colors duration-500 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
@@ -383,13 +523,13 @@ const howItWorksSteps = computed(() => [
                             </div>
 
                             <!-- Text + stat pill for large card -->
-                            <div class="mt-5 md:mt-8">
-                                <div v-if="index === 0 && card.stat" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 group-hover:bg-white/15 group-hover:border-white/30 transition-all duration-500 mb-3">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#C4A265] group-hover:bg-white transition-colors duration-500"></span>
+                            <div class="mt-5 md:mt-6 max-w-[80%]">
+                                <div v-if="index === 0 && card.stat" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/25 group-hover:bg-white/15 group-hover:border-white/30 transition-all duration-500 mb-3">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#C4A265] group-hover:bg-white transition-colors duration-500 animate-pulse"></span>
                                     <span class="text-[10px] font-bold text-[#C4A265] group-hover:text-white transition-colors duration-500 tracking-wide">{{ card.stat }}</span>
                                 </div>
                                 <h3 class="font-bold text-[#0D2B45] group-hover:text-white transition-colors duration-500 mb-2 leading-snug"
-                                    :class="index === 0 ? 'text-lg md:text-2xl' : 'text-base md:text-[17px]'">
+                                    :class="index === 0 ? 'text-xl md:text-2xl' : 'text-base md:text-[17px]'">
                                     {{ card.title }}
                                 </h3>
                                 <p class="text-gray-500 group-hover:text-white/80 transition-colors duration-500 leading-relaxed"
@@ -403,7 +543,7 @@ const howItWorksSteps = computed(() => [
                                 <span class="text-[11px] md:text-xs font-semibold text-[#C4A265] group-hover:text-white transition-colors duration-500">
                                     {{ t('home.learn_more') }}
                                 </span>
-                                <div class="w-7 h-7 rounded-lg bg-[#C4A265]/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-500 group-hover:translate-x-0 rtl:group-hover:-translate-x-0">
+                                <div class="w-7 h-7 rounded-lg bg-[#C4A265]/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-500">
                                     <svg class="w-3.5 h-3.5 text-[#C4A265] group-hover:text-white rtl:rotate-180 transition-all duration-500 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
                                     </svg>
