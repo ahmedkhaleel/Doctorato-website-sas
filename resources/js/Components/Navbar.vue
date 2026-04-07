@@ -69,12 +69,8 @@ onUnmounted(() => {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
-                <Link href="/" class="flex items-center gap-2 shrink-0">
-                    <span
-                        class="text-xl lg:text-2xl font-bold tracking-tight transition-colors duration-300 text-primary"
-                    >
-                        <span class="bg-gradient-to-r from-secondary to-secondary-light bg-clip-text text-transparent">D</span>octorato
-                    </span>
+                <Link href="/" class="flex items-center shrink-0">
+                    <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-12 lg:h-14 w-auto" />
                 </Link>
 
                 <!-- Desktop Nav Links -->

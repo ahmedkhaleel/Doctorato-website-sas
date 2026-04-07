@@ -112,20 +112,13 @@ const roleLabels = {
                 <!-- Logo -->
                 <div class="px-4 py-5 border-b border-white/10 flex items-center justify-between">
                     <div v-if="sidebarOpen" class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/20">
-                            <svg class="w-6 h-6 text-[#0D2B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
+                        <div class="bg-white rounded-xl p-1.5 shadow-lg shadow-black/20">
+                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-9 w-auto" />
                         </div>
-                        <div>
-                            <div class="text-lg font-bold text-white leading-tight">Doctorato</div>
-                            <div class="text-[10px] text-[#C4A265] uppercase tracking-widest">Admin Panel</div>
-                        </div>
+                        <div class="text-[10px] text-[#C4A265] uppercase tracking-widest">Admin Panel</div>
                     </div>
-                    <div v-else class="w-10 h-10 mx-auto rounded-xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center">
-                        <svg class="w-5 h-5 text-[#0D2B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
+                    <div v-else class="mx-auto bg-white rounded-xl p-1 shadow-lg shadow-black/20">
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-8 w-8 object-contain" />
                     </div>
 
                     <button

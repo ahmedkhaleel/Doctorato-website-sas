@@ -21,7 +21,9 @@ function submit() {
         <div class="w-full max-w-md">
             <!-- Logo -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-[#C4A265] mb-2">Doctorato</h1>
+                <div class="inline-block bg-white rounded-2xl p-4 shadow-2xl shadow-black/30 mb-3">
+                    <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-16 w-auto" />
+                </div>
                 <p class="text-white/60 text-sm">لوحة تحكم الموقع</p>
             </div>
 

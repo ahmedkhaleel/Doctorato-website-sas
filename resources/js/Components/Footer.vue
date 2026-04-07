@@ -72,9 +72,7 @@ const socialLinks = [
                 <!-- Column 1: Logo & About -->
                 <div>
                     <Link href="/" class="inline-block mb-4">
-                        <span class="text-2xl font-bold">
-                            <span class="bg-gradient-to-r from-secondary to-secondary-light bg-clip-text text-transparent">D</span>octorato
-                        </span>
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-14 w-auto bg-white rounded-xl p-2" />
                     </Link>
                     <p class="text-white/60 text-sm leading-relaxed mb-6">
                         {{ $t('footer.description') }}
