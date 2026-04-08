@@ -19,7 +19,8 @@ watch(flash, (v) => {
 
 function hasPerm(perm) {
     if (!authUser.value) return false;
-    if (authUser.value.role === 'super_admin') return true;
+    // super_admin and admin roles have unrestricted access
+    if (authUser.value.role === 'super_admin' || authUser.value.role === 'admin') return true;
     return (authUser.value.permissions || []).includes(perm);
 }
 
@@ -53,6 +54,8 @@ const menuGroups = computed(() => [
     {
         label: 'المحتوى',
         items: [
+            { label: 'مقالات المدونة', icon: 'doc', route: '/admin/blog/posts', perm: 'dashboard.view' },
+            { label: 'تصنيفات المدونة', icon: 'tag', route: '/admin/blog/categories', perm: 'dashboard.view' },
             { label: 'الأسئلة الشائعة', icon: 'faq', route: '/admin/faqs', perm: 'faqs.manage' },
             { label: 'الشهادات', icon: 'star', route: '/admin/testimonials', perm: 'testimonials.manage' },
             { label: 'خطط الأسعار', icon: 'price', route: '/admin/plans', perm: 'plans.manage' },
@@ -123,12 +126,12 @@ const roleLabels = {
 
             <div class="relative h-full flex flex-col">
                 <!-- Logo -->
-                <div class="px-4 py-5 border-b border-white/10 flex items-center justify-between">
+                <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
                     <div v-if="sidebarOpen" class="flex items-center gap-2">
-                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 h-auto logo-white" />
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-7 w-auto logo-white" />
                     </div>
                     <div v-else class="mx-auto">
-                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-10 h-10 object-contain logo-white" />
+                        <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-5 w-auto max-w-[56px] object-contain logo-white" />
                     </div>
 
                     <button
@@ -193,6 +196,12 @@ const roleLabels = {
                                     <svg v-else-if="item.icon === 'cog'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <svg v-else-if="item.icon === 'doc'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <svg v-else-if="item.icon === 'tag'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                     </svg>
                                     <svg v-else-if="item.icon === 'coin'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

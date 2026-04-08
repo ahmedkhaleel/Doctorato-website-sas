@@ -136,23 +136,46 @@ function renderStars(rating) {
 .testimonials-carousel :deep(.swiper-button-next),
 .testimonials-carousel :deep(.swiper-button-prev) {
     color: var(--color-secondary);
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
     background: white;
     border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s;
+}
+
+@media (min-width: 768px) {
+    .testimonials-carousel :deep(.swiper-button-next),
+    .testimonials-carousel :deep(.swiper-button-prev) {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Hide on small mobile to give content more room */
+@media (max-width: 640px) {
+    .testimonials-carousel :deep(.swiper-button-next),
+    .testimonials-carousel :deep(.swiper-button-prev) {
+        display: none;
+    }
 }
 
 .testimonials-carousel :deep(.swiper-button-next:hover),
 .testimonials-carousel :deep(.swiper-button-prev:hover) {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    transform: scale(1.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    transform: scale(1.08);
+}
+
+/* Shrink the inner navigation icon (Swiper renders an SVG inside) */
+.testimonials-carousel :deep(.swiper-button-next svg),
+.testimonials-carousel :deep(.swiper-button-prev svg) {
+    width: 9px;
+    height: 14px;
 }
 
 .testimonials-carousel :deep(.swiper-button-next::after),
 .testimonials-carousel :deep(.swiper-button-prev::after) {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 700;
 }
 

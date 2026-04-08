@@ -82,3 +82,99 @@ a, button {
 .logo-white {
     filter: brightness(0) invert(1);
 }
+
+/* ===== PREMIUM ANIMATIONS ===== */
+
+/* Slow pulse for ambient orbs */
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 0.7; transform: scale(1.08); }
+}
+.animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+}
+
+/* Aurora drift — for shifting mesh gradients */
+@keyframes aurora-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(40px, -30px) scale(1.1); }
+    66%      { transform: translate(-30px, 40px) scale(0.95); }
+}
+.animate-aurora {
+    animation: aurora-drift 18s ease-in-out infinite;
+}
+
+/* Grid scroll — subtly moves diagonal lines */
+@keyframes grid-drift {
+    0%   { background-position: 0 0, 0 0; }
+    100% { background-position: 60px 60px, -60px 60px; }
+}
+.animate-grid-drift {
+    animation: grid-drift 25s linear infinite;
+}
+
+/* Shimmer sweep — diagonal light pass */
+@keyframes shimmer-sweep {
+    0%   { transform: translateX(-150%) skewX(-12deg); }
+    100% { transform: translateX(250%) skewX(-12deg); }
+}
+.animate-shimmer {
+    animation: shimmer-sweep 3s ease-in-out infinite;
+}
+
+/* Float — gentle up-and-down */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+}
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Conic gradient rotation for animated borders */
+@keyframes spin-slow {
+    to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+    animation: spin-slow 6s linear infinite;
+}
+
+/* Fade-up entrance — used by sections marked .animate-fade-up */
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+    animation: fade-up 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Stagger helper — children get incremental delays */
+.animate-stagger > * {
+    animation: fade-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.animate-stagger > *:nth-child(2) { animation-delay: 0.15s; }
+.animate-stagger > *:nth-child(3) { animation-delay: 0.25s; }
+.animate-stagger > *:nth-child(4) { animation-delay: 0.35s; }
+.animate-stagger > *:nth-child(5) { animation-delay: 0.45s; }
+.animate-stagger > *:nth-child(6) { animation-delay: 0.55s; }
+
+/* Counter glow on hover */
+@keyframes number-glow {
+    0%, 100% { text-shadow: 0 0 0 transparent; }
+    50%      { text-shadow: 0 0 30px currentColor; }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .animate-pulse-slow,
+    .animate-aurora,
+    .animate-grid-drift,
+    .animate-shimmer,
+    .animate-float,
+    .animate-spin-slow,
+    .animate-fade-up,
+    .animate-stagger > * {
+        animation: none !important;
+    }
+}

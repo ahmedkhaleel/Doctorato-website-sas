@@ -2,14 +2,21 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
+import { useLocale } from '@/composables/useLocale';
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import CurrencySwitcher from '@/Components/CurrencySwitcher.vue';
 
 const { t, locale } = useI18n();
+const { switchLocale } = useLocale();
 
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
 const isProductDropdownOpen = ref(false);
+const openMobileDropdown = ref(null);
+
+function toggleMobileDropdown(label) {
+    openMobileDropdown.value = openMobileDropdown.value === label ? null : label;
+}
 
 const navLinks = computed(() => [
     { label: t('nav.home'), href: '/' },
@@ -38,6 +45,7 @@ function handleScroll() {
 
 function closeMobileMenu() {
     isMobileMenuOpen.value = false;
+    openMobileDropdown.value = null;
 }
 
 let dropdownTimeout = null;
@@ -148,10 +156,23 @@ onUnmounted(() => {
                     </Link>
                 </div>
 
-                <!-- Mobile Hamburger -->
+                <!-- Mobile Right Actions: language toggle + hamburger -->
+                <div class="lg:hidden flex items-center gap-1">
+                    <!-- Quick language toggle (icon + label) -->
+                    <button
+                        @click="switchLocale"
+                        :aria-label="locale === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'"
+                        class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-dark hover:text-primary hover:bg-light-blue transition-colors"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-xs font-bold tracking-wide">{{ locale === 'ar' ? 'EN' : 'AR' }}</span>
+                    </button>
+
                 <button
                     @click="isMobileMenuOpen = !isMobileMenuOpen"
-                    class="lg:hidden p-2 rounded-lg transition-colors text-dark hover:bg-gray-100"
+                    class="p-2 rounded-lg transition-colors text-dark hover:bg-gray-100"
                     :aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,10 +192,18 @@ onUnmounted(() => {
                         />
                     </svg>
                 </button>
+                </div>
             </div>
         </div>
 
-        <!-- Mobile Menu Overlay -->
+        <!--
+          Mobile Menu Overlay + Drawer — teleported to <body>.
+          The parent <nav> uses backdrop-blur, which makes it a containing
+          block for any position:fixed descendants. Without Teleport, the
+          drawer's `top-0 bottom-0` would be relative to the (~80px) nav
+          instead of the viewport, so it wouldn't render full-height.
+        -->
+        <Teleport to="body">
         <Transition
             enter-active-class="transition-opacity duration-300"
             enter-from-class="opacity-0"
@@ -222,19 +251,48 @@ onUnmounted(() => {
                 <!-- Drawer Links -->
                 <div class="p-4 space-y-1">
                     <template v-for="link in navLinks" :key="link.label">
-                        <!-- Dropdown section in mobile -->
-                        <template v-if="link.dropdown">
-                            <p class="px-4 pt-4 pb-2 text-xs font-bold text-gray uppercase tracking-wider">{{ link.label }}</p>
-                            <Link
-                                v-for="child in link.children"
-                                :key="child.href"
-                                :href="child.href"
-                                @click="closeMobileMenu"
-                                class="block px-4 py-2.5 rounded-xl text-dark hover:bg-light-blue hover:text-primary font-medium transition-colors text-sm"
+                        <!-- Collapsible dropdown — same items as desktop, but as an accordion -->
+                        <div v-if="link.dropdown" class="rounded-xl overflow-hidden">
+                            <button
+                                type="button"
+                                @click="toggleMobileDropdown(link.label)"
+                                class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-dark hover:bg-light-blue hover:text-primary font-medium transition-colors"
+                                :class="{ 'bg-light-blue text-primary': openMobileDropdown === link.label }"
                             >
-                                {{ child.label }}
-                            </Link>
-                        </template>
+                                <span>{{ link.label }}</span>
+                                <svg
+                                    class="w-4 h-4 transition-transform duration-300"
+                                    :class="{ 'rotate-180': openMobileDropdown === link.label }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Animated children panel -->
+                            <Transition
+                                enter-active-class="transition-all duration-300 ease-out"
+                                enter-from-class="max-h-0 opacity-0"
+                                enter-to-class="max-h-[600px] opacity-100"
+                                leave-active-class="transition-all duration-200 ease-in"
+                                leave-from-class="max-h-[600px] opacity-100"
+                                leave-to-class="max-h-0 opacity-0"
+                            >
+                                <div v-if="openMobileDropdown === link.label" class="overflow-hidden">
+                                    <div class="ms-4 mt-1 ps-3 border-s-2 border-secondary/30 space-y-0.5 py-1">
+                                        <Link
+                                            v-for="child in link.children"
+                                            :key="child.href"
+                                            :href="child.href"
+                                            @click="closeMobileMenu"
+                                            class="block px-3 py-2 rounded-lg text-dark hover:bg-light-blue hover:text-primary font-medium transition-colors text-sm"
+                                        >
+                                            {{ child.label }}
+                                        </Link>
+                                    </div>
+                                </div>
+                            </Transition>
+                        </div>
 
                         <!-- Regular link -->
                         <Link
@@ -268,5 +326,6 @@ onUnmounted(() => {
                 </div>
             </div>
         </Transition>
+        </Teleport>
     </nav>
 </template>

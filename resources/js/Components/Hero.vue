@@ -16,11 +16,31 @@ const brandRef = ref(null);
 const mockupRef = ref(null);
 
 const stats = [
-    { target: 800, suffix: '+', labelKey: 'hero.stats.features' },
-    { target: 6, suffix: '', labelKey: 'hero.stats.portals' },
-    { target: 3000, suffix: '+', labelKey: 'hero.stats.translations' },
-    { target: 80, suffix: '+', labelKey: 'hero.stats.permissions' },
-    { target: 39, suffix: '', labelKey: 'hero.stats.webmaster_pages' },
+    {
+        target: 800, suffix: '+', labelKey: 'hero.stats.features',
+        accent: '#C4A265', accentSoft: 'rgba(196,162,101,0.18)',
+        icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+    },
+    {
+        target: 6, suffix: '', labelKey: 'hero.stats.portals',
+        accent: '#5DADE2', accentSoft: 'rgba(93,173,226,0.18)',
+        icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+    },
+    {
+        target: 3000, suffix: '+', labelKey: 'hero.stats.translations',
+        accent: '#2E86C1', accentSoft: 'rgba(46,134,193,0.18)',
+        icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
+    },
+    {
+        target: 80, suffix: '+', labelKey: 'hero.stats.permissions',
+        accent: '#27AE60', accentSoft: 'rgba(39,174,96,0.18)',
+        icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+    },
+    {
+        target: 39, suffix: '', labelKey: 'hero.stats.webmaster_pages',
+        accent: '#D4B87A', accentSoft: 'rgba(212,184,122,0.18)',
+        icon: 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2',
+    },
 ];
 
 onMounted(() => {
@@ -69,16 +89,40 @@ onMounted(() => {
         ref="heroRef"
         class="relative min-h-screen flex flex-col overflow-hidden bg-[#0A1628]"
     >
-        <!-- Gradient Mesh Background -->
+        <!-- Layer 1: Gradient Mesh Background -->
         <div class="absolute inset-0 hero-gradient-mesh" />
 
-        <!-- Animated Grid Overlay -->
+        <!-- Layer 2: Static rectangular grid -->
         <div class="absolute inset-0 hero-grid-overlay opacity-[0.04] pointer-events-none" />
 
-        <!-- Animated Gradient Orbs -->
-        <div class="absolute top-[-10%] start-[-5%] w-[500px] h-[500px] bg-[#1B4F72]/30 rounded-full blur-[120px] pointer-events-none hero-orb-1" />
-        <div class="absolute bottom-[10%] end-[-10%] w-[600px] h-[600px] bg-[#C4A265]/10 rounded-full blur-[150px] pointer-events-none hero-orb-2" />
-        <div class="absolute top-[40%] start-[30%] w-[400px] h-[400px] bg-[#1B4F72]/15 rounded-full blur-[100px] pointer-events-none hero-orb-3" />
+        <!-- Layer 3: Animated diagonal grid (drifts slowly) -->
+        <div
+            class="absolute inset-0 opacity-[0.05] pointer-events-none animate-grid-drift"
+            style="background-image: linear-gradient(45deg, rgba(196,162,101,0.5) 1px, transparent 1px), linear-gradient(-45deg, rgba(196,162,101,0.5) 1px, transparent 1px); background-size: 80px 80px;"
+        />
+
+        <!-- Layer 4: Hexagon medical pattern -->
+        <svg class="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="hero-hex-pattern" x="0" y="0" width="56" height="64" patternUnits="userSpaceOnUse">
+                    <polygon points="28,2 52,16 52,48 28,62 4,48 4,16" fill="none" stroke="white" stroke-width="1"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#hero-hex-pattern)"/>
+        </svg>
+
+        <!-- Layer 5: Noise / grain overlay -->
+        <div class="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E&quot;);"></div>
+
+        <!-- Layer 6: Animated Gradient Orbs (auroras) -->
+        <div class="absolute top-[-10%] start-[-5%] w-[500px] h-[500px] bg-[#1B4F72]/40 rounded-full blur-[120px] pointer-events-none animate-aurora" />
+        <div class="absolute bottom-[10%] end-[-10%] w-[600px] h-[600px] bg-[#C4A265]/18 rounded-full blur-[150px] pointer-events-none animate-aurora" style="animation-delay: -6s" />
+        <div class="absolute top-[40%] start-[30%] w-[400px] h-[400px] bg-[#2E86C1]/20 rounded-full blur-[100px] pointer-events-none animate-aurora" style="animation-delay: -12s" />
+
+        <!-- Layer 7: Glowing accent dots -->
+        <div class="absolute top-[18%] end-[12%] w-2 h-2 rounded-full bg-[#C4A265] shadow-[0_0_20px_#C4A265] animate-pulse-slow opacity-60 pointer-events-none"></div>
+        <div class="absolute top-[35%] start-[10%] w-1.5 h-1.5 rounded-full bg-[#5DADE2] shadow-[0_0_15px_#5DADE2] animate-pulse-slow opacity-50 pointer-events-none" style="animation-delay: -3s"></div>
+        <div class="absolute bottom-[22%] end-[20%] w-1.5 h-1.5 rounded-full bg-[#27AE60] shadow-[0_0_15px_#27AE60] animate-pulse-slow opacity-50 pointer-events-none" style="animation-delay: -5s"></div>
 
         <!-- Floating Medical Icons -->
         <div class="absolute inset-0 pointer-events-none overflow-hidden">
@@ -362,20 +406,66 @@ onMounted(() => {
                 <div
                     v-for="(stat, index) in stats"
                     :key="index"
-                    class="hero-stat-glass group relative rounded-xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.07] p-5 text-center transition-all duration-500 hover:bg-white/[0.08] hover:border-white/[0.15]"
+                    class="hero-stat-glass group relative"
+                    :style="{ '--accent': stat.accent }"
                 >
-                    <!-- Hover glow -->
-                    <div class="absolute inset-0 rounded-xl bg-[#C4A265]/0 group-hover:bg-[#C4A265]/[0.03] transition-colors duration-500 pointer-events-none" />
-                    <div class="relative">
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#C4A265] mb-1.5">
-                            <AnimatedCounter
-                                :target="stat.target"
-                                :suffix="stat.suffix"
-                                :duration="2000"
-                            />
-                        </div>
-                        <div class="text-[11px] sm:text-xs text-white/40 font-medium">
-                            {{ $t(stat.labelKey) }}
+                    <!-- Animated conic-gradient border on hover -->
+                    <div class="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden">
+                        <div class="absolute inset-[-100%] animate-spin-slow" :style="{ background: `conic-gradient(from 0deg, transparent 0deg, ${stat.accent} 60deg, transparent 120deg, transparent 360deg)` }"></div>
+                    </div>
+
+                    <!-- Card body -->
+                    <div class="relative h-full rounded-2xl bg-[#0A1628]/85 backdrop-blur-md border border-white/[0.07] p-5 transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-2xl overflow-hidden">
+                        <!-- Radial hover glow -->
+                        <div
+                            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                            :style="{ background: `radial-gradient(circle at 50% 0%, ${stat.accentSoft} 0%, transparent 70%)` }"
+                        ></div>
+
+                        <!-- Top accent line that grows on hover -->
+                        <div
+                            class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[2px] transition-all duration-700"
+                            :style="{ background: `linear-gradient(90deg, transparent, ${stat.accent}, transparent)`, boxShadow: `0 0 12px ${stat.accent}` }"
+                        ></div>
+
+                        <!-- Glowing accent dot -->
+                        <div
+                            class="absolute top-3 end-3 w-1.5 h-1.5 rounded-full opacity-60 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500"
+                            :style="{ background: stat.accent, boxShadow: `0 0 12px ${stat.accent}` }"
+                        ></div>
+
+                        <!-- Subtle dotted corner -->
+                        <svg class="absolute -bottom-2 -end-2 w-12 h-12 text-white/[0.04] pointer-events-none" viewBox="0 0 48 48" fill="none">
+                            <pattern :id="`hero-dots-${index}`" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+                                <circle cx="1.5" cy="1.5" r="1" fill="currentColor" />
+                            </pattern>
+                            <rect width="48" height="48" :fill="`url(#hero-dots-${index})`" />
+                        </svg>
+
+                        <div class="relative">
+                            <!-- Icon -->
+                            <div
+                                class="w-9 h-9 rounded-lg flex items-center justify-center mb-3 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                                :style="{ background: stat.accentSoft, color: stat.accent, boxShadow: `inset 0 0 0 1px ${stat.accent}30` }"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" :d="stat.icon" />
+                                </svg>
+                            </div>
+
+                            <!-- Number with gradient -->
+                            <div class="text-3xl sm:text-4xl font-black leading-none mb-1.5 bg-gradient-to-br from-white to-white/70 bg-clip-text text-transparent group-hover:from-white group-hover:to-[var(--accent)] transition-all duration-500">
+                                <AnimatedCounter
+                                    :target="stat.target"
+                                    :suffix="stat.suffix"
+                                    :duration="2000"
+                                />
+                            </div>
+
+                            <!-- Label -->
+                            <div class="text-[11px] sm:text-xs font-bold uppercase tracking-widest transition-colors" :style="{ color: stat.accent }">
+                                {{ $t(stat.labelKey) }}
+                            </div>
                         </div>
                     </div>
                 </div>

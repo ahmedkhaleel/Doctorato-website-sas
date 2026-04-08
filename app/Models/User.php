@@ -97,7 +97,8 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permission): bool
     {
-        if ($this->role === 'super_admin') {
+        // super_admin and admin roles have unrestricted access
+        if ($this->role === 'super_admin' || $this->role === 'admin') {
             return true;
         }
         return in_array($permission, $this->permissions ?? [], true);

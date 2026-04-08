@@ -113,56 +113,154 @@ const notificationFeatures = computed(() => [
     />
     <MainLayout>
         <!-- ============================================================ -->
-        <!-- HERO SECTION                                                  -->
+        <!-- HERO SECTION — Cinematic Premium Edition                      -->
         <!-- ============================================================ -->
-        <section class="relative py-28 overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-[#0D2F45]">
-            <!-- Decorative blobs -->
-            <div class="absolute inset-0 opacity-10 pointer-events-none">
-                <div class="absolute top-6 start-6 w-80 h-80 bg-secondary rounded-full blur-3xl"></div>
-                <div class="absolute bottom-6 end-6 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-                <div class="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/30 rounded-full blur-[120px]"></div>
+        <section class="relative py-32 lg:py-40 overflow-hidden bg-[#070F1B]">
+            <!-- Layer 1: Base radial gradient -->
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0A1628] via-[#0D2F45] to-[#070F1B]"></div>
+
+            <!-- Layer 2: Animated aurora orbs -->
+            <div class="absolute inset-0">
+                <div class="absolute top-[-15%] start-[10%] w-[600px] h-[600px] bg-[#1B4F72]/50 rounded-full blur-[140px] animate-aurora"></div>
+                <div class="absolute bottom-[-20%] end-[5%] w-[700px] h-[700px] bg-[#C4A265]/25 rounded-full blur-[160px] animate-aurora" style="animation-delay: -6s"></div>
+                <div class="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#2E86C1]/20 rounded-full blur-[120px] animate-aurora" style="animation-delay: -12s"></div>
             </div>
 
-            <!-- Floating tooth icons -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.06]">
-                <svg class="absolute top-12 start-[15%] w-16 h-16 text-white animate-bounce" viewBox="0 0 64 64" fill="currentColor">
+            <!-- Layer 3: Animated diagonal grid -->
+            <div
+                class="absolute inset-0 opacity-[0.06] animate-grid-drift"
+                style="background-image: linear-gradient(45deg, rgba(196,162,101,0.6) 1px, transparent 1px), linear-gradient(-45deg, rgba(196,162,101,0.6) 1px, transparent 1px); background-size: 60px 60px;"
+            ></div>
+
+            <!-- Layer 4: Hexagon medical pattern (DNA/molecule feel) -->
+            <svg class="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="hex-pattern" x="0" y="0" width="56" height="64" patternUnits="userSpaceOnUse">
+                        <polygon points="28,2 52,16 52,48 28,62 4,48 4,16" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#hex-pattern)"/>
+            </svg>
+
+            <!-- Layer 5: Noise / grain overlay -->
+            <div class="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E&quot;);"></div>
+
+            <!-- Layer 6: Floating tooth icons with motion -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg class="absolute top-[12%] start-[8%] w-20 h-20 text-[#C4A265]/20 animate-float" viewBox="0 0 64 64" fill="currentColor">
                     <path d="M32 4c-6 0-11 2-14 6s-4 9-3 15c1 5 3 11 5 16 2 4 4 9 5 13 1 3 3 6 7 6s6-3 7-6c1-4 3-9 5-13 2-5 4-11 5-16 1-6 0-11-3-15S38 4 32 4z"/>
                 </svg>
-                <svg class="absolute bottom-20 end-[20%] w-12 h-12 text-white" viewBox="0 0 64 64" fill="currentColor">
+                <svg class="absolute top-[20%] end-[10%] w-14 h-14 text-white/15 animate-float" style="animation-delay: -2s" viewBox="0 0 64 64" fill="currentColor">
                     <path d="M32 4c-6 0-11 2-14 6s-4 9-3 15c1 5 3 11 5 16 2 4 4 9 5 13 1 3 3 6 7 6s6-3 7-6c1-4 3-9 5-13 2-5 4-11 5-16 1-6 0-11-3-15S38 4 32 4z"/>
                 </svg>
+                <svg class="absolute bottom-[18%] start-[18%] w-12 h-12 text-[#5DADE2]/20 animate-float" style="animation-delay: -4s" viewBox="0 0 64 64" fill="currentColor">
+                    <path d="M32 4c-6 0-11 2-14 6s-4 9-3 15c1 5 3 11 5 16 2 4 4 9 5 13 1 3 3 6 7 6s6-3 7-6c1-4 3-9 5-13 2-5 4-11 5-16 1-6 0-11-3-15S38 4 32 4z"/>
+                </svg>
+                <svg class="absolute bottom-[15%] end-[20%] w-16 h-16 text-[#C4A265]/15 animate-float" style="animation-delay: -1s" viewBox="0 0 64 64" fill="currentColor">
+                    <path d="M32 4c-6 0-11 2-14 6s-4 9-3 15c1 5 3 11 5 16 2 4 4 9 5 13 1 3 3 6 7 6s6-3 7-6c1-4 3-9 5-13 2-5 4-11 5-16 1-6 0-11-3-15S38 4 32 4z"/>
+                </svg>
+
+                <!-- Glowing accent dots -->
+                <div class="absolute top-[30%] start-[25%] w-2 h-2 rounded-full bg-[#C4A265] shadow-[0_0_20px_#C4A265] animate-pulse-slow"></div>
+                <div class="absolute top-[60%] end-[28%] w-1.5 h-1.5 rounded-full bg-[#5DADE2] shadow-[0_0_15px_#5DADE2] animate-pulse-slow" style="animation-delay: -3s"></div>
+                <div class="absolute bottom-[35%] start-[35%] w-1.5 h-1.5 rounded-full bg-[#C4A265] shadow-[0_0_15px_#C4A265] animate-pulse-slow" style="animation-delay: -5s"></div>
+                <div class="absolute top-[45%] end-[35%] w-2 h-2 rounded-full bg-[#27AE60] shadow-[0_0_20px_#27AE60] animate-pulse-slow" style="animation-delay: -2s"></div>
             </div>
+
+            <!-- Top + bottom border glow -->
+            <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/50 to-transparent"></div>
+            <div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/50 to-transparent"></div>
 
             <div class="relative container mx-auto px-4 text-center">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20 animate-fade-up">
-                    <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Badge with glow -->
+                <div class="relative inline-flex items-center gap-2 px-5 py-2 bg-white/[0.06] backdrop-blur-md rounded-full mb-8 border border-white/10 animate-fade-up overflow-hidden group">
+                    <!-- Shimmer sweep on hover -->
+                    <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                        <div class="absolute top-0 -start-1/2 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+                    </div>
+                    <span class="relative flex w-2 h-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C4A265] opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-[#C4A265]"></span>
+                    </span>
+                    <svg class="relative w-5 h-5 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                     </svg>
-                    <span class="text-sm font-semibold text-white">{{ t('dental_page.hero_badge') }}</span>
+                    <span class="relative text-sm font-semibold text-white tracking-wide">{{ t('dental_page.hero_badge') }}</span>
                 </div>
 
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 animate-fade-up">
-                    {{ t('dental_page.hero_title') }}
+                <!-- Title with gradient glow -->
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 animate-fade-up leading-tight">
+                    <span class="bg-gradient-to-br from-white via-white to-[#C4A265] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(196,162,101,0.3)]">
+                        {{ t('dental_page.hero_title') }}
+                    </span>
                 </h1>
-                <p class="text-xl text-white/80 max-w-3xl mx-auto mb-10 animate-fade-up">
+
+                <!-- Decorative divider -->
+                <div class="flex items-center justify-center gap-3 mb-6 animate-fade-up">
+                    <div class="h-px w-12 bg-gradient-to-r from-transparent to-[#C4A265]"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-[#C4A265] animate-pulse"></div>
+                    <div class="h-px w-12 bg-gradient-to-l from-transparent to-[#C4A265]"></div>
+                </div>
+
+                <p class="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-10 animate-fade-up leading-relaxed">
                     {{ t('dental_page.hero_subtitle') }}
                 </p>
 
+                <!-- CTAs -->
                 <div class="flex flex-wrap justify-center gap-4 animate-fade-up">
                     <Link
                         href="/demo"
-                        class="px-8 py-4 bg-secondary hover:bg-secondary-dark text-white font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-secondary/25 hover:-translate-y-0.5"
+                        class="group relative px-8 py-4 bg-gradient-to-br from-[#C4A265] to-[#D4B87A] text-white font-bold rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-[#C4A265]/40 hover:-translate-y-1 overflow-hidden"
                     >
-                        {{ t('dental_page.hero_cta_demo') }}
+                        <!-- Shimmer sweep -->
+                        <div class="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                            <div class="absolute top-0 -start-1/2 w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                        </div>
+                        <span class="relative flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ t('dental_page.hero_cta_demo') }}
+                        </span>
                     </Link>
                     <a
                         href="#dental-chart"
-                        class="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full backdrop-blur-sm transition-all duration-300 border border-white/20"
+                        class="group px-8 py-4 bg-white/[0.06] hover:bg-white/[0.12] text-white font-bold rounded-full backdrop-blur-md transition-all duration-500 border border-white/15 hover:border-white/30 hover:-translate-y-0.5"
                     >
-                        {{ t('dental_page.hero_cta_explore') }}
+                        <span class="flex items-center gap-2">
+                            {{ t('dental_page.hero_cta_explore') }}
+                            <svg class="w-5 h-5 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                        </span>
                     </a>
                 </div>
+
+                <!-- Trust indicators row -->
+                <div class="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-white/40 text-xs animate-fade-up">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <span>FDI معايير دولية</span>
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-white/20"></div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span>مخطط أسنان تفاعلي</span>
+                    </div>
+                    <div class="w-1 h-1 rounded-full bg-white/20"></div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        <span>علاجات + أشعة + مختبرات</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom scroll cue -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-float pointer-events-none">
+                <div class="w-px h-12 bg-gradient-to-b from-transparent to-[#C4A265]/40"></div>
+                <svg class="w-4 h-4 text-[#C4A265]/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
             </div>
         </section>
 

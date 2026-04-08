@@ -732,21 +732,36 @@ const homeJsonLd = computed(() => ({
             </div>
         </section>
 
-        <!-- 6. Stats Section - Premium redesign with bento layout -->
-        <section class="py-20 lg:py-28 relative overflow-hidden bg-[#0A1F33]">
-            <!-- Animated mesh gradient background -->
+        <!-- 6. Stats Section — Premium redesign with cinematic background -->
+        <section class="stats-section py-24 lg:py-32 relative overflow-hidden bg-[#070F1B]">
+            <!-- Layer 1: Base radial gradient -->
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0A1628] via-[#070F1B] to-[#0A1F33]"></div>
+
+            <!-- Layer 2: Animated aurora orbs (drifting mesh gradient) -->
             <div class="absolute inset-0">
-                <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#1B4F72]/40 rounded-full blur-[120px] animate-pulse-slow"></div>
-                <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#C4A265]/15 rounded-full blur-[140px] animate-pulse-slow" style="animation-delay: 2s"></div>
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#2E86C1]/20 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 4s"></div>
+                <div class="absolute top-[-10%] left-[15%] w-[600px] h-[600px] bg-[#1B4F72]/40 rounded-full blur-[140px] animate-aurora"></div>
+                <div class="absolute bottom-[-15%] right-[10%] w-[700px] h-[700px] bg-[#C4A265]/20 rounded-full blur-[160px] animate-aurora" style="animation-delay: -6s"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#2E86C1]/25 rounded-full blur-[120px] animate-aurora" style="animation-delay: -12s"></div>
             </div>
 
-            <!-- Diagonal lines pattern -->
-            <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(45deg, white 1px, transparent 1px), linear-gradient(-45deg, white 1px, transparent 1px); background-size: 60px 60px;"></div>
+            <!-- Layer 3: Animated diagonal grid texture -->
+            <div
+                class="absolute inset-0 opacity-[0.05] animate-grid-drift"
+                style="background-image: linear-gradient(45deg, rgba(196,162,101,0.6) 1px, transparent 1px), linear-gradient(-45deg, rgba(196,162,101,0.6) 1px, transparent 1px); background-size: 60px 60px;"
+            ></div>
+
+            <!-- Layer 4: Subtle noise/grain via SVG -->
+            <div class="absolute inset-0 opacity-[0.035] mix-blend-overlay pointer-events-none" style="background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E&quot;);"></div>
+
+            <!-- Layer 5: Floating accent dots -->
+            <div class="absolute top-[15%] left-[8%] w-2 h-2 rounded-full bg-[#C4A265] shadow-[0_0_20px_#C4A265] animate-float opacity-60"></div>
+            <div class="absolute top-[30%] right-[12%] w-1.5 h-1.5 rounded-full bg-[#5DADE2] shadow-[0_0_15px_#5DADE2] animate-float opacity-50" style="animation-delay: -2s"></div>
+            <div class="absolute bottom-[25%] left-[18%] w-1.5 h-1.5 rounded-full bg-[#C4A265] shadow-[0_0_15px_#C4A265] animate-float opacity-40" style="animation-delay: -4s"></div>
+            <div class="absolute bottom-[15%] right-[20%] w-2 h-2 rounded-full bg-[#27AE60] shadow-[0_0_20px_#27AE60] animate-float opacity-50" style="animation-delay: -1s"></div>
 
             <!-- Top + bottom border glow -->
-            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/40 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/40 to-transparent"></div>
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/50 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/50 to-transparent"></div>
 
             <div class="container mx-auto px-4 relative z-10">
                 <!-- Header -->
@@ -766,46 +781,64 @@ const homeJsonLd = computed(() => ({
                     </p>
                 </div>
 
-                <!-- Bento Grid Stats -->
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-5 max-w-6xl mx-auto">
+                <!-- Bento Grid Stats — premium edition -->
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-5 max-w-6xl mx-auto animate-stagger">
                     <!-- Featured stat (Big) -->
-                    <div class="col-span-2 md:col-span-3 md:row-span-2 group relative animate-fade-up">
-                        <div
-                            class="relative h-full min-h-[280px] md:min-h-[360px] rounded-3xl p-8 md:p-10 overflow-hidden border border-white/10 transition-all duration-700 hover:border-[#C4A265]/30"
-                            style="background: linear-gradient(135deg, rgba(196,162,101,0.12) 0%, rgba(27,79,114,0.2) 100%);"
-                        >
-                            <!-- Animated gradient orbs inside -->
-                            <div class="absolute -top-20 -end-20 w-64 h-64 bg-[#C4A265]/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
-                            <div class="absolute -bottom-10 -start-10 w-48 h-48 bg-[#1B4F72]/30 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
+                    <div class="col-span-2 md:col-span-3 md:row-span-2 group relative">
+                        <!-- Animated conic-gradient border -->
+                        <div class="absolute -inset-px rounded-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
+                            <div class="absolute inset-[-100%] animate-spin-slow" style="background: conic-gradient(from 0deg, transparent 0deg, #C4A265 90deg, transparent 180deg, #1B4F72 270deg, transparent 360deg);"></div>
+                        </div>
 
-                            <!-- Decorative grid -->
-                            <svg class="absolute top-4 end-4 w-20 h-20 text-white/5" viewBox="0 0 80 80" fill="none">
-                                <pattern id="dots-bg" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-                                    <circle cx="2" cy="2" r="1" fill="currentColor" />
+                        <div
+                            class="relative h-full min-h-[280px] md:min-h-[380px] rounded-3xl p-8 md:p-10 overflow-hidden bg-[#0A1628]/90 backdrop-blur-xl transition-all duration-700"
+                        >
+                            <!-- Inner gradient layer -->
+                            <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(196,162,101,0.10) 0%, rgba(27,79,114,0.18) 60%, rgba(10,22,40,0) 100%);"></div>
+
+                            <!-- Pulsing orb -->
+                            <div class="absolute -top-32 -end-32 w-80 h-80 bg-[#C4A265]/25 rounded-full blur-[100px] animate-pulse-slow"></div>
+                            <div class="absolute -bottom-20 -start-20 w-64 h-64 bg-[#1B4F72]/40 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: -3s"></div>
+
+                            <!-- Shimmer sweep on hover -->
+                            <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+                                <div class="absolute top-0 -start-1/2 w-1/2 h-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                            </div>
+
+                            <!-- Decorative dots grid -->
+                            <svg class="absolute top-6 end-6 w-24 h-24 text-[#C4A265]/15" viewBox="0 0 80 80" fill="none">
+                                <pattern id="dots-featured" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                                    <circle cx="2" cy="2" r="1.2" fill="currentColor" />
                                 </pattern>
-                                <rect width="80" height="80" fill="url(#dots-bg)" />
+                                <rect width="80" height="80" fill="url(#dots-featured)" />
                             </svg>
 
                             <div class="relative h-full flex flex-col">
-                                <!-- Icon -->
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center mb-6 shadow-2xl shadow-[#C4A265]/30 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" :d="stats[0].icon" />
-                                    </svg>
+                                <!-- Icon with gradient ring -->
+                                <div class="relative w-20 h-20 mb-6">
+                                    <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
+                                    <div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center shadow-2xl shadow-[#C4A265]/40 group-hover:rotate-[-6deg] group-hover:scale-110 transition-all duration-500">
+                                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" :d="stats[0].icon" />
+                                        </svg>
+                                    </div>
                                 </div>
 
-                                <!-- Number -->
-                                <div class="flex items-baseline gap-2 mb-2">
-                                    <div class="text-6xl md:text-7xl lg:text-8xl font-black bg-gradient-to-br from-white via-[#C4A265] to-[#D4B87A] bg-clip-text text-transparent leading-none">
+                                <!-- Number with gradient + glow -->
+                                <div class="flex items-baseline gap-2 mb-3">
+                                    <div class="text-7xl md:text-8xl lg:text-9xl font-black leading-none bg-gradient-to-br from-white via-[#F5E6C8] to-[#C4A265] bg-clip-text text-transparent group-hover:drop-shadow-[0_0_30px_rgba(196,162,101,0.4)] transition-all duration-700">
                                         <AnimatedCounter :target="stats[0].target" :suffix="stats[0].suffix" />
                                     </div>
                                 </div>
 
                                 <!-- Label -->
                                 <div class="mt-auto">
-                                    <div class="h-px w-12 bg-gradient-to-r from-[#C4A265] to-transparent mb-3"></div>
-                                    <p class="text-[#C4A265] font-bold text-base md:text-lg uppercase tracking-wider">{{ stats[0].label }}</p>
-                                    <p class="text-white/50 text-xs md:text-sm mt-1.5 max-w-xs">{{ locale === 'ar' ? 'خواص شاملة لإدارة كل تفاصيل عيادتك' : 'Comprehensive features for every clinic detail' }}</p>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <div class="h-px w-12 bg-gradient-to-r from-[#C4A265] to-transparent"></div>
+                                        <div class="w-1 h-1 rounded-full bg-[#C4A265] animate-pulse"></div>
+                                    </div>
+                                    <p class="text-[#C4A265] font-bold text-lg md:text-xl uppercase tracking-wider">{{ stats[0].label }}</p>
+                                    <p class="text-white/55 text-xs md:text-sm mt-2 max-w-xs leading-relaxed">{{ locale === 'ar' ? 'خواص شاملة لإدارة كل تفاصيل عيادتك بكفاءة' : 'Comprehensive features for every clinic detail' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -815,47 +848,58 @@ const homeJsonLd = computed(() => ({
                     <div
                         v-for="(stat, idx) in stats.slice(1)"
                         :key="idx"
-                        class="col-span-1 md:col-span-3 lg:col-span-1 group relative animate-fade-up"
-                        :class="{ 'md:col-span-3 lg:col-span-1': idx === 0, 'md:col-span-3 lg:col-span-1': idx === 1 }"
-                        :style="{ animationDelay: `${(idx + 1) * 100}ms` }"
+                        class="col-span-1 md:col-span-3 lg:col-span-1 group relative"
                     >
+                        <!-- Animated gradient border on hover -->
+                        <div class="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 overflow-hidden">
+                            <div class="absolute inset-[-100%] animate-spin-slow" :style="{ background: `conic-gradient(from 0deg, transparent 0deg, ${stat.accent} 60deg, transparent 120deg, transparent 360deg)` }"></div>
+                        </div>
+
                         <div
-                            class="relative h-full min-h-[140px] md:min-h-[170px] rounded-2xl p-5 md:p-6 overflow-hidden border border-white/10 backdrop-blur-md bg-white/[0.03] transition-all duration-500 hover:bg-white/[0.06] hover:-translate-y-1"
+                            class="relative h-full min-h-[160px] md:min-h-[180px] rounded-2xl p-5 md:p-6 overflow-hidden bg-[#0A1628]/80 backdrop-blur-xl border border-white/[0.06] transition-all duration-500 group-hover:bg-[#0A1628]/95 group-hover:-translate-y-1.5 group-hover:shadow-2xl"
                             :style="{ '--accent': stat.accent }"
                         >
-                            <!-- Hover glow -->
+                            <!-- Radial hover glow -->
                             <div
-                                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
-                                :style="{ background: `radial-gradient(circle at 50% 0%, ${stat.accentSoft} 0%, transparent 70%)` }"
+                                class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                :style="{ background: `radial-gradient(circle at 50% 0%, ${stat.accentSoft} 0%, transparent 65%)` }"
                             ></div>
 
-                            <!-- Top accent line -->
+                            <!-- Top accent line that grows -->
                             <div
-                                class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-px transition-all duration-700"
-                                :style="{ background: `linear-gradient(90deg, transparent, ${stat.accent}, transparent)` }"
+                                class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[2px] transition-all duration-700"
+                                :style="{ background: `linear-gradient(90deg, transparent, ${stat.accent}, transparent)`, boxShadow: `0 0 12px ${stat.accent}` }"
                             ></div>
 
-                            <!-- Floating accent dot -->
-                            <div class="absolute top-4 end-4 w-1.5 h-1.5 rounded-full opacity-50 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500" :style="{ background: stat.accent, boxShadow: `0 0 12px ${stat.accent}` }"></div>
+                            <!-- Glowing accent dot -->
+                            <div class="absolute top-4 end-4 w-2 h-2 rounded-full opacity-60 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500" :style="{ background: stat.accent, boxShadow: `0 0 16px ${stat.accent}` }"></div>
+
+                            <!-- Subtle corner texture -->
+                            <svg class="absolute -bottom-2 -end-2 w-16 h-16 text-white/[0.04]" viewBox="0 0 64 64" fill="none">
+                                <pattern :id="`dots-stat-${idx}`" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+                                    <circle cx="2" cy="2" r="1" fill="currentColor" />
+                                </pattern>
+                                <rect width="64" height="64" :fill="`url(#dots-stat-${idx})`" />
+                            </svg>
 
                             <div class="relative">
                                 <!-- Icon -->
                                 <div
-                                    class="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-                                    :style="{ background: stat.accentSoft, color: stat.accent }"
+                                    class="relative w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                                    :style="{ background: stat.accentSoft, color: stat.accent, boxShadow: `inset 0 0 0 1px ${stat.accent}30` }"
                                 >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" :d="stat.icon" />
                                     </svg>
                                 </div>
 
-                                <!-- Number -->
-                                <div class="text-3xl md:text-4xl font-black text-white leading-none mb-2">
+                                <!-- Number with gradient -->
+                                <div class="text-4xl md:text-5xl font-black leading-none mb-2 bg-gradient-to-br from-white to-white/70 bg-clip-text text-transparent group-hover:from-white group-hover:to-[var(--accent)] transition-all duration-500">
                                     <AnimatedCounter :target="stat.target" :suffix="stat.suffix" />
                                 </div>
 
                                 <!-- Label -->
-                                <p class="font-semibold text-[10px] sm:text-[11px] uppercase tracking-widest" :style="{ color: stat.accent }">
+                                <p class="font-bold text-[10px] sm:text-[11px] uppercase tracking-widest transition-colors" :style="{ color: stat.accent }">
                                     {{ stat.label }}
                                 </p>
                             </div>
