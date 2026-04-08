@@ -93,6 +93,10 @@ function fmtDate(d) {
                 <option v-for="(label, value) in statusLabels" :key="value" :value="value">{{ label }}</option>
             </select>
             <button @click="applyFilters" class="px-4 py-2 bg-[#1B4F72] text-white rounded-lg text-sm font-medium">تصفية</button>
+            <a href="/admin/export/subscriptions" class="px-4 py-2 border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                تصدير CSV
+            </a>
         </div>
 
         <!-- Table -->

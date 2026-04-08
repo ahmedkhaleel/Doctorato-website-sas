@@ -84,6 +84,26 @@ function cancelSubscription() {
 function copyReference() {
     navigator.clipboard?.writeText(props.subscription.reference);
 }
+
+const refundTarget = ref(null);
+
+function confirmRefund(payment) {
+    refundTarget.value = payment;
+}
+
+function doRefund() {
+    if (!refundTarget.value) return;
+    router.post(
+        `/admin/payments/${refundTarget.value.id}/refund`,
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                refundTarget.value = null;
+            },
+        }
+    );
+}
 </script>
 
 <template>
@@ -309,10 +329,15 @@ function copyReference() {
                                 </p>
                                 <p v-if="payment.failure_reason" class="text-xs text-red-500 mt-0.5">{{ payment.failure_reason }}</p>
                             </div>
-                            <div class="text-end">
+                            <div class="text-end flex flex-col items-end gap-1">
                                 <p class="font-bold tabular-nums" :class="payment.status === 'succeeded' ? 'text-emerald-600' : 'text-gray-500'">
                                     {{ payment.status === 'succeeded' ? '+' : '' }}{{ fmtMoney(payment.amount) }} {{ payment.currency }}
                                 </p>
+                                <button
+                                    v-if="payment.status === 'succeeded'"
+                                    @click="confirmRefund(payment)"
+                                    class="text-[10px] text-red-500 hover:underline"
+                                >استرداد</button>
                             </div>
                         </div>
                     </div>
@@ -341,6 +366,33 @@ function copyReference() {
                         <div class="flex gap-3">
                             <button @click="showCancelConfirm = false" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">تراجع</button>
                             <button @click="cancelSubscription" class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold transition-colors">نعم، ألغِ</button>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
+
+        <!-- Refund confirmation dialog -->
+        <Teleport to="body">
+            <Transition
+                enter-active-class="transition-opacity duration-200"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-150"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div v-if="refundTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" @click.self="refundTarget = null">
+                    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-up">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-50 flex items-center justify-center mb-4">
+                            <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                        </div>
+                        <h3 class="text-center text-lg font-bold text-gray-800 mb-2">استرداد المبلغ؟</h3>
+                        <p class="text-center text-2xl font-black text-amber-600 mb-2 tabular-nums">{{ fmtMoney(refundTarget.amount) }} {{ refundTarget.currency }}</p>
+                        <p class="text-center text-xs text-amber-700 mb-6">سيتم إرسال طلب الاسترداد إلى Paymob. قد يستغرق 3-7 أيام عمل.</p>
+                        <div class="flex gap-3">
+                            <button @click="refundTarget = null" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">تراجع</button>
+                            <button @click="doRefund" class="flex-1 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-sm font-semibold transition-colors">نعم، استرد</button>
                         </div>
                     </div>
                 </div>

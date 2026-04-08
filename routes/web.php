@@ -129,6 +129,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/{subscription}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'show'])->name('subscriptions.show');
     Route::post('/subscriptions/{subscription}/cancel', [\App\Http\Controllers\Admin\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+    Route::post('/payments/{payment}/refund', [\App\Http\Controllers\Admin\SubscriptionController::class, 'refundPayment'])->name('payments.refund');
 
     Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
@@ -143,6 +144,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/addons', [\App\Http\Controllers\Admin\AddOnController::class, 'store'])->name('addons.store');
     Route::put('/addons/{addon}', [\App\Http\Controllers\Admin\AddOnController::class, 'update'])->name('addons.update');
     Route::delete('/addons/{addon}', [\App\Http\Controllers\Admin\AddOnController::class, 'destroy'])->name('addons.destroy');
+
+    Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('/search', [\App\Http\Controllers\Admin\SearchController::class, 'global'])->name('search.global');
+
+    Route::get('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'index'])->name('email-templates.index');
+    Route::put('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
+
+    Route::get('/export/subscriptions', [\App\Http\Controllers\Admin\ExportController::class, 'subscriptions'])->name('export.subscriptions');
+    Route::get('/export/invoices', [\App\Http\Controllers\Admin\ExportController::class, 'invoices'])->name('export.invoices');
+    Route::get('/export/demos', [\App\Http\Controllers\Admin\ExportController::class, 'demos'])->name('export.demos');
+    Route::get('/export/contacts', [\App\Http\Controllers\Admin\ExportController::class, 'contacts'])->name('export.contacts');
 
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');

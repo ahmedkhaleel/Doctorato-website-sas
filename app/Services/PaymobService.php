@@ -143,6 +143,45 @@ class PaymobService
      *
      * @see https://docs.paymob.com/docs/hmac-calculation
      */
+    /**
+     * Issue a refund for a successful transaction.
+     * Paymob exposes: POST /acceptance/void_refund/refund
+     *
+     * @param string|int $transactionId Paymob gateway_transaction_id from our Payment model
+     * @param float $amount Amount in EGP
+     * @return array raw Paymob response
+     */
+    public function refund(string|int $transactionId, float $amount): array
+    {
+        if (!$this->isConfigured()) {
+            throw new RuntimeException('Paymob is not configured. Set PAYMOB_* environment variables.');
+        }
+
+        $authToken = $this->auth();
+        $amountCents = (int) round($amount * 100);
+
+        try {
+            $res = Http::acceptJson()
+                ->withToken($authToken)
+                ->post("{$this->baseUrl}/acceptance/void_refund/refund", [
+                    'auth_token' => $authToken,
+                    'transaction_id' => $transactionId,
+                    'amount_cents' => $amountCents,
+                ])
+                ->throw();
+        } catch (RequestException $e) {
+            Log::error('Paymob refund failed', [
+                'transaction_id' => $transactionId,
+                'amount' => $amount,
+                'message' => $e->getMessage(),
+                'response' => $e->response?->body(),
+            ]);
+            throw new RuntimeException('Paymob refund failed: ' . $e->getMessage(), previous: $e);
+        }
+
+        return $res->json();
+    }
+
     public function verifyHmac(array $obj, string $receivedHmac): bool
     {
         $fields = [

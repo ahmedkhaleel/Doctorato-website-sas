@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Subscription;
@@ -73,6 +74,67 @@ class SubscriptionController extends Controller
             'cancelled_at' => now(),
         ]);
 
+        ActivityLog::record(
+            'cancelled',
+            $subscription,
+            "ألغى اشتراك {$subscription->customer_name} ({$subscription->reference})"
+        );
+
         return back()->with('success', 'تم إلغاء الاشتراك');
+    }
+
+    /**
+     * Refund a specific payment on a subscription.
+     * In test mode (or when Paymob isn't configured) it marks locally.
+     * In production it calls PaymobService::refund() and updates state.
+     */
+    public function refundPayment(Payment $payment, \App\Services\PaymobService $paymob)
+    {
+        abort_if($payment->status !== 'succeeded', 422, 'يمكن استرداد الدفعات الناجحة فقط');
+
+        $subscription = $payment->subscription;
+        $invoice = $payment->invoice;
+
+        try {
+            if (config('paymob.test_mode') || !$paymob->isConfigured() || !$payment->gateway_transaction_id) {
+                // Local refund simulation
+                $response = ['test_mode' => true, 'refunded_at' => now()->toIso8601String()];
+            } else {
+                $response = $paymob->refund($payment->gateway_transaction_id, (float) $payment->amount);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withErrors(['refund' => 'فشل الاسترداد: ' . $e->getMessage()]);
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($payment, $invoice, $subscription, $response) {
+            $payment->update([
+                'status' => 'refunded',
+                'raw_response' => array_merge($payment->raw_response ?? [], ['refund' => $response]),
+                'processed_at' => now(),
+            ]);
+
+            if ($invoice) {
+                $invoice->update(['status' => 'refunded']);
+            }
+
+            // If this was the sub's only successful payment, move it to cancelled
+            $hasOtherSuccess = $subscription?->payments()
+                ->where('id', '!=', $payment->id)
+                ->where('status', 'succeeded')
+                ->exists();
+
+            if ($subscription && !$hasOtherSuccess) {
+                $subscription->update(['status' => 'cancelled', 'cancelled_at' => now()]);
+            }
+        });
+
+        ActivityLog::record(
+            'refunded',
+            $subscription,
+            "استردّ مبلغ {$payment->amount} {$payment->currency} للعميل {$subscription->customer_name}"
+        );
+
+        return back()->with('success', 'تم استرداد المبلغ');
     }
 }

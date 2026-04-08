@@ -52,6 +52,7 @@ const menuGroups = computed(() => [
         items: [
             { label: 'الإعدادات العامة', icon: 'cog', route: '/admin/settings/general', perm: 'dashboard.view' },
             { label: 'التتبع والتحليلات', icon: 'chart', route: '/admin/settings/tracking', perm: 'dashboard.view' },
+            { label: 'قوالب البريد', icon: 'mail', route: '/admin/email-templates', perm: 'dashboard.view' },
         ],
     },
     {
@@ -71,6 +72,7 @@ const menuGroups = computed(() => [
         label: 'النظام',
         items: [
             { label: 'المستخدمون والصلاحيات', icon: 'users', route: '/admin/users', perm: 'users.manage' },
+            { label: 'سجل النشاط', icon: 'clock', route: '/admin/activity-logs', perm: 'dashboard.view' },
         ],
     },
 ]);
@@ -91,6 +93,42 @@ const badges = computed(() => ({
     new_demos: page.props.stats?.new_demos || 0,
     unread_contacts: page.props.stats?.unread_contacts || 0,
 }));
+
+// Global search
+const searchQuery = ref('');
+const searchResults = ref([]);
+const searchFocused = ref(false);
+const searchBusy = ref(false);
+let searchTimeout = null;
+
+function onSearchInput() {
+    clearTimeout(searchTimeout);
+    if (searchQuery.value.trim().length < 2) {
+        searchResults.value = [];
+        return;
+    }
+    searchBusy.value = true;
+    searchTimeout = setTimeout(async () => {
+        try {
+            const res = await fetch(`/admin/search?q=${encodeURIComponent(searchQuery.value)}`, {
+                headers: { Accept: 'application/json' },
+                credentials: 'same-origin',
+            });
+            if (res.ok) {
+                const data = await res.json();
+                searchResults.value = data.results || [];
+            }
+        } finally {
+            searchBusy.value = false;
+        }
+    }, 250);
+}
+
+function resetSearch() {
+    searchQuery.value = '';
+    searchResults.value = [];
+    searchFocused.value = false;
+}
 
 function doLogout() {
     router.post('/admin/logout');
@@ -208,6 +246,9 @@ const roleLabels = {
                                     <svg v-else-if="item.icon === 'tag'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                     </svg>
+                                    <svg v-else-if="item.icon === 'clock'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
                                     <svg v-else-if="item.icon === 'coin'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
@@ -270,6 +311,45 @@ const roleLabels = {
                         <div>
                             <h2 class="text-lg font-bold text-[#1C2833]">لوحة تحكم دكتوراتو</h2>
                             <p class="text-xs text-gray-500 hidden sm:block">إدارة متكاملة لكل محتويات الموقع</p>
+                        </div>
+                    </div>
+
+                    <!-- Global search -->
+                    <div class="hidden md:block relative flex-1 max-w-md mx-6">
+                        <div class="relative">
+                            <svg class="absolute top-1/2 -translate-y-1/2 start-3 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            <input
+                                v-model="searchQuery"
+                                @input="onSearchInput"
+                                @focus="searchFocused = true"
+                                @blur="setTimeout(() => searchFocused = false, 200)"
+                                type="text"
+                                placeholder="بحث موحّد في الاشتراكات والفواتير والطلبات..."
+                                class="w-full ps-10 pe-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-[#1B4F72]/20 focus:border-[#1B4F72] outline-none transition"
+                            />
+                            <span v-if="searchBusy" class="absolute top-1/2 -translate-y-1/2 end-3 text-xs text-gray-400">...</span>
+                        </div>
+
+                        <!-- Results dropdown -->
+                        <div
+                            v-if="searchFocused && (searchResults.length || (searchQuery.length >= 2 && !searchBusy))"
+                            class="absolute top-full inset-x-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 max-h-[500px] overflow-y-auto z-50"
+                        >
+                            <div v-if="!searchResults.length" class="p-6 text-center text-sm text-gray-400">لا توجد نتائج مطابقة</div>
+                            <Link
+                                v-for="(r, i) in searchResults"
+                                :key="`${r.type}-${i}`"
+                                :href="r.url"
+                                @click="resetSearch"
+                                class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-b-0"
+                            >
+                                <span class="text-xl">{{ r.icon }}</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-800 truncate">{{ r.title }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ r.subtitle }}</p>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 shrink-0">{{ r.type_label }}</span>
+                            </Link>
                         </div>
                     </div>
 
