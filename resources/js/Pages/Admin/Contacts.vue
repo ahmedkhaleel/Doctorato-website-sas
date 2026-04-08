@@ -27,6 +27,25 @@ const filtered = computed(() => {
 
 const unreadCount = computed(() => (props.contacts || []).filter(c => !c.is_read).length);
 
+const stats = computed(() => {
+    const list = props.contacts || [];
+    const today = list.filter((c) => {
+        const d = new Date(c.created_at);
+        const now = new Date();
+        return d.toDateString() === now.toDateString();
+    }).length;
+    const week = list.filter((c) => {
+        const d = new Date(c.created_at);
+        return (Date.now() - d.getTime()) / 86400000 < 7;
+    }).length;
+    return {
+        total: list.length,
+        unread: list.filter((c) => !c.is_read).length,
+        today,
+        week,
+    };
+});
+
 function markRead(contact) {
     router.put(`/admin/contacts/${contact.id}/read`);
 }
@@ -52,36 +71,59 @@ function initials(name) {
 </script>
 
 <template>
-    <AdminLayout>
+    <AdminLayout page-title="رسائل التواصل">
         <Head title="رسائل التواصل" />
 
-        <!-- Header -->
-        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-[#0D2B45]">رسائل التواصل</h1>
-                <p class="text-gray-500 text-sm mt-1">رسائل الزوار من نموذج التواصل</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-3 rounded-2xl shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-gray-500">غير مقروءة</p>
-                        <p class="text-base font-bold text-gray-800 leading-none">{{ unreadCount }}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] text-white px-4 py-3 rounded-2xl shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        <!-- Hero Header -->
+        <div class="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#0D2B45] via-[#1B4F72] to-[#0D2B45] text-white p-6 lg:p-8 shadow-xl">
+            <div class="absolute top-0 end-0 w-64 h-64 bg-[#C4A265]/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 animate-pulse-slow"></div>
+            <div class="absolute bottom-0 start-0 w-48 h-48 bg-[#1B4F72]/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 animate-pulse-slow" style="animation-delay: -3s"></div>
+            <svg class="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="ct-hex" x="0" y="0" width="56" height="64" patternUnits="userSpaceOnUse">
+                        <polygon points="28,2 52,16 52,48 28,62 4,48 4,16" fill="none" stroke="white" stroke-width="1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#ct-hex)" />
+            </svg>
+
+            <div class="relative flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/30">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <div>
-                        <p class="text-[10px] text-white/70">الإجمالي</p>
-                        <p class="text-base font-bold leading-none">{{ contacts.length }}</p>
-                    </div>
                 </div>
+                <div>
+                    <div class="flex items-center gap-2 text-[#C4A265] text-xs mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#C4A265] animate-pulse"></span>
+                        <span class="uppercase tracking-widest font-semibold">Contact Messages</span>
+                    </div>
+                    <h1 class="text-2xl lg:text-3xl font-extrabold mb-1">رسائل التواصل</h1>
+                    <p class="text-white/60 text-sm">رسائل الزوار من نموذج التواصل</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 animate-stagger">
+            <div class="group relative bg-white rounded-2xl p-5 border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[2px] bg-gradient-to-r from-transparent via-[#1B4F72] to-transparent transition-all duration-700"></div>
+                <p class="text-xs text-gray-500 mb-1">إجمالي</p>
+                <p class="text-3xl font-extrabold text-gray-800 tabular-nums">{{ stats.total }}</p>
+            </div>
+            <div class="group relative bg-orange-50 rounded-2xl p-5 border border-orange-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[2px] bg-gradient-to-r from-transparent via-orange-500 to-transparent transition-all duration-700"></div>
+                <p class="text-xs text-orange-700 mb-1">غير مقروءة</p>
+                <p class="text-3xl font-extrabold text-orange-700 tabular-nums">{{ stats.unread }}</p>
+            </div>
+            <div class="group relative bg-emerald-50 rounded-2xl p-5 border border-emerald-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent transition-all duration-700"></div>
+                <p class="text-xs text-emerald-700 mb-1">اليوم</p>
+                <p class="text-3xl font-extrabold text-emerald-700 tabular-nums">{{ stats.today }}</p>
+            </div>
+            <div class="bg-gradient-to-br from-[#C4A265] to-[#D4B876] text-white rounded-2xl p-5">
+                <p class="text-xs text-white/80 mb-1">آخر 7 أيام</p>
+                <p class="text-3xl font-bold mt-1 tabular-nums">{{ stats.week }}</p>
             </div>
         </div>
 
@@ -101,6 +143,10 @@ function initials(name) {
                     class="px-4 py-2.5 rounded-xl text-xs font-semibold transition">غير مقروءة</button>
                 <button @click="readFilter = 'read'" :class="readFilter === 'read' ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-600'"
                     class="px-4 py-2.5 rounded-xl text-xs font-semibold transition">مقروءة</button>
+                <a href="/admin/export/contacts" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    CSV
+                </a>
             </div>
         </div>
 
