@@ -2,7 +2,16 @@
 import MainLayout from '@/Layouts/MainLayout.vue';
 import SeoHead from '@/Components/SeoHead.vue';
 import { Link } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
 import { ref, computed } from 'vue';
+
+const { locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
+
+// Tiny bilingual string helper used throughout the page.
+// Using inline pairs keeps the page self-contained and avoids dragging
+// i18n keys into the global translation files for a single page.
+const tr = (ar, en) => (isAr.value ? ar : en);
 
 // === User inputs ===
 const monthlyPatients = ref(500);
@@ -59,14 +68,16 @@ const paybackDays = computed(() => {
 });
 
 function fmtMoney(v) {
-    return new Intl.NumberFormat('ar-EG').format(Math.round(v || 0));
+    return new Intl.NumberFormat(isAr.value ? 'ar-EG' : 'en-US').format(Math.round(v || 0));
 }
+
+const currencyLabel = computed(() => tr('ج.م', 'EGP'));
 </script>
 
 <template>
     <SeoHead
-        title="حاسبة العائد على الاستثمار"
-        description="احسب كم ستوفّر عيادتك وكم ستربح إضافياً عند استخدام دكتوراتو — في أقل من دقيقة"
+        :title="tr('حاسبة العائد على الاستثمار', 'ROI Calculator')"
+        :description="tr('احسب كم ستوفّر عيادتك وكم ستربح إضافياً عند استخدام دكتوراتو — في أقل من دقيقة', 'Calculate your clinic savings and extra revenue with Doctorato — in under a minute')"
     />
 
     <MainLayout>
@@ -86,15 +97,15 @@ function fmtMoney(v) {
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C4A265] opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-[#C4A265]"></span>
                     </span>
-                    <span class="text-sm font-semibold tracking-wide">حاسبة العائد على الاستثمار</span>
+                    <span class="text-sm font-semibold tracking-wide">{{ tr('حاسبة العائد على الاستثمار', 'ROI Calculator') }}</span>
                 </div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 animate-fade-up leading-tight">
                     <span class="bg-gradient-to-br from-white to-[#C4A265] bg-clip-text text-transparent">
-                        كم ستوفّر عيادتك مع دكتوراتو؟
+                        {{ tr('كم ستوفّر عيادتك مع دكتوراتو؟', 'How much will your clinic save with Doctorato?') }}
                     </span>
                 </h1>
                 <p class="text-lg text-white/70 max-w-2xl mx-auto animate-fade-up">
-                    أدخل أرقام عيادتك الحالية، واحصل فوراً على تقدير علمي لعائد الاستثمار خلال شهر و سنة.
+                    {{ tr('أدخل أرقام عيادتك الحالية، واحصل فوراً على تقدير علمي لعائد الاستثمار خلال شهر و سنة.', 'Enter your current clinic numbers and get an instant data-backed estimate of your monthly and annual ROI.') }}
                 </p>
             </div>
         </section>
@@ -106,13 +117,13 @@ function fmtMoney(v) {
                     <!-- Inputs -->
                     <div class="lg:col-span-2">
                         <div class="bg-white rounded-3xl border border-gray-100 shadow-lg p-6 md:p-8 sticky top-28">
-                            <h2 class="text-xl font-bold text-dark mb-1">أرقام عيادتك الحالية</h2>
-                            <p class="text-sm text-gray mb-6">حرّك المؤشرات لرؤية النتيجة فوراً</p>
+                            <h2 class="text-xl font-bold text-dark mb-1">{{ tr('أرقام عيادتك الحالية', 'Your clinic today') }}</h2>
+                            <p class="text-sm text-gray mb-6">{{ tr('حرّك المؤشرات لرؤية النتيجة فوراً', 'Move the sliders to see the result instantly') }}</p>
 
                             <div class="space-y-6">
                                 <div>
                                     <div class="flex justify-between mb-2">
-                                        <label class="text-sm font-semibold text-dark">عدد المرضى شهرياً</label>
+                                        <label class="text-sm font-semibold text-dark">{{ tr('عدد المرضى شهرياً', 'Patients per month') }}</label>
                                         <span class="text-sm font-bold text-primary tabular-nums">{{ fmtMoney(monthlyPatients) }}</span>
                                     </div>
                                     <input v-model.number="monthlyPatients" type="range" min="50" max="3000" step="50" class="w-full accent-[#1B4F72]" />
@@ -121,7 +132,7 @@ function fmtMoney(v) {
 
                                 <div>
                                     <div class="flex justify-between mb-2">
-                                        <label class="text-sm font-semibold text-dark">متوسط قيمة الزيارة (ج.م)</label>
+                                        <label class="text-sm font-semibold text-dark">{{ tr('متوسط قيمة الزيارة (ج.م)', 'Average visit value (EGP)') }}</label>
                                         <span class="text-sm font-bold text-primary tabular-nums">{{ fmtMoney(avgTicket) }}</span>
                                     </div>
                                     <input v-model.number="avgTicket" type="range" min="50" max="3000" step="50" class="w-full accent-[#1B4F72]" />
@@ -130,7 +141,7 @@ function fmtMoney(v) {
 
                                 <div>
                                     <div class="flex justify-between mb-2">
-                                        <label class="text-sm font-semibold text-dark">ساعات الإدارة أسبوعياً</label>
+                                        <label class="text-sm font-semibold text-dark">{{ tr('ساعات الإدارة أسبوعياً', 'Admin hours per week') }}</label>
                                         <span class="text-sm font-bold text-primary tabular-nums">{{ adminHoursPerWeek }}h</span>
                                     </div>
                                     <input v-model.number="adminHoursPerWeek" type="range" min="0" max="80" step="1" class="w-full accent-[#1B4F72]" />
@@ -138,7 +149,7 @@ function fmtMoney(v) {
 
                                 <div>
                                     <div class="flex justify-between mb-2">
-                                        <label class="text-sm font-semibold text-dark">تكلفة ساعة الموظف (ج.م)</label>
+                                        <label class="text-sm font-semibold text-dark">{{ tr('تكلفة ساعة الموظف (ج.م)', 'Staff hourly cost (EGP)') }}</label>
                                         <span class="text-sm font-bold text-primary tabular-nums">{{ fmtMoney(hourlyCost) }}</span>
                                     </div>
                                     <input v-model.number="hourlyCost" type="range" min="20" max="200" step="5" class="w-full accent-[#1B4F72]" />
@@ -146,7 +157,7 @@ function fmtMoney(v) {
 
                                 <div>
                                     <div class="flex justify-between mb-2">
-                                        <label class="text-sm font-semibold text-dark">معدّل عدم الحضور %</label>
+                                        <label class="text-sm font-semibold text-dark">{{ tr('معدّل عدم الحضور %', 'No-show rate %') }}</label>
                                         <span class="text-sm font-bold text-primary tabular-nums">{{ noShowRate }}%</span>
                                     </div>
                                     <input v-model.number="noShowRate" type="range" min="0" max="50" step="1" class="w-full accent-[#1B4F72]" />
@@ -171,20 +182,20 @@ function fmtMoney(v) {
                             </svg>
 
                             <div class="relative">
-                                <p class="text-[#C4A265] text-xs font-bold uppercase tracking-widest mb-2">العائد السنوي الصافي المتوقع</p>
+                                <p class="text-[#C4A265] text-xs font-bold uppercase tracking-widest mb-2">{{ tr('العائد السنوي الصافي المتوقع', 'Estimated net annual return') }}</p>
                                 <div class="text-5xl md:text-6xl lg:text-7xl font-black bg-gradient-to-br from-white via-[#F5E6C8] to-[#C4A265] bg-clip-text text-transparent leading-none mb-3 tabular-nums">
                                     {{ fmtMoney(annualNetImpact) }}
-                                    <span class="text-2xl">ج.م</span>
+                                    <span class="text-2xl">{{ currencyLabel }}</span>
                                 </div>
-                                <p class="text-white/60">بعد خصم اشتراك دكتوراتو ({{ fmtMoney(monthlyCost) }} ج.م شهرياً)</p>
+                                <p class="text-white/60">{{ tr(`بعد خصم اشتراك دكتوراتو (${fmtMoney(monthlyCost)} ج.م شهرياً)`, `After deducting your Doctorato subscription (${fmtMoney(monthlyCost)} EGP / month)`) }}</p>
 
                                 <div class="mt-6 grid grid-cols-2 gap-4">
                                     <div class="bg-white/[0.06] backdrop-blur-sm rounded-2xl border border-white/10 p-4">
-                                        <p class="text-xs text-white/60">ROI شهري</p>
+                                        <p class="text-xs text-white/60">{{ tr('ROI شهري', 'Monthly ROI') }}</p>
                                         <p class="text-3xl font-extrabold text-[#C4A265] tabular-nums">{{ roiPercent }}%</p>
                                     </div>
                                     <div class="bg-white/[0.06] backdrop-blur-sm rounded-2xl border border-white/10 p-4">
-                                        <p class="text-xs text-white/60">فترة الاسترداد</p>
+                                        <p class="text-xs text-white/60">{{ tr('فترة الاسترداد', 'Payback period') }}</p>
                                         <p class="text-3xl font-extrabold text-[#C4A265] tabular-nums">
                                             <span v-if="paybackDays !== null">{{ paybackDays }}<span class="text-base">d</span></span>
                                             <span v-else>—</span>
@@ -196,7 +207,7 @@ function fmtMoney(v) {
 
                         <!-- Breakdown -->
                         <div class="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm">
-                            <h3 class="font-bold text-dark mb-5">تفصيل التوفيرات الشهرية</h3>
+                            <h3 class="font-bold text-dark mb-5">{{ tr('تفصيل التوفيرات الشهرية', 'Monthly savings breakdown') }}</h3>
 
                             <div class="space-y-4">
                                 <div class="flex items-center gap-4">
@@ -204,10 +215,10 @@ function fmtMoney(v) {
                                         <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     </div>
                                     <div class="flex-1">
-                                        <p class="font-semibold text-dark text-sm">توفير وقت الإدارة (55٪)</p>
-                                        <p class="text-xs text-gray">{{ hoursSavedMonthly }} ساعة موفّرة شهرياً</p>
+                                        <p class="font-semibold text-dark text-sm">{{ tr('توفير وقت الإدارة (55٪)', 'Admin time saved (55%)') }}</p>
+                                        <p class="text-xs text-gray">{{ tr(`${hoursSavedMonthly} ساعة موفّرة شهرياً`, `${hoursSavedMonthly} hours saved per month`) }}</p>
                                     </div>
-                                    <p class="font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(adminCostSavedMonthly) }} ج.م</p>
+                                    <p class="font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(adminCostSavedMonthly) }} {{ currencyLabel }}</p>
                                 </div>
 
                                 <div class="flex items-center gap-4">
@@ -215,10 +226,10 @@ function fmtMoney(v) {
                                         <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                     </div>
                                     <div class="flex-1">
-                                        <p class="font-semibold text-dark text-sm">تقليل عدم الحضور (65٪)</p>
-                                        <p class="text-xs text-gray">من إجمالي {{ fmtMoney(lostRevenueMonthly) }} ج.م مفقودة</p>
+                                        <p class="font-semibold text-dark text-sm">{{ tr('تقليل عدم الحضور (65٪)', 'No-show reduction (65%)') }}</p>
+                                        <p class="text-xs text-gray">{{ tr(`من إجمالي ${fmtMoney(lostRevenueMonthly)} ج.م مفقودة`, `Out of ${fmtMoney(lostRevenueMonthly)} EGP currently lost`) }}</p>
                                     </div>
-                                    <p class="font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(recoveredRevenueMonthly) }} ج.م</p>
+                                    <p class="font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(recoveredRevenueMonthly) }} {{ currencyLabel }}</p>
                                 </div>
 
                                 <div class="flex items-center gap-4">
@@ -226,40 +237,42 @@ function fmtMoney(v) {
                                         <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                                     </div>
                                     <div class="flex-1">
-                                        <p class="font-semibold text-dark text-sm">نمو الإيرادات (18٪)</p>
-                                        <p class="text-xs text-gray">احتفاظ بالمرضى وزيارات متكررة</p>
+                                        <p class="font-semibold text-dark text-sm">{{ tr('نمو الإيرادات (18٪)', 'Revenue growth (18%)') }}</p>
+                                        <p class="text-xs text-gray">{{ tr('احتفاظ بالمرضى وزيارات متكررة', 'Patient retention and repeat visits') }}</p>
                                     </div>
-                                    <p class="font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(additionalRevenueMonthly) }} ج.م</p>
+                                    <p class="font-bold text-emerald-600 tabular-nums">+{{ fmtMoney(additionalRevenueMonthly) }} {{ currencyLabel }}</p>
                                 </div>
 
                                 <div class="border-t border-gray-100 pt-4 flex items-center justify-between">
-                                    <p class="font-bold text-dark">إجمالي التأثير الشهري</p>
-                                    <p class="text-2xl font-extrabold text-primary tabular-nums">{{ fmtMoney(totalMonthlyImpact) }} ج.م</p>
+                                    <p class="font-bold text-dark">{{ tr('إجمالي التأثير الشهري', 'Total monthly impact') }}</p>
+                                    <p class="text-2xl font-extrabold text-primary tabular-nums">{{ fmtMoney(totalMonthlyImpact) }} {{ currencyLabel }}</p>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <p class="text-gray">- اشتراك دكتوراتو</p>
-                                    <p class="text-red-500 tabular-nums">-{{ fmtMoney(monthlyCost) }} ج.م</p>
+                                    <p class="text-gray">{{ tr('- اشتراك دكتوراتو', '- Doctorato subscription') }}</p>
+                                    <p class="text-red-500 tabular-nums">-{{ fmtMoney(monthlyCost) }} {{ currencyLabel }}</p>
                                 </div>
                                 <div class="border-t-2 border-gray-200 pt-4 flex items-center justify-between">
-                                    <p class="font-bold text-dark">صافي العائد الشهري</p>
-                                    <p class="text-3xl font-black text-emerald-600 tabular-nums">{{ fmtMoney(netMonthlyImpact) }} ج.م</p>
+                                    <p class="font-bold text-dark">{{ tr('صافي العائد الشهري', 'Net monthly return') }}</p>
+                                    <p class="text-3xl font-black text-emerald-600 tabular-nums">{{ fmtMoney(netMonthlyImpact) }} {{ currencyLabel }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- CTA -->
                         <div class="bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] rounded-3xl p-8 text-white text-center">
-                            <h3 class="text-2xl font-bold mb-3">جاهز لتحقيق هذه الأرقام؟</h3>
-                            <p class="text-white/70 mb-5">احجز عرضاً تجريبياً مجانياً وسنريك كيف تطبّق هذه الأرقام على عيادتك</p>
+                            <h3 class="text-2xl font-bold mb-3">{{ tr('جاهز لتحقيق هذه الأرقام؟', 'Ready to hit these numbers?') }}</h3>
+                            <p class="text-white/70 mb-5">{{ tr('احجز عرضاً تجريبياً مجانياً وسنريك كيف تطبّق هذه الأرقام على عيادتك', 'Book a free demo and we’ll show you exactly how to apply these numbers to your clinic') }}</p>
                             <Link href="/demo" class="inline-block px-8 py-3.5 bg-secondary hover:bg-secondary-dark text-white font-bold rounded-full transition-all hover:-translate-y-0.5">
-                                اطلب عرضاً تجريبياً مجانياً
+                                {{ tr('اطلب عرضاً تجريبياً مجانياً', 'Request a free demo') }}
                             </Link>
                         </div>
 
                         <!-- Disclaimer -->
                         <p class="text-xs text-gray text-center px-4">
-                            * النتائج تقديرية مبنية على متوسطات حقيقية من 200+ عيادة تستخدم دكتوراتو في مصر والشرق الأوسط.
-                            النتائج الفعلية قد تختلف حسب حجم العيادة ونوع الخدمات وتطبيق التوصيات.
+                            {{ tr(
+                                '* النتائج تقديرية مبنية على متوسطات حقيقية من 200+ عيادة تستخدم دكتوراتو في مصر والشرق الأوسط. النتائج الفعلية قد تختلف حسب حجم العيادة ونوع الخدمات وتطبيق التوصيات.',
+                                '* Estimates are based on real averages from 200+ clinics using Doctorato across Egypt and the Middle East. Actual results vary with clinic size, service mix, and how the recommendations are applied.'
+                            ) }}
                         </p>
                     </div>
                 </div>
