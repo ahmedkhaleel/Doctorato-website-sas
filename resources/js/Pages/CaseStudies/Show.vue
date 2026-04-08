@@ -6,14 +6,14 @@ import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 
 const props = defineProps({
-    case: { type: Object, required: true },
+    study: { type: Object, required: true },
     related: { type: Array, default: () => [] },
 });
 
 const { locale } = useI18n();
 
 function localized(field) {
-    const c = props.case;
+    const c = props.study;
     return locale.value === 'ar' ? c[`${field}_ar`] : c[`${field}_en`] || c[`${field}_ar`];
 }
 
@@ -38,9 +38,9 @@ const jsonLd = computed(() => ({
 
 <template>
     <SeoHead
-        :title="case.seo_title || localized('title')"
-        :description="case.seo_description || localized('summary')"
-        :image="case.hero_image"
+        :title="study.seo_title || localized('title')"
+        :description="study.seo_description || localized('summary')"
+        :image="study.hero_image"
         :json-ld="jsonLd"
     />
 
@@ -68,7 +68,7 @@ const jsonLd = computed(() => ({
                         {{ localized('industry') }}
                     </span>
                     <span class="text-white/40 text-xs">·</span>
-                    <span class="text-white/60 text-xs">{{ case.location }}</span>
+                    <span class="text-white/60 text-xs">{{ study.location }}</span>
                 </div>
 
                 <h1 class="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
@@ -85,17 +85,17 @@ const jsonLd = computed(() => ({
                     </div>
                     <div>
                         <p class="font-bold">{{ localized('client_name') }}</p>
-                        <p class="text-xs text-white/50">{{ case.location }}</p>
+                        <p class="text-xs text-white/50">{{ study.location }}</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Metrics row -->
-        <section v-if="case.metrics && case.metrics.length" class="py-12 bg-light-blue/30">
+        <section v-if="study.metrics && study.metrics.length" class="py-12 bg-light-blue/30">
             <div class="max-w-5xl mx-auto px-4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div v-for="(m, i) in case.metrics" :key="i" class="bg-white rounded-2xl border border-gray-100 p-6 text-center hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                    <div v-for="(m, i) in study.metrics" :key="i" class="bg-white rounded-2xl border border-gray-100 p-6 text-center hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                         <div class="text-4xl md:text-5xl font-black text-primary tabular-nums">{{ m.value }}{{ m.suffix }}</div>
                         <div class="text-xs text-gray mt-2 font-medium">{{ metricLabel(m) }}</div>
                     </div>
@@ -137,24 +137,24 @@ const jsonLd = computed(() => ({
                 </div>
 
                 <!-- Modules used -->
-                <div v-if="case.modules_used && case.modules_used.length">
+                <div v-if="study.modules_used && study.modules_used.length">
                     <h3 class="text-sm font-bold text-gray uppercase tracking-widest mb-4">الوحدات المستخدمة</h3>
                     <div class="flex flex-wrap gap-2">
-                        <span v-for="m in case.modules_used" :key="m" class="px-4 py-2 rounded-full bg-light-blue text-primary text-sm font-semibold border border-primary/10">
+                        <span v-for="m in study.modules_used" :key="m" class="px-4 py-2 rounded-full bg-light-blue text-primary text-sm font-semibold border border-primary/10">
                             {{ m }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Testimonial -->
-                <div v-if="case.testimonial_ar" class="bg-gradient-to-br from-light-blue/40 to-light-gold/30 rounded-3xl p-8 md:p-10 border-s-4 border-secondary">
+                <div v-if="study.testimonial_ar" class="bg-gradient-to-br from-light-blue/40 to-light-gold/30 rounded-3xl p-8 md:p-10 border-s-4 border-secondary">
                     <svg class="w-10 h-10 text-secondary mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/></svg>
                     <p class="text-xl md:text-2xl text-dark italic font-medium leading-relaxed mb-4">
-                        "{{ locale === 'ar' ? case.testimonial_ar : case.testimonial_en || case.testimonial_ar }}"
+                        "{{ locale === 'ar' ? study.testimonial_ar : study.testimonial_en || study.testimonial_ar }}"
                     </p>
                     <div>
-                        <p class="font-bold text-primary">{{ case.testimonial_author }}</p>
-                        <p class="text-sm text-gray">{{ case.testimonial_role }}</p>
+                        <p class="font-bold text-primary">{{ study.testimonial_author }}</p>
+                        <p class="text-sm text-gray">{{ study.testimonial_role }}</p>
                     </div>
                 </div>
             </div>

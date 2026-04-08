@@ -32,8 +32,11 @@ class CaseStudyController extends Controller
             ->take(3)
             ->get();
 
+        // NOTE: the prop is named `study` rather than `case` because `case`
+        // is a reserved JavaScript keyword and breaks Vue's template compiler
+        // in production builds (Rolldown).
         return Inertia::render('CaseStudies/Show', [
-            'case' => $case,
+            'study' => $case,
             'related' => $related,
         ]);
     }
