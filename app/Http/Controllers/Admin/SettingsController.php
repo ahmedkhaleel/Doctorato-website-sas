@@ -44,4 +44,65 @@ class SettingsController extends Controller
 
         return back()->with('success', 'تم حفظ إعدادات التتبع');
     }
+
+    /** General site settings: contact info, social links, launch banner. */
+    public function general(): Response
+    {
+        $keys = [
+            'company_email', 'company_phone', 'company_whatsapp', 'company_address_ar', 'company_address_en',
+            'social_twitter', 'social_facebook', 'social_instagram', 'social_linkedin', 'social_tiktok', 'social_youtube',
+            'banner_enabled', 'banner_text_ar', 'banner_text_en', 'banner_cta_label_ar', 'banner_cta_label_en', 'banner_cta_url',
+            'footer_tagline_ar', 'footer_tagline_en',
+        ];
+
+        $settings = [];
+        foreach ($keys as $k) {
+            $settings[$k] = SiteSetting::get($k);
+        }
+        $settings['banner_enabled'] = $settings['banner_enabled'] === '1';
+
+        return Inertia::render('Admin/SettingsGeneral', [
+            'general' => $settings,
+        ]);
+    }
+
+    public function updateGeneral(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'company_email' => ['nullable', 'email', 'max:150'],
+            'company_phone' => ['nullable', 'string', 'max:30'],
+            'company_whatsapp' => ['nullable', 'string', 'max:30'],
+            'company_address_ar' => ['nullable', 'string', 'max:300'],
+            'company_address_en' => ['nullable', 'string', 'max:300'],
+            'social_twitter' => ['nullable', 'url', 'max:255'],
+            'social_facebook' => ['nullable', 'url', 'max:255'],
+            'social_instagram' => ['nullable', 'url', 'max:255'],
+            'social_linkedin' => ['nullable', 'url', 'max:255'],
+            'social_tiktok' => ['nullable', 'url', 'max:255'],
+            'social_youtube' => ['nullable', 'url', 'max:255'],
+            'banner_enabled' => ['nullable', 'boolean'],
+            'banner_text_ar' => ['nullable', 'string', 'max:255'],
+            'banner_text_en' => ['nullable', 'string', 'max:255'],
+            'banner_cta_label_ar' => ['nullable', 'string', 'max:60'],
+            'banner_cta_label_en' => ['nullable', 'string', 'max:60'],
+            'banner_cta_url' => ['nullable', 'string', 'max:255'],
+            'footer_tagline_ar' => ['nullable', 'string', 'max:300'],
+            'footer_tagline_en' => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $textKeys = [
+            'company_email', 'company_phone', 'company_whatsapp', 'company_address_ar', 'company_address_en',
+            'social_twitter', 'social_facebook', 'social_instagram', 'social_linkedin', 'social_tiktok', 'social_youtube',
+            'banner_text_ar', 'banner_text_en', 'banner_cta_label_ar', 'banner_cta_label_en', 'banner_cta_url',
+            'footer_tagline_ar', 'footer_tagline_en',
+        ];
+
+        foreach ($textKeys as $k) {
+            SiteSetting::put($k, $data[$k] ?? null, 'general');
+        }
+
+        SiteSetting::put('banner_enabled', !empty($data['banner_enabled']) ? '1' : '0', 'general');
+
+        return back()->with('success', 'تم حفظ الإعدادات العامة');
+    }
 }

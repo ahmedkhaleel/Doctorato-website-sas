@@ -40,6 +40,35 @@ class HandleInertiaRequests extends Middleware
                 // Only enable in production by default; admin can override
                 'enabled' => SiteSetting::get('tracking_enabled', app()->environment('production') ? '1' : '0') === '1',
             ],
+            'site' => fn () => [
+                'contact' => [
+                    'email' => SiteSetting::get('company_email'),
+                    'phone' => SiteSetting::get('company_phone'),
+                    'whatsapp' => SiteSetting::get('company_whatsapp'),
+                    'address_ar' => SiteSetting::get('company_address_ar'),
+                    'address_en' => SiteSetting::get('company_address_en'),
+                ],
+                'social' => [
+                    'twitter' => SiteSetting::get('social_twitter'),
+                    'facebook' => SiteSetting::get('social_facebook'),
+                    'instagram' => SiteSetting::get('social_instagram'),
+                    'linkedin' => SiteSetting::get('social_linkedin'),
+                    'tiktok' => SiteSetting::get('social_tiktok'),
+                    'youtube' => SiteSetting::get('social_youtube'),
+                ],
+                'banner' => [
+                    'enabled' => SiteSetting::get('banner_enabled') === '1',
+                    'text_ar' => SiteSetting::get('banner_text_ar'),
+                    'text_en' => SiteSetting::get('banner_text_en'),
+                    'cta_label_ar' => SiteSetting::get('banner_cta_label_ar'),
+                    'cta_label_en' => SiteSetting::get('banner_cta_label_en'),
+                    'cta_url' => SiteSetting::get('banner_cta_url'),
+                ],
+                'footer' => [
+                    'tagline_ar' => SiteSetting::get('footer_tagline_ar'),
+                    'tagline_en' => SiteSetting::get('footer_tagline_en'),
+                ],
+            ],
         ];
     }
 }

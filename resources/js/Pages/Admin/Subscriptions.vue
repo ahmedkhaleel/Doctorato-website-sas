@@ -128,11 +128,14 @@ function fmtDate(d) {
                             </td>
                             <td class="px-4 py-3 text-gray-600">{{ fmtDate(sub.ends_at) }}</td>
                             <td class="px-4 py-3">
-                                <button
-                                    v-if="sub.status === 'active'"
-                                    @click="cancel(sub)"
-                                    class="text-xs text-red-600 hover:underline"
-                                >إلغاء</button>
+                                <div class="flex items-center gap-2">
+                                    <Link :href="`/admin/subscriptions/${sub.id}`" class="text-xs text-[#1B4F72] hover:underline">عرض</Link>
+                                    <button
+                                        v-if="sub.status === 'active'"
+                                        @click="cancel(sub)"
+                                        class="text-xs text-red-600 hover:underline"
+                                    >إلغاء</button>
+                                </div>
                             </td>
                         </tr>
                         <tr v-if="!subscriptions.data.length">

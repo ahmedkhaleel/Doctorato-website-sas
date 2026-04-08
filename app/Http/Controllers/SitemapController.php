@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Models\CaseStudy;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -22,6 +23,8 @@ class SitemapController extends Controller
         ['path' => '/demo', 'priority' => '0.8', 'freq' => 'monthly'],
         ['path' => '/faq', 'priority' => '0.7', 'freq' => 'monthly'],
         ['path' => '/blog', 'priority' => '0.8', 'freq' => 'weekly'],
+        ['path' => '/case-studies', 'priority' => '0.85', 'freq' => 'monthly'],
+        ['path' => '/roi-calculator', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/privacy', 'priority' => '0.3', 'freq' => 'yearly'],
         ['path' => '/terms', 'priority' => '0.3', 'freq' => 'yearly'],
     ];
@@ -53,6 +56,24 @@ class SitemapController extends Controller
                         $post->updated_at?->toAtomString() ?? now()->toAtomString(),
                         'monthly',
                         '0.6',
+                        $locales,
+                        $path,
+                    );
+                }
+            });
+
+        // Case studies
+        CaseStudy::query()
+            ->published()
+            ->orderByDesc('updated_at')
+            ->chunk(200, function ($cases) use (&$xml, $base, $locales) {
+                foreach ($cases as $case) {
+                    $path = '/case-studies/' . $case->slug;
+                    $xml .= $this->urlBlock(
+                        $base . $path,
+                        $case->updated_at?->toAtomString() ?? now()->toAtomString(),
+                        'monthly',
+                        '0.7',
                         $locales,
                         $path,
                     );

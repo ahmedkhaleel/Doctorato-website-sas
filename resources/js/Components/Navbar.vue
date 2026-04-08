@@ -34,6 +34,8 @@ const navLinks = computed(() => [
     },
     { label: t('nav.pricing'), href: '/pricing' },
     { label: t('nav.about'), href: '/about' },
+    { label: 'دراسات الحالة', href: '/case-studies' },
+    { label: 'حاسبة العائد', href: '/roi-calculator' },
     { label: t('nav.blog'), href: '/blog' },
     { label: t('nav.faq'), href: '/faq' },
     { label: t('nav.contact'), href: '/contact' },

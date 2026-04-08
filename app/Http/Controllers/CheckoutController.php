@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Coupon;
 use App\Models\Invoice;
 use App\Models\PricingPlan;
 use App\Models\Subscription;
 use App\Services\PaymobService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +41,41 @@ class CheckoutController extends Controller
         ]);
     }
 
+    /** AJAX endpoint: validate a coupon against a plan+cycle and return the discount. */
+    public function validateCoupon(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'code' => ['required', 'string', 'max:40'],
+            'plan_id' => ['required', 'integer', 'exists:pricing_plans,id'],
+            'cycle' => ['required', 'in:monthly,yearly'],
+        ]);
+
+        $coupon = Coupon::where('code', strtoupper($data['code']))->first();
+        $plan = PricingPlan::find($data['plan_id']);
+
+        if (!$coupon || !$plan) {
+            return response()->json(['valid' => false, 'message' => 'كود غير صحيح'], 404);
+        }
+
+        $amount = $data['cycle'] === 'yearly' ? (float) $plan->yearly_price : (float) $plan->monthly_price;
+
+        if (!$coupon->isValid($amount, $plan->id)) {
+            return response()->json(['valid' => false, 'message' => 'الكوبون غير صالح أو منتهي'], 422);
+        }
+
+        $discount = $coupon->computeDiscount($amount);
+
+        return response()->json([
+            'valid' => true,
+            'code' => $coupon->code,
+            'discount' => $discount,
+            'total' => round($amount - $discount, 2),
+            'label' => $coupon->type === 'percentage'
+                ? ((int) $coupon->value) . '% خصم'
+                : ((int) $coupon->value) . ' ج.م خصم',
+        ]);
+    }
+
     /** Create the subscription + invoice and redirect to Paymob iframe. */
     public function start(Request $request, PaymobService $paymob): RedirectResponse
     {
@@ -50,16 +87,28 @@ class CheckoutController extends Controller
             'customer_phone' => ['required', 'string', 'max:30'],
             'clinic_name' => ['nullable', 'string', 'max:150'],
             'city' => ['nullable', 'string', 'max:80'],
+            'coupon_code' => ['nullable', 'string', 'max:40'],
         ]);
 
         $plan = PricingPlan::findOrFail($data['plan_id']);
         abort_if($plan->is_custom, 404);
 
-        $amount = $data['cycle'] === 'yearly'
+        $subtotal = $data['cycle'] === 'yearly'
             ? (float) $plan->yearly_price
             : (float) $plan->monthly_price;
 
-        [$subscription, $invoice] = DB::transaction(function () use ($data, $plan, $amount) {
+        // Apply coupon if present and still valid at submit time
+        $discount = 0;
+        $coupon = null;
+        if (!empty($data['coupon_code'])) {
+            $coupon = Coupon::where('code', strtoupper($data['coupon_code']))->first();
+            if ($coupon && $coupon->isValid($subtotal, $plan->id)) {
+                $discount = $coupon->computeDiscount($subtotal);
+            }
+        }
+        $total = max(0, $subtotal - $discount);
+
+        [$subscription, $invoice] = DB::transaction(function () use ($data, $plan, $subtotal, $discount, $total, $coupon) {
             $sub = Subscription::create([
                 'pricing_plan_id' => $plan->id,
                 'customer_name' => $data['customer_name'],
@@ -69,27 +118,34 @@ class CheckoutController extends Controller
                 'city' => $data['city'] ?? null,
                 'country' => 'EG',
                 'billing_cycle' => $data['cycle'],
-                'amount' => $amount,
+                'amount' => $total,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discount,
                 'currency' => $plan->currency ?: 'EGP',
                 'status' => 'pending',
             ]);
 
             $inv = Invoice::create([
                 'subscription_id' => $sub->id,
-                'subtotal' => $amount,
+                'subtotal' => $subtotal,
                 'tax' => 0,
-                'discount' => 0,
-                'total' => $amount,
+                'discount' => $discount,
+                'total' => $total,
                 'currency' => $sub->currency,
                 'status' => 'pending',
                 'due_at' => now()->addDays(3),
                 'line_items' => [[
                     'name' => ($plan->name_ar ?: $plan->name_en) . ' — ' . $data['cycle'],
                     'qty' => 1,
-                    'unit_price' => $amount,
-                    'total' => $amount,
+                    'unit_price' => $subtotal,
+                    'total' => $subtotal,
                 ]],
+                'metadata' => $coupon ? ['coupon' => $coupon->code] : null,
             ]);
+
+            if ($coupon) {
+                $coupon->markUsed();
+            }
 
             return [$sub, $inv];
         });

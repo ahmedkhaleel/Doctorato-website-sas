@@ -42,13 +42,16 @@ const menuGroups = computed(() => [
         label: 'المبيعات',
         items: [
             { label: 'الاشتراكات والمدفوعات', icon: 'card', route: '/admin/subscriptions', perm: 'dashboard.view' },
+            { label: 'الفواتير', icon: 'doc', route: '/admin/invoices', perm: 'dashboard.view' },
+            { label: 'الكوبونات', icon: 'tag', route: '/admin/coupons', perm: 'dashboard.view' },
             { label: 'التحليلات والإيرادات', icon: 'chart', route: '/admin/analytics', perm: 'dashboard.view' },
         ],
     },
     {
         label: 'الإعدادات',
         items: [
-            { label: 'التتبع والتحليلات', icon: 'cog', route: '/admin/settings/tracking', perm: 'dashboard.view' },
+            { label: 'الإعدادات العامة', icon: 'cog', route: '/admin/settings/general', perm: 'dashboard.view' },
+            { label: 'التتبع والتحليلات', icon: 'chart', route: '/admin/settings/tracking', perm: 'dashboard.view' },
         ],
     },
     {
@@ -56,9 +59,11 @@ const menuGroups = computed(() => [
         items: [
             { label: 'مقالات المدونة', icon: 'doc', route: '/admin/blog/posts', perm: 'dashboard.view' },
             { label: 'تصنيفات المدونة', icon: 'tag', route: '/admin/blog/categories', perm: 'dashboard.view' },
+            { label: 'دراسات الحالة', icon: 'star', route: '/admin/case-studies', perm: 'dashboard.view' },
             { label: 'الأسئلة الشائعة', icon: 'faq', route: '/admin/faqs', perm: 'faqs.manage' },
             { label: 'الشهادات', icon: 'star', route: '/admin/testimonials', perm: 'testimonials.manage' },
             { label: 'خطط الأسعار', icon: 'price', route: '/admin/plans', perm: 'plans.manage' },
+            { label: 'الإضافات (Add-ons)', icon: 'tag', route: '/admin/addons', perm: 'dashboard.view' },
             { label: 'العملات', icon: 'coin', route: '/admin/currencies', perm: 'currencies.manage' },
         ],
     },

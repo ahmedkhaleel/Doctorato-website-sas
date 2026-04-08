@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{HomeController, DemoRequestController, ContactController, NewsletterController, BlogController, PricingController, PageController, CheckoutController, PaymobWebhookController, SitemapController};
+use App\Http\Controllers\{HomeController, DemoRequestController, ContactController, NewsletterController, BlogController, PricingController, PageController, CheckoutController, PaymobWebhookController, SitemapController, CaseStudyController};
 use Illuminate\Support\Facades\Route;
 
 // Language switcher
@@ -47,8 +47,16 @@ Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsle
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
+// Case Studies
+Route::get('/case-studies', [CaseStudyController::class, 'index'])->name('case-studies.index');
+Route::get('/case-studies/{slug}', [CaseStudyController::class, 'show'])->name('case-studies.show');
+
+// ROI Calculator
+Route::get('/roi-calculator', fn () => \Inertia\Inertia::render('RoiCalculator'))->name('roi-calculator');
+
 // Checkout
 Route::get('/checkout/{planSlug}', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout/validate-coupon', [CheckoutController::class, 'validateCoupon'])->name('checkout.validate-coupon')->middleware('throttle:20,1');
 Route::post('/checkout/start', [CheckoutController::class, 'start'])->name('checkout.start')->middleware('throttle:6,1');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('checkout.failed');
@@ -97,6 +105,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
 
+    Route::get('/case-studies', [\App\Http\Controllers\Admin\CaseStudyController::class, 'index'])->name('case-studies.index');
+    Route::post('/case-studies', [\App\Http\Controllers\Admin\CaseStudyController::class, 'store'])->name('case-studies.store');
+    Route::put('/case-studies/{caseStudy}', [\App\Http\Controllers\Admin\CaseStudyController::class, 'update'])->name('case-studies.update');
+    Route::delete('/case-studies/{caseStudy}', [\App\Http\Controllers\Admin\CaseStudyController::class, 'destroy'])->name('case-studies.destroy');
+
     Route::get('/blog/posts', [\App\Http\Controllers\Admin\BlogPostController::class, 'index'])->name('blog.posts.index');
     Route::post('/blog/posts', [\App\Http\Controllers\Admin\BlogPostController::class, 'store'])->name('blog.posts.store');
     Route::put('/blog/posts/{post}', [\App\Http\Controllers\Admin\BlogPostController::class, 'update'])->name('blog.posts.update');
@@ -110,10 +123,26 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'tracking'])->name('settings.tracking');
     Route::put('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'updateTracking'])->name('settings.tracking.update');
+    Route::get('/settings/general', [\App\Http\Controllers\Admin\SettingsController::class, 'general'])->name('settings.general');
+    Route::put('/settings/general', [\App\Http\Controllers\Admin\SettingsController::class, 'updateGeneral'])->name('settings.general.update');
 
     Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/{subscription}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'show'])->name('subscriptions.show');
     Route::post('/subscriptions/{subscription}/cancel', [\App\Http\Controllers\Admin\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+
+    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/print', [\App\Http\Controllers\Admin\InvoiceController::class, 'print'])->name('invoices.print');
+
+    Route::get('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('coupons.index');
+    Route::post('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'store'])->name('coupons.store');
+    Route::put('/coupons/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'update'])->name('coupons.update');
+    Route::delete('/coupons/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'destroy'])->name('coupons.destroy');
+
+    Route::get('/addons', [\App\Http\Controllers\Admin\AddOnController::class, 'index'])->name('addons.index');
+    Route::post('/addons', [\App\Http\Controllers\Admin\AddOnController::class, 'store'])->name('addons.store');
+    Route::put('/addons/{addon}', [\App\Http\Controllers\Admin\AddOnController::class, 'update'])->name('addons.update');
+    Route::delete('/addons/{addon}', [\App\Http\Controllers\Admin\AddOnController::class, 'destroy'])->name('addons.destroy');
 
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');

@@ -22,7 +22,57 @@ const form = useForm({
     customer_phone: '',
     clinic_name: '',
     city: '',
+    coupon_code: '',
 });
+
+// Coupon state
+const couponInput = ref('');
+const couponApplied = ref(null); // { code, discount, total, label }
+const couponError = ref(null);
+const couponBusy = ref(false);
+
+async function applyCoupon() {
+    if (!couponInput.value.trim()) return;
+    couponBusy.value = true;
+    couponError.value = null;
+    try {
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const res = await fetch('/checkout/validate-coupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                code: couponInput.value.trim().toUpperCase(),
+                plan_id: props.plan.id,
+                cycle: cycle.value,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.valid) {
+            couponError.value = data.message || 'كود غير صحيح';
+            couponApplied.value = null;
+            form.coupon_code = '';
+        } else {
+            couponApplied.value = data;
+            form.coupon_code = data.code;
+        }
+    } catch (e) {
+        couponError.value = 'خطأ في الاتصال';
+    } finally {
+        couponBusy.value = false;
+    }
+}
+
+function removeCoupon() {
+    couponApplied.value = null;
+    couponInput.value = '';
+    form.coupon_code = '';
+    couponError.value = null;
+}
 
 const planName = computed(() => (locale.value === 'ar' ? props.plan.name_ar : props.plan.name_en));
 
@@ -38,7 +88,16 @@ const yearlySavings = computed(() => {
 function setCycle(value) {
     cycle.value = value;
     form.cycle = value;
+    // Re-validate the coupon for the new amount
+    if (couponApplied.value) {
+        applyCoupon();
+    }
 }
+
+const finalTotal = computed(() => {
+    if (couponApplied.value) return couponApplied.value.total;
+    return amount.value;
+});
 
 const track = useTracking();
 
@@ -144,7 +203,7 @@ function formatPrice(v) {
                             class="w-full bg-secondary hover:bg-secondary-dark text-white font-semibold py-4 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-60"
                         >
                             {{ form.processing ? t('checkout.processing', 'جاري التحويل...') : t('checkout.pay_now', 'ادفع الآن') }}
-                            — {{ formatPrice(amount) }} {{ plan.currency }}
+                            — {{ formatPrice(finalTotal) }} {{ plan.currency }}
                         </button>
 
                         <p class="text-xs text-gray text-center">
@@ -182,6 +241,38 @@ function formatPrice(v) {
                                 </button>
                             </div>
 
+                            <!-- Coupon field -->
+                            <div class="mb-4 pb-4 border-b border-gray-100">
+                                <label class="block text-xs font-bold text-gray uppercase tracking-wider mb-2">كوبون خصم</label>
+                                <div v-if="!couponApplied" class="flex gap-2">
+                                    <input
+                                        v-model="couponInput"
+                                        @keydown.enter.prevent="applyCoupon"
+                                        type="text"
+                                        dir="ltr"
+                                        placeholder="LAUNCH30"
+                                        class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono uppercase focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition"
+                                    />
+                                    <button
+                                        type="button"
+                                        @click="applyCoupon"
+                                        :disabled="couponBusy"
+                                        class="px-4 py-2 bg-dark hover:bg-primary text-white rounded-lg text-sm font-semibold disabled:opacity-60 transition"
+                                    >
+                                        {{ couponBusy ? '...' : 'تطبيق' }}
+                                    </button>
+                                </div>
+                                <div v-else class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        <span class="font-mono font-bold text-sm text-emerald-700">{{ couponApplied.code }}</span>
+                                        <span class="text-xs text-emerald-600">· {{ couponApplied.label }}</span>
+                                    </div>
+                                    <button type="button" @click="removeCoupon" class="text-red-500 hover:text-red-700 text-xs">✕</button>
+                                </div>
+                                <p v-if="couponError" class="text-xs text-danger mt-1">{{ couponError }}</p>
+                            </div>
+
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
                                     <span class="text-gray">{{ t('checkout.subtotal', 'الإجمالي') }}</span>
@@ -191,12 +282,16 @@ function formatPrice(v) {
                                     <span>{{ t('checkout.savings', 'توفير سنوي') }}</span>
                                     <span class="font-semibold">-{{ formatPrice(yearlySavings) }} {{ plan.currency }}</span>
                                 </div>
+                                <div v-if="couponApplied" class="flex justify-between text-emerald-600 font-semibold">
+                                    <span>كوبون {{ couponApplied.code }}</span>
+                                    <span>-{{ formatPrice(couponApplied.discount) }} {{ plan.currency }}</span>
+                                </div>
                             </div>
 
                             <div class="border-t border-gray-100 pt-4 mt-4 flex justify-between items-center">
                                 <span class="font-bold text-dark">{{ t('checkout.total', 'المستحق') }}</span>
                                 <span class="text-2xl font-bold text-primary">
-                                    {{ formatPrice(amount) }}
+                                    {{ formatPrice(finalTotal) }}
                                     <span class="text-sm font-normal">{{ plan.currency }}</span>
                                 </span>
                             </div>

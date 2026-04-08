@@ -20,6 +20,7 @@ const props = defineProps({
     faqs: { type: Array, default: () => [] },
     currencies: Array,
     currentCurrency: String,
+    addons: { type: Array, default: () => [] },
 });
 
 const billingCycle = ref('monthly');
@@ -126,69 +127,9 @@ const guarantees = computed(() => [
 
 const showComparison = ref(false);
 
-// Add-ons — prices stored natively in EGP (the base currency)
-const addons = ref([
-    {
-        icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-        name_ar: 'مستخدم إضافي',
-        name_en: 'Extra user',
-        desc_ar: 'أضف مستخدماً جديداً فوق حد الخطة',
-        desc_en: 'Add a user above your plan limit',
-        price_egp: 99,
-        period_ar: 'شهرياً',
-        period_en: 'month',
-    },
-    {
-        icon: 'M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129',
-        name_ar: '1000 رسالة SMS',
-        name_en: '1,000 SMS messages',
-        desc_ar: 'رسائل تذكير ومواعيد للمرضى',
-        desc_en: 'Reminders & appointment SMS',
-        price_egp: 249,
-        period_ar: 'الباقة',
-        period_en: 'bundle',
-    },
-    {
-        icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
-        name_ar: 'واتساب بزنس API',
-        name_en: 'WhatsApp Business API',
-        desc_ar: 'إرسال تذكيرات ومواعيد عبر واتساب',
-        desc_en: 'Send reminders & notifications via WhatsApp',
-        price_egp: 399,
-        period_ar: 'شهرياً',
-        period_en: 'month',
-    },
-    {
-        icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
-        name_ar: 'دومين وبريد احترافي',
-        name_en: 'Custom domain + email',
-        desc_ar: 'نطاق خاص وبريد باسم عيادتك',
-        desc_en: 'Your own domain & branded email',
-        price_egp: 199,
-        period_ar: 'شهرياً',
-        period_en: 'month',
-    },
-    {
-        icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-        name_ar: 'نسخ احتياطي كل ساعة',
-        name_en: 'Hourly backup',
-        desc_ar: 'نسخ احتياطي متكرر وحماية قصوى',
-        desc_en: 'Frequent backups, maximum protection',
-        price_egp: 299,
-        period_ar: 'شهرياً',
-        period_en: 'month',
-    },
-    {
-        icon: 'M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z',
-        name_ar: 'White-Label كامل',
-        name_en: 'Full White-Label',
-        desc_ar: 'شعارك وهويتك بدلاً من دكتوراتو',
-        desc_en: 'Your branding instead of Doctorato',
-        price_egp: 1999,
-        period_ar: 'شهرياً',
-        period_en: 'month',
-    },
-]);
+// Add-ons come from the `addons` prop (fed from AddOn model). Keep a local
+// alias so the existing template doesn't need to change.
+const addons = computed(() => props.addons || []);
 
 const pricingJsonLd = computed(() => ({
     '@context': 'https://schema.org',
@@ -506,26 +447,32 @@ const pricingJsonLd = computed(() => ({
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-stagger">
                     <div
-                        v-for="(addon, idx) in addons"
-                        :key="idx"
-                        class="group relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#C4A265]/30 hover:-translate-y-1 transition-all duration-300 animate-fade-up"
+                        v-for="addon in addons"
+                        :key="addon.id"
+                        class="group relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#C4A265]/30 hover:-translate-y-1 transition-all duration-300 animate-fade-up overflow-hidden"
                     >
+                        <div v-if="addon.badge_ar" class="absolute top-3 end-3 px-2 py-0.5 rounded-full bg-[#C4A265]/15 text-[#C4A265] text-[10px] font-bold">
+                            {{ locale === 'ar' ? addon.badge_ar : addon.badge_en }}
+                        </div>
                         <div class="flex items-start gap-4">
-                            <div class="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#1B4F72]/10 to-[#C4A265]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <svg class="w-6 h-6 text-[#1B4F72]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="addon.icon"/>
-                                </svg>
+                            <div class="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#1B4F72]/10 to-[#C4A265]/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 text-[#1B4F72] font-bold text-xs uppercase">
+                                {{ (addon.icon || addon.name_en || '?').substring(0, 2) }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h3 class="text-base font-bold text-[#1C2833] mb-1">
                                     {{ locale === 'ar' ? addon.name_ar : addon.name_en }}
                                 </h3>
                                 <p class="text-xs text-gray-500 leading-relaxed mb-3">
-                                    {{ locale === 'ar' ? addon.desc_ar : addon.desc_en }}
+                                    {{ locale === 'ar' ? addon.description_ar : addon.description_en }}
                                 </p>
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatPrice(addon.price_egp) }}</span>
-                                    <span class="text-xs text-gray-400">/ {{ locale === 'ar' ? addon.period_ar : addon.period_en }}</span>
+                                    <span class="text-xs text-gray-400">
+                                        /
+                                        <template v-if="addon.period === 'yearly'">{{ locale === 'ar' ? 'سنوياً' : 'year' }}</template>
+                                        <template v-else-if="addon.period === 'one_time'">{{ locale === 'ar' ? 'لمرة واحدة' : 'one-time' }}</template>
+                                        <template v-else>{{ locale === 'ar' ? 'شهرياً' : 'month' }}</template>
+                                    </span>
                                 </div>
                             </div>
                         </div>
