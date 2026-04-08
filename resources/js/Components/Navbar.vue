@@ -11,33 +11,46 @@ const { switchLocale } = useLocale();
 
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
-const isProductDropdownOpen = ref(false);
+// Tracks which desktop dropdown is open ('product' | 'resources' | null).
+// A string key (instead of a boolean per menu) keeps the state flat and
+// ensures opening one dropdown automatically closes the other.
+const openDesktopDropdown = ref(null);
 const openMobileDropdown = ref(null);
 
 function toggleMobileDropdown(label) {
     openMobileDropdown.value = openMobileDropdown.value === label ? null : label;
 }
 
+// Navbar structure — 6 top-level items, 2 dropdowns (Product / Resources).
+// This mirrors the standard SaaS layout used by Stripe, Linear, and Notion:
+// primary entry points stay flat, while supporting content lives under a
+// single "Resources" menu instead of cluttering the main bar.
 const navLinks = computed(() => [
     { label: t('nav.home'), href: '/' },
     {
         label: t('nav.product'),
-        dropdown: true,
+        dropdown: 'product',
         children: [
-            { label: t('nav.features'), href: '/features', desc: t('nav.features_desc') },
-            { label: t('nav.portals'), href: '/portals', desc: t('nav.portals_desc') },
-            { label: t('nav.dental'), href: '/dental', desc: t('nav.dental_desc') },
-            { label: t('nav.solutions'), href: '/solutions', desc: t('nav.solutions_desc') },
-            { label: t('nav.technology'), href: '/technology', desc: t('nav.technology_desc') },
-            { label: t('nav.reports'), href: '/reports', desc: t('nav.reports_desc') },
+            { label: t('nav.features'), href: '/features', desc: t('nav.features_desc'), icon: 'features' },
+            { label: t('nav.portals'), href: '/portals', desc: t('nav.portals_desc'), icon: 'portals' },
+            { label: t('nav.dental'), href: '/dental', desc: t('nav.dental_desc'), icon: 'dental' },
+            { label: t('nav.solutions'), href: '/solutions', desc: t('nav.solutions_desc'), icon: 'solutions' },
+            { label: t('nav.technology'), href: '/technology', desc: t('nav.technology_desc'), icon: 'technology' },
+            { label: t('nav.reports'), href: '/reports', desc: t('nav.reports_desc'), icon: 'reports' },
         ],
     },
     { label: t('nav.pricing'), href: '/pricing' },
+    {
+        label: locale.value === 'ar' ? 'الموارد' : 'Resources',
+        dropdown: 'resources',
+        children: [
+            { label: locale.value === 'ar' ? 'دراسات الحالة' : 'Case studies', href: '/case-studies', desc: locale.value === 'ar' ? 'قصص نجاح عملاء حقيقيين' : 'Real customer success stories', icon: 'case' },
+            { label: locale.value === 'ar' ? 'حاسبة العائد' : 'ROI calculator', href: '/roi-calculator', desc: locale.value === 'ar' ? 'احسب توفيرك خلال دقيقة' : 'Calculate your savings in a minute', icon: 'roi' },
+            { label: t('nav.blog'), href: '/blog', desc: locale.value === 'ar' ? 'مقالات ونصائح لإدارة العيادات' : 'Articles & tips for clinics', icon: 'blog' },
+            { label: t('nav.faq'), href: '/faq', desc: locale.value === 'ar' ? 'إجابات الأسئلة المتكررة' : 'Answers to common questions', icon: 'faq' },
+        ],
+    },
     { label: t('nav.about'), href: '/about' },
-    { label: 'دراسات الحالة', href: '/case-studies' },
-    { label: 'حاسبة العائد', href: '/roi-calculator' },
-    { label: t('nav.blog'), href: '/blog' },
-    { label: t('nav.faq'), href: '/faq' },
     { label: t('nav.contact'), href: '/contact' },
 ]);
 
@@ -51,13 +64,13 @@ function closeMobileMenu() {
 }
 
 let dropdownTimeout = null;
-function openDropdown() {
+function openDropdown(key) {
     clearTimeout(dropdownTimeout);
-    isProductDropdownOpen.value = true;
+    openDesktopDropdown.value = key;
 }
 function closeDropdown() {
     dropdownTimeout = setTimeout(() => {
-        isProductDropdownOpen.value = false;
+        openDesktopDropdown.value = null;
     }, 150);
 }
 
@@ -90,14 +103,19 @@ onUnmounted(() => {
                         <div
                             v-if="link.dropdown"
                             class="relative"
-                            @mouseenter="openDropdown"
+                            @mouseenter="openDropdown(link.dropdown)"
                             @mouseleave="closeDropdown"
                         >
                             <button
-                                class="px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 flex items-center gap-1 text-dark hover:text-primary hover:bg-light-blue"
+                                :class="[
+                                    'px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 flex items-center gap-1',
+                                    openDesktopDropdown === link.dropdown
+                                        ? 'text-primary bg-light-blue'
+                                        : 'text-dark hover:text-primary hover:bg-light-blue'
+                                ]"
                             >
                                 {{ link.label }}
-                                <svg class="w-4 h-4 transition-transform" :class="isProductDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 transition-transform" :class="openDesktopDropdown === link.dropdown ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
@@ -112,7 +130,7 @@ onUnmounted(() => {
                                 leave-to-class="opacity-0 translate-y-2"
                             >
                                 <div
-                                    v-if="isProductDropdownOpen"
+                                    v-if="openDesktopDropdown === link.dropdown"
                                     class="absolute top-full start-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
                                 >
                                     <div class="p-3">
@@ -121,11 +139,25 @@ onUnmounted(() => {
                                             :key="child.href"
                                             :href="child.href"
                                             class="flex items-start gap-3 p-3 rounded-xl hover:bg-light-blue transition-colors group"
-                                            @click="isProductDropdownOpen = false"
+                                            @click="openDesktopDropdown = null"
                                         >
-                                            <div>
+                                            <div class="w-10 h-10 rounded-xl bg-primary/5 group-hover:bg-primary/10 flex items-center justify-center shrink-0 transition-colors">
+                                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                                    <path v-if="child.icon === 'features'" stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                                    <path v-else-if="child.icon === 'portals'" stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                                    <path v-else-if="child.icon === 'dental'" stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                                    <path v-else-if="child.icon === 'solutions'" stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    <path v-else-if="child.icon === 'technology'" stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                                    <path v-else-if="child.icon === 'reports'" stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6m4 6V9m4 10v-4M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                                    <path v-else-if="child.icon === 'case'" stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                                    <path v-else-if="child.icon === 'roi'" stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    <path v-else-if="child.icon === 'blog'" stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    <path v-else-if="child.icon === 'faq'" stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
                                                 <p class="text-sm font-semibold text-dark group-hover:text-primary transition-colors">{{ child.label }}</p>
-                                                <p class="text-xs text-gray mt-0.5">{{ child.desc }}</p>
+                                                <p class="text-xs text-gray mt-0.5 leading-relaxed">{{ child.desc }}</p>
                                             </div>
                                         </Link>
                                     </div>
