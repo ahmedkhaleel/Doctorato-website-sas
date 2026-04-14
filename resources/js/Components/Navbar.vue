@@ -34,6 +34,7 @@ const navLinks = computed(() => [
             { label: t('nav.features'), href: '/features', desc: t('nav.features_desc'), icon: 'features' },
             { label: t('nav.portals'), href: '/portals', desc: t('nav.portals_desc'), icon: 'portals' },
             { label: t('nav.dental'), href: '/dental', desc: t('nav.dental_desc'), icon: 'dental' },
+            { label: locale.value === 'ar' ? 'طب الأطفال' : 'Pediatrics', href: '/pediatrics', desc: locale.value === 'ar' ? 'وحدة متكاملة لعيادات طب الأطفال' : 'Complete pediatric clinic module', icon: 'pediatrics' },
             { label: t('nav.solutions'), href: '/solutions', desc: t('nav.solutions_desc'), icon: 'solutions' },
             { label: t('nav.technology'), href: '/technology', desc: t('nav.technology_desc'), icon: 'technology' },
             { label: t('nav.reports'), href: '/reports', desc: t('nav.reports_desc'), icon: 'reports' },
@@ -146,6 +147,7 @@ onUnmounted(() => {
                                                     <path v-if="child.icon === 'features'" stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                                     <path v-else-if="child.icon === 'portals'" stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                                                     <path v-else-if="child.icon === 'dental'" stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                                    <path v-else-if="child.icon === 'pediatrics'" stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                                                     <path v-else-if="child.icon === 'solutions'" stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                     <path v-else-if="child.icon === 'technology'" stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                                     <path v-else-if="child.icon === 'reports'" stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6m4 6V9m4 10v-4M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>

@@ -29,6 +29,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/features', [PageController::class, 'features'])->name('features');
 Route::get('/portals', [PageController::class, 'portals'])->name('portals');
 Route::get('/dental', [PageController::class, 'dental'])->name('dental');
+Route::get('/pediatrics', [PageController::class, 'pediatrics'])->name('pediatrics');
 Route::get('/solutions', [PageController::class, 'solutions'])->name('solutions');
 Route::get('/technology', [PageController::class, 'technology'])->name('technology');
 Route::get('/reports', [PageController::class, 'reports'])->name('reports');
