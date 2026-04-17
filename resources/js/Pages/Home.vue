@@ -322,6 +322,159 @@ const homeJsonLd = computed(() => ({
             <div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1B4F72]/20 to-transparent" />
         </section>
 
+        <!-- 3b. Specialized Solutions — 3 dedicated services spotlight -->
+        <section class="py-20 lg:py-24 bg-white relative overflow-hidden">
+            <!-- Subtle background -->
+            <div class="absolute top-0 end-0 w-[500px] h-[500px] bg-[#1B4F72]/[0.025] rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 start-0 w-[400px] h-[400px] bg-[#C4A265]/[0.035] rounded-full blur-3xl"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <!-- Header -->
+                <div class="text-center mb-14 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 mb-5">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-[#1B4F72]">
+                            {{ locale === 'ar' ? 'حلول متخصّصة' : 'Specialized solutions' }}
+                        </span>
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#1C2833] mb-4 leading-tight">
+                        {{ locale === 'ar' ? 'نظام واحد، 3 تخصّصات جاهزة' : 'One platform, 3 ready-made specialties' }}
+                    </h2>
+                    <p class="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                        {{ locale === 'ar'
+                            ? 'اختر الحل الأقرب لعيادتك — كل واحد مدمج بالكامل داخل دكتوراتو'
+                            : 'Pick the solution closest to your clinic — each one is fully integrated inside Doctorato' }}
+                    </p>
+                </div>
+
+                <!-- 3 spotlight cards -->
+                <div class="grid md:grid-cols-3 gap-6 animate-stagger">
+                    <!-- Dental System -->
+                    <Link
+                        href="/dental"
+                        class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#0D2F45] to-[#0A1628] text-white p-8 border border-white/10 hover:border-[#C4A265]/40 hover:-translate-y-1 transition-all duration-500 shadow-lg"
+                    >
+                        <!-- Animated orb -->
+                        <div class="absolute -top-24 -end-24 w-64 h-64 bg-[#C4A265]/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                        <!-- Hex pattern -->
+                        <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="hx-dental" x="0" y="0" width="48" height="56" patternUnits="userSpaceOnUse">
+                                    <polygon points="24,2 44,14 44,42 24,54 4,42 4,14" fill="none" stroke="white" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#hx-dental)"/>
+                        </svg>
+
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center mb-5 shadow-lg shadow-[#C4A265]/30 group-hover:rotate-6 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-extrabold mb-2">
+                                {{ locale === 'ar' ? 'نظام عيادات الأسنان' : 'Dental Clinic System' }}
+                            </h3>
+                            <p class="text-white/60 text-sm leading-relaxed mb-5">
+                                {{ locale === 'ar'
+                                    ? 'نظام كامل لإدارة عيادات الأسنان: مخطط FDI تفاعلي، خطط علاج، أشعة، لاب، موافقات رقمية.'
+                                    : 'Full dental clinic system: interactive FDI chart, treatment plans, imaging, lab orders, digital consent.' }}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-[#C4A265] text-sm font-bold group-hover:gap-3 transition-all">
+                                {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </Link>
+
+                    <!-- Pediatrics -->
+                    <Link
+                        href="/pediatrics"
+                        class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#0D2F45] to-[#0A1628] text-white p-8 border border-white/10 hover:border-[#EC4899]/40 hover:-translate-y-1 transition-all duration-500 shadow-lg"
+                    >
+                        <div class="absolute -top-24 -end-24 w-64 h-64 bg-[#EC4899]/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                        <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="hx-ped" x="0" y="0" width="48" height="56" patternUnits="userSpaceOnUse">
+                                    <polygon points="24,2 44,14 44,42 24,54 4,42 4,14" fill="none" stroke="white" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#hx-ped)"/>
+                        </svg>
+
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EC4899] to-[#DB2777] flex items-center justify-center mb-5 shadow-lg shadow-[#EC4899]/30 group-hover:rotate-6 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-extrabold mb-2">
+                                {{ locale === 'ar' ? 'طب الأطفال' : 'Pediatrics' }}
+                            </h3>
+                            <p class="text-white/60 text-sm leading-relaxed mb-5">
+                                {{ locale === 'ar'
+                                    ? 'وحدة متكاملة لعيادات الأطفال: مخططات نمو WHO، تطعيمات، بروتوكولات، ملف عائلي.'
+                                    : 'Complete pediatric module: WHO growth charts, vaccinations, protocols, family profiles.' }}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-[#EC4899] text-sm font-bold group-hover:gap-3 transition-all">
+                                {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </Link>
+
+                    <!-- Telemedicine -->
+                    <Link
+                        href="/telemedicine"
+                        class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#0D2F45] to-[#0A1628] text-white p-8 border border-white/10 hover:border-[#5DADE2]/40 hover:-translate-y-1 transition-all duration-500 shadow-lg"
+                    >
+                        <div class="absolute -top-24 -end-24 w-64 h-64 bg-[#5DADE2]/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                        <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="hx-tel" x="0" y="0" width="48" height="56" patternUnits="userSpaceOnUse">
+                                    <polygon points="24,2 44,14 44,42 24,54 4,42 4,14" fill="none" stroke="white" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#hx-tel)"/>
+                        </svg>
+
+                        <!-- NEW badge -->
+                        <div class="absolute top-5 end-5 px-2.5 py-1 rounded-full bg-[#5DADE2]/20 border border-[#5DADE2]/30 text-[#5DADE2] text-[10px] font-bold uppercase tracking-widest">
+                            {{ locale === 'ar' ? 'جديد' : 'New' }}
+                        </div>
+
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2E86C1] to-[#1B4F72] flex items-center justify-center mb-5 shadow-lg shadow-[#2E86C1]/30 group-hover:rotate-6 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-extrabold mb-2">
+                                {{ locale === 'ar' ? 'الاستشارات الأون لاين' : 'Online Consultations' }}
+                            </h3>
+                            <p class="text-white/60 text-sm leading-relaxed mb-5">
+                                {{ locale === 'ar'
+                                    ? 'مكالمات فيديو HD، وصفات إلكترونية، دفع فوري، سجل طبي متزامن — عيادة افتراضية كاملة.'
+                                    : 'HD video, digital prescriptions, instant payment, live-synced records — a complete virtual clinic.' }}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-[#5DADE2] text-sm font-bold group-hover:gap-3 transition-all">
+                                {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </Link>
+                </div>
+            </div>
+        </section>
+
         <!-- 4. Explore System — Premium Bento Grid -->
         <section class="py-20 lg:py-24 bg-white relative overflow-hidden">
             <!-- Decorative orbs -->

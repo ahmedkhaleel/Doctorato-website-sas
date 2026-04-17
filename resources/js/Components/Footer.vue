@@ -3,7 +3,16 @@ import { ref } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
+const { t, locale, te } = useI18n();
+
+// Render a footer link label. When a translation key exists we use it;
+// otherwise fall back to the inline ar/en pair defined on the link —
+// this avoids having to round-trip to ar.json for brand-new pages.
+function linkLabel(link) {
+    if (link.label && te(link.label)) return t(link.label);
+    if (link.fallback) return locale.value === 'ar' ? link.fallback.ar : link.fallback.en;
+    return link.label;
+}
 
 const newsletterForm = useForm({ email: '' });
 const newsletterSuccess = ref(false);
@@ -23,7 +32,9 @@ const quickLinks = [
     { label: 'nav.home', href: '/' },
     { label: 'nav.features', href: '/features' },
     { label: 'nav.portals', href: '/portals' },
-    { label: 'nav.dental', href: '/dental' },
+    { label: 'footer.link_dental', href: '/dental', fallback: { ar: 'نظام عيادات الأسنان', en: 'Dental clinic system' } },
+    { label: 'footer.link_pediatrics', href: '/pediatrics', fallback: { ar: 'طب الأطفال', en: 'Pediatrics' } },
+    { label: 'footer.link_telemedicine', href: '/telemedicine', fallback: { ar: 'الاستشارات الأون لاين', en: 'Online consultations' } },
     { label: 'nav.solutions', href: '/solutions' },
     { label: 'nav.pricing', href: '/pricing' },
 ];
@@ -104,7 +115,7 @@ const socialLinks = [
                                 :href="link.href"
                                 class="text-white/60 hover:text-secondary transition-colors text-sm"
                             >
-                                {{ $t(link.label) }}
+                                {{ linkLabel(link) }}
                             </Link>
                         </li>
                     </ul>
