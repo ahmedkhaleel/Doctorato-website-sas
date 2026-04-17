@@ -28,6 +28,11 @@ class PageController extends Controller
         return Inertia::render('Pediatrics');
     }
 
+    public function telemedicine()
+    {
+        return Inertia::render('Telemedicine');
+    }
+
     public function solutions()
     {
         return Inertia::render('Solutions');
