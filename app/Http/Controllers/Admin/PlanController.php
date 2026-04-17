@@ -26,17 +26,25 @@ class PlanController extends Controller
             'description_en' => 'nullable|string',
             'monthly_price' => 'required|numeric|min:0',
             'yearly_price' => 'required|numeric|min:0',
-            'currency' => 'string',
+            'currency' => 'nullable|string',
             'is_popular' => 'boolean',
             'is_custom' => 'boolean',
             'is_active' => 'boolean',
-            'features_ar' => 'array',
-            'features_en' => 'array',
+            'features_ar' => 'nullable|array',
+            'features_en' => 'nullable|array',
+            'modules_included' => 'nullable|array',
             'max_users' => 'nullable|integer',
             'max_patients' => 'nullable|integer',
-            'support_level' => 'string',
-            'display_order' => 'integer',
+            'support_level' => 'nullable|string',
+            'display_order' => 'nullable|integer',
         ]);
+
+        // Defaults for columns that don't have a DB-level default.
+        // Without these the insert throws "Field '...' doesn't have a default value".
+        $validated['features_ar'] = $validated['features_ar'] ?? [];
+        $validated['features_en'] = $validated['features_en'] ?? [];
+        $validated['modules_included'] = $validated['modules_included'] ?? [];
+        $validated['support_level'] = $validated['support_level'] ?? 'standard';
 
         PricingPlan::create($validated);
         return back()->with('success', 'تم إضافة الخطة بنجاح');
@@ -51,15 +59,17 @@ class PlanController extends Controller
             'description_en' => 'nullable|string',
             'monthly_price' => 'required|numeric|min:0',
             'yearly_price' => 'required|numeric|min:0',
+            'currency' => 'nullable|string',
             'is_popular' => 'boolean',
             'is_custom' => 'boolean',
             'is_active' => 'boolean',
-            'features_ar' => 'array',
-            'features_en' => 'array',
+            'features_ar' => 'nullable|array',
+            'features_en' => 'nullable|array',
+            'modules_included' => 'nullable|array',
             'max_users' => 'nullable|integer',
             'max_patients' => 'nullable|integer',
-            'support_level' => 'string',
-            'display_order' => 'integer',
+            'support_level' => 'nullable|string',
+            'display_order' => 'nullable|integer',
         ]);
 
         $plan->update($validated);

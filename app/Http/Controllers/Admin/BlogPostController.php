@@ -49,7 +49,11 @@ class BlogPostController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePost($request);
-        $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title_en'] ?: $data['title_ar']);
+        // When the admin leaves slug blank, fall back to the English then
+        // Arabic title. Note: validator marks `slug` as nullable, so the
+        // key may not exist in the validated output — use null coalescing
+        // instead of indexing directly.
+        $data['slug'] = $this->uniqueSlug(($data['slug'] ?? null) ?: ($data['title_en'] ?? '') ?: ($data['title_ar'] ?? ''));
 
         BlogPost::create($data);
 
