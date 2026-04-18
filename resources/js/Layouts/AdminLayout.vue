@@ -92,6 +92,7 @@ const menuGroups = computed(() => [
             { label: 'الفواتير', icon: 'doc', route: '/admin/invoices', perm: 'dashboard.view' },
             { label: 'الكوبونات', icon: 'ticket', route: '/admin/coupons', perm: 'dashboard.view' },
             { label: 'خطط الأسعار', icon: 'price', route: '/admin/plans', perm: 'plans.manage' },
+            { label: 'الأسعار حسب الدولة', icon: 'coin', route: '/admin/plan-prices', perm: 'dashboard.view' },
             { label: 'الإضافات', icon: 'tag', route: '/admin/addons', perm: 'dashboard.view' },
             { label: 'العملات', icon: 'coin', route: '/admin/currencies', perm: 'currencies.manage' },
         ],

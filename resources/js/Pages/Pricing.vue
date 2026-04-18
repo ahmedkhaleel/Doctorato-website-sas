@@ -25,7 +25,11 @@ const props = defineProps({
 
 const billingCycle = ref('monthly');
 const isYearly = computed(() => billingCycle.value === 'yearly');
-const isApproximate = computed(() => currentCurrencyCode.value !== 'EGP');
+
+// Pricing is now per-country. Each plan row already carries the correct
+// numeric price + currency for the active country, so we render it as-is
+// (no more EGP→X conversion, no more "~approximate" hedge).
+const isApproximate = computed(() => false);
 
 function toggleBilling() {
     billingCycle.value = billingCycle.value === 'monthly' ? 'yearly' : 'monthly';
@@ -36,10 +40,23 @@ function getPlanPrice(plan) {
     return isYearly.value ? plan.yearly_price : plan.monthly_price;
 }
 
+function localeNumber(value) {
+    if (value === null || value === undefined) return '';
+    return new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US').format(
+        Math.round(Number(value))
+    );
+}
+
 function getFormattedPrice(plan) {
     const price = getPlanPrice(plan);
     if (price === null || price === undefined) return null;
-    return formatPrice(price);
+    return localeNumber(price);
+}
+
+function getCurrencySymbol(plan) {
+    // Per-country currency symbol from the backend (e.g. ج.م / ر.س / د.إ).
+    // Falls back to the plan's currency code if no symbol was seeded.
+    return plan?.currency_symbol || plan?.currency || '';
 }
 
 // Comparison table data
@@ -338,6 +355,9 @@ const pricingJsonLd = computed(() => ({
                                         <span class="text-2xl md:text-3xl font-extrabold whitespace-nowrap" :class="plan.is_popular ? 'text-white' : 'text-[#1B4F72]'">
                                             {{ getFormattedPrice(plan) }}
                                         </span>
+                                        <span class="text-sm font-semibold whitespace-nowrap" :class="plan.is_popular ? 'text-white/80' : 'text-[#1B4F72]/70'">
+                                            {{ getCurrencySymbol(plan) }}
+                                        </span>
                                         <span class="text-xs whitespace-nowrap" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">
                                             / {{ isYearly ? t('pricing.year') : t('pricing.month') }}
                                         </span>
@@ -537,7 +557,7 @@ const pricingJsonLd = computed(() => ({
                                             {{ localizedField(plan, 'name') }}
                                         </div>
                                         <div v-if="!plan.is_custom" class="text-xs text-gray-400">
-                                            {{ getFormattedPrice(plan) }} / {{ isYearly ? t('pricing.year') : t('pricing.month') }}
+                                            {{ getFormattedPrice(plan) }} {{ getCurrencySymbol(plan) }} / {{ isYearly ? t('pricing.year') : t('pricing.month') }}
                                         </div>
                                         <span v-if="plan.is_popular" class="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#C4A265] text-white">
                                             {{ t('pricing.most_popular') }}

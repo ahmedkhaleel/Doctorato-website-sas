@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Currency;
 use App\Models\DemoRequest;
 use App\Models\SiteSetting;
+use App\Services\CountryDetector;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -19,10 +20,17 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        $detector = app(CountryDetector::class);
+        $activeCountry = $detector->resolve($request);
+
         return [
             ...parent::share($request),
             'currencies' => fn () => Currency::where('is_active', true)->orderBy('display_order')->get(),
             'currentCurrency' => fn () => session('currency', 'EGP'),
+            // Active country + list of supported markets — consumed by the
+            // Navbar country switcher and the Pricing page to pick prices.
+            'activeCountry' => $activeCountry,
+            'supportedCountries' => fn () => $detector->supportedCountries(),
             'auth' => [
                 'user' => $request->user(),
             ],

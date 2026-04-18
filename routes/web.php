@@ -21,6 +21,13 @@ Route::get('/currency/{code}', function ($code) {
     return back();
 })->name('currency.switch');
 
+// Country switcher — persists the chosen market in session so PricingPlan
+// lookups return prices for that country on every subsequent request.
+Route::get('/country/{code}', function ($code, \Illuminate\Http\Request $request) {
+    app(\App\Services\CountryDetector::class)->setCountry($request, strtoupper($code));
+    return back();
+})->name('country.switch');
+
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -79,6 +86,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/faqs', [\App\Http\Controllers\Admin\FaqController::class, 'store'])->name('faqs.store');
     Route::put('/faqs/{faq}', [\App\Http\Controllers\Admin\FaqController::class, 'update'])->name('faqs.update');
     Route::delete('/faqs/{faq}', [\App\Http\Controllers\Admin\FaqController::class, 'destroy'])->name('faqs.destroy');
+
+    Route::get('/plan-prices', [\App\Http\Controllers\Admin\PlanPriceController::class, 'index'])->name('plan-prices.index');
+    Route::post('/plan-prices', [\App\Http\Controllers\Admin\PlanPriceController::class, 'store'])->name('plan-prices.store');
+    Route::put('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'update'])->name('plan-prices.update');
+    Route::delete('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'destroy'])->name('plan-prices.destroy');
 
     Route::get('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'index'])->name('plans.index');
     Route::post('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'store'])->name('plans.store');

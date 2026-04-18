@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import CurrencySwitcher from '@/Components/CurrencySwitcher.vue';
+import CountrySwitcher from '@/Components/CountrySwitcher.vue';
 
 const { t, locale } = useI18n();
 const { switchLocale } = useLocale();
@@ -182,7 +183,7 @@ onUnmounted(() => {
 
                 <!-- Desktop Right Actions -->
                 <div class="hidden lg:flex items-center gap-3">
-                    <CurrencySwitcher />
+                    <CountrySwitcher variant="default" />
 
                     <LanguageSwitcher variant="default" />
 
@@ -348,7 +349,7 @@ onUnmounted(() => {
                 <div class="px-4 py-4 border-t border-gray-100 space-y-3">
                     <div class="flex items-center gap-3">
                         <LanguageSwitcher variant="default" />
-                        <CurrencySwitcher />
+                        <CountrySwitcher variant="default" />
                     </div>
                 </div>
 
