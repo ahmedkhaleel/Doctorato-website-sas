@@ -22,7 +22,7 @@ class PlanPriceSeeder extends Seeder
         // [plan_slug => [country_code => [monthly, yearly, currency, symbol, flag, name_ar, name_en]]]
         $prices = [
             'basic' => [
-                'EG' => [799,   7670,  'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
+                'EG' => [958.80,  9204,  'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
                 'SA' => [99,    949,   'SAR', 'ر.س',  '🇸🇦', 'السعودية',   'Saudi Arabia'],
                 'AE' => [99,    949,   'AED', 'د.إ',  '🇦🇪', 'الإمارات',   'UAE'],
                 'KW' => [8,     79,    'KWD', 'د.ك',  '🇰🇼', 'الكويت',     'Kuwait'],
@@ -36,7 +36,7 @@ class PlanPriceSeeder extends Seeder
                 'US' => [29,    279,   'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
             ],
             'professional' => [
-                'EG' => [1599,  15350, 'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
+                'EG' => [1918.80, 18420, 'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
                 'SA' => [199,   1910,  'SAR', 'ر.س',  '🇸🇦', 'السعودية',   'Saudi Arabia'],
                 'AE' => [199,   1910,  'AED', 'د.إ',  '🇦🇪', 'الإمارات',   'UAE'],
                 'KW' => [16,    155,   'KWD', 'د.ك',  '🇰🇼', 'الكويت',     'Kuwait'],
@@ -50,7 +50,7 @@ class PlanPriceSeeder extends Seeder
                 'US' => [59,    565,   'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
             ],
             'enterprise' => [
-                'EG' => [2999,  28790, 'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
+                'EG' => [3598.80, 34548, 'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
                 'SA' => [399,   3830,  'SAR', 'ر.س',  '🇸🇦', 'السعودية',   'Saudi Arabia'],
                 'AE' => [399,   3830,  'AED', 'د.إ',  '🇦🇪', 'الإمارات',   'UAE'],
                 'KW' => [33,    315,   'KWD', 'د.ك',  '🇰🇼', 'الكويت',     'Kuwait'],
