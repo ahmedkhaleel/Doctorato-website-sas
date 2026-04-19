@@ -74,6 +74,7 @@ const doctorCountOptions = ['1-5', '6-15', '16-50', '50+'];
 const specialties = computed(() => [
     { value: 'derma', label: t('demo.specialty_derma') },
     { value: 'dental', label: t('demo.specialty_dental') },
+    { value: 'pediatrics', label: t('demo.specialty_pediatrics') },
     { value: 'general', label: t('demo.specialty_general') },
     { value: 'multi', label: t('demo.specialty_multi') },
     { value: 'other', label: t('demo.specialty_other') },
@@ -81,6 +82,8 @@ const specialties = computed(() => [
 
 const moduleOptions = computed(() => [
     { value: 'dental', label: t('demo.module_dental') },
+    { value: 'pediatrics', label: t('demo.module_pediatrics') },
+    { value: 'telemedicine', label: t('demo.module_telemedicine') },
     { value: 'crm', label: t('demo.module_crm') },
     { value: 'hr', label: t('demo.module_hr') },
     { value: 'inventory', label: t('demo.module_inventory') },

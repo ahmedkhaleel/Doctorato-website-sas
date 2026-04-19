@@ -39,6 +39,34 @@ const featureCategories = computed(() => [
         ],
     },
     {
+        key: 'specialized',
+        title: t('demo.cat_specialized_title'),
+        subtitle: t('demo.cat_specialized_subtitle'),
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />`,
+        features: [
+            {
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />`,
+                title: t('demo.feature_telemedicine_title'),
+                description: t('demo.feature_telemedicine_desc'),
+            },
+            {
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />`,
+                title: t('demo.feature_pediatrics_title'),
+                description: t('demo.feature_pediatrics_desc'),
+            },
+            {
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />`,
+                title: t('demo.feature_patient_portal_title'),
+                description: t('demo.feature_patient_portal_desc'),
+            },
+            {
+                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />`,
+                title: t('demo.feature_multiclinic_title'),
+                description: t('demo.feature_multiclinic_desc'),
+            },
+        ],
+    },
+    {
         key: 'operations',
         title: t('demo.cat_ops_title'),
         subtitle: t('demo.cat_ops_subtitle'),
@@ -101,20 +129,64 @@ const featureCategories = computed(() => [
     <Head :title="t('demo.page_title')" />
     <MainLayout>
         <!-- Hero Section -->
-        <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">
-            <div class="absolute inset-0 opacity-10">
-                <div class="absolute top-20 start-20 w-72 h-72 bg-secondary rounded-full blur-3xl"></div>
-                <div class="absolute bottom-10 end-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        <section class="relative pt-32 pb-24 md:pt-40 md:pb-28 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
+            <!-- Background pattern -->
+            <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+
+            <!-- Glow orbs -->
+            <div class="absolute top-20 -start-20 w-96 h-96 bg-[#C4A265]/15 rounded-full blur-[120px]"></div>
+            <div class="absolute -bottom-10 -end-20 w-[28rem] h-[28rem] bg-[#2471A3]/20 rounded-full blur-[120px]"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#C4A265]/5 rounded-full blur-[100px]"></div>
+
+            <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <!-- Live badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.12] mb-6 animate-fade-up">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                        </span>
+                        <span class="text-sm text-white/80 font-medium">{{ t('demo.hero_badge') }}</span>
+                    </div>
+
+                    <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 animate-fade-up leading-tight">
+                        {{ t('demo.hero_title') }}
+                    </h1>
+                    <p class="text-base md:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-10 animate-fade-up">
+                        {{ t('demo.hero_subtitle') }}
+                    </p>
+
+                    <!-- Inline stats -->
+                    <div class="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto mb-10 animate-fade-up">
+                        <div class="text-center">
+                            <div class="text-2xl md:text-4xl font-extrabold text-[#C4A265] mb-1 tabular-nums">+200</div>
+                            <div class="text-[11px] md:text-xs text-white/60 uppercase tracking-wider">{{ t('demo.hero_stat_clinics') }}</div>
+                        </div>
+                        <div class="text-center border-x border-white/10">
+                            <div class="text-2xl md:text-4xl font-extrabold text-[#C4A265] mb-1 tabular-nums">12</div>
+                            <div class="text-[11px] md:text-xs text-white/60 uppercase tracking-wider">{{ t('demo.hero_stat_countries') }}</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl md:text-4xl font-extrabold text-[#C4A265] mb-1 tabular-nums">99.9%</div>
+                            <div class="text-[11px] md:text-xs text-white/60 uppercase tracking-wider">{{ t('demo.hero_stat_uptime') }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Scroll CTA -->
+                    <a
+                        href="#demo"
+                        class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold text-sm shadow-lg shadow-[#C4A265]/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 animate-fade-up"
+                    >
+                        {{ t('demo.hero_scroll_cta') }}
+                        <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                    </a>
+                </div>
             </div>
 
-            <div class="relative container mx-auto px-4 text-center">
-                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 animate-fade-up">
-                    {{ t('demo.hero_title') }}
-                </h1>
-                <p class="text-xl text-white/80 max-w-3xl mx-auto animate-fade-up">
-                    {{ t('demo.hero_subtitle') }}
-                </p>
-            </div>
+            <!-- Bottom wave/fade -->
+            <div class="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-light-blue to-transparent"></div>
         </section>
 
         <!-- Features Overview -->
