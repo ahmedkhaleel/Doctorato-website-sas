@@ -123,6 +123,7 @@ onMounted(() => document.addEventListener('click', handleSpecialtyOutside));
 onBeforeUnmount(() => document.removeEventListener('click', handleSpecialtyOutside));
 
 const moduleOptions = computed(() => [
+    { value: 'derma', label: t('demo.module_derma') },
     { value: 'dental', label: t('demo.module_dental') },
     { value: 'pediatrics', label: t('demo.module_pediatrics') },
     { value: 'telemedicine', label: t('demo.module_telemedicine') },
