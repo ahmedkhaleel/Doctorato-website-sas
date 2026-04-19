@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
@@ -71,14 +71,56 @@ const countryList = [
 
 const doctorCountOptions = ['1-5', '6-15', '16-50', '50+'];
 
+// Specialties shown in the pastel searchable combobox. Each one carries
+// an emoji + a soft bg/ring tint so the dropdown feels like a palette,
+// not a boring <select>. Order puts the common cosmetic/derma picks on
+// top (where most new clinics start) followed by the other majors.
 const specialties = computed(() => [
-    { value: 'derma', label: t('demo.specialty_derma') },
-    { value: 'dental', label: t('demo.specialty_dental') },
-    { value: 'pediatrics', label: t('demo.specialty_pediatrics') },
-    { value: 'general', label: t('demo.specialty_general') },
-    { value: 'multi', label: t('demo.specialty_multi') },
-    { value: 'other', label: t('demo.specialty_other') },
+    { value: 'derma', label: t('demo.specialty_derma'),       icon: '🧴', tint: 'bg-rose-50 ring-rose-200/60 text-rose-700',      search: 'جلدية تجميل derma cosmetic skin جلد بوتكس فيلر' },
+    { value: 'cosmetics', label: t('demo.specialty_cosmetics'), icon: '💆‍♀️', tint: 'bg-pink-50 ring-pink-200/60 text-pink-700',     search: 'تجميل نضارة بوتكس فيلر ليزر cosmetic beauty aesthetic laser' },
+    { value: 'dental', label: t('demo.specialty_dental'),     icon: '🦷', tint: 'bg-sky-50 ring-sky-200/60 text-sky-700',         search: 'أسنان dentist dental teeth' },
+    { value: 'pediatrics', label: t('demo.specialty_pediatrics'), icon: '👶', tint: 'bg-amber-50 ring-amber-200/60 text-amber-700', search: 'أطفال pediatrics children kids طب الأطفال' },
+    { value: 'gyn', label: t('demo.specialty_gyn'),           icon: '🤰', tint: 'bg-fuchsia-50 ring-fuchsia-200/60 text-fuchsia-700', search: 'نساء توليد حمل ولادة gyn obstetrics womens' },
+    { value: 'ortho', label: t('demo.specialty_ortho'),       icon: '🦴', tint: 'bg-stone-50 ring-stone-200/60 text-stone-700',   search: 'عظام مفاصل كسور ortho bones joints' },
+    { value: 'cardio', label: t('demo.specialty_cardio'),     icon: '❤️', tint: 'bg-red-50 ring-red-200/60 text-red-700',          search: 'قلب قلبية cardio heart' },
+    { value: 'ent', label: t('demo.specialty_ent'),           icon: '👂', tint: 'bg-indigo-50 ring-indigo-200/60 text-indigo-700', search: 'أنف أذن حنجرة ent otolaryngology' },
+    { value: 'eye', label: t('demo.specialty_eye'),           icon: '👁️', tint: 'bg-cyan-50 ring-cyan-200/60 text-cyan-700',      search: 'عيون رمد eye ophthalmology' },
+    { value: 'general', label: t('demo.specialty_general'),   icon: '🩺', tint: 'bg-emerald-50 ring-emerald-200/60 text-emerald-700', search: 'عام family باطنة general medicine internal' },
+    { value: 'multi', label: t('demo.specialty_multi'),       icon: '🏥', tint: 'bg-violet-50 ring-violet-200/60 text-violet-700',  search: 'متعدد multi multispecialty clinic مركز' },
+    { value: 'other', label: t('demo.specialty_other'),       icon: '✨', tint: 'bg-slate-50 ring-slate-200/60 text-slate-700',    search: 'أخرى other misc' },
 ]);
+
+// Searchable specialty combobox state.
+const specialtyOpen = ref(false);
+const specialtySearch = ref('');
+const specialtyRef = ref(null);
+
+const filteredSpecialties = computed(() => {
+    const q = specialtySearch.value.trim().toLowerCase();
+    if (!q) return specialties.value;
+    return specialties.value.filter(s =>
+        `${s.label} ${s.search || ''}`.toLowerCase().includes(q)
+    );
+});
+const selectedSpecialty = computed(() =>
+    specialties.value.find(s => s.value === form.specialty) || null
+);
+function pickSpecialty(s) {
+    form.specialty = s.value;
+    specialtyOpen.value = false;
+    specialtySearch.value = '';
+}
+function clearSpecialty() {
+    form.specialty = '';
+    specialtySearch.value = '';
+}
+function handleSpecialtyOutside(e) {
+    if (specialtyRef.value && !specialtyRef.value.contains(e.target)) {
+        specialtyOpen.value = false;
+    }
+}
+onMounted(() => document.addEventListener('click', handleSpecialtyOutside));
+onBeforeUnmount(() => document.removeEventListener('click', handleSpecialtyOutside));
 
 const moduleOptions = computed(() => [
     { value: 'dental', label: t('demo.module_dental') },
@@ -280,16 +322,115 @@ function toggleModule(moduleValue) {
                             <p v-if="form.errors.doctors_count" class="text-danger text-xs mt-1">{{ form.errors.doctors_count }}</p>
                         </div>
 
-                        <!-- Specialty -->
-                        <div>
+                        <!-- Specialty (searchable pastel combobox) -->
+                        <div ref="specialtyRef" class="relative">
                             <label class="block text-sm font-medium text-dark mb-1.5">{{ $t('demo.specialty') }}</label>
-                            <select
-                                v-model="form.specialty"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-light/50 bg-white focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all"
+
+                            <!-- Trigger / search input -->
+                            <button
+                                type="button"
+                                @click="specialtyOpen = !specialtyOpen"
+                                class="w-full flex items-center gap-2 px-3 py-3 rounded-xl border bg-white transition-all text-start"
+                                :class="specialtyOpen
+                                    ? 'border-secondary ring-2 ring-secondary/20'
+                                    : 'border-gray-light/50 hover:border-secondary/50'"
                             >
-                                <option value="">{{ $t('demo.select_specialty') }}</option>
-                                <option v-for="s in specialties" :key="s.value" :value="s.value">{{ s.label }}</option>
-                            </select>
+                                <template v-if="selectedSpecialty">
+                                    <span
+                                        class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ring-1 text-base"
+                                        :class="selectedSpecialty.tint"
+                                    >{{ selectedSpecialty.icon }}</span>
+                                    <span class="flex-1 text-sm font-medium text-dark truncate">{{ selectedSpecialty.label }}</span>
+                                    <button
+                                        type="button"
+                                        @click.stop="clearSpecialty"
+                                        class="shrink-0 p-1 rounded-full text-gray hover:bg-gray-100 hover:text-dark transition-colors"
+                                        :aria-label="locale === 'ar' ? 'مسح' : 'Clear'"
+                                    >
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <span class="shrink-0 w-8 h-8 rounded-lg bg-light-gold/40 ring-1 ring-secondary/20 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </span>
+                                    <span class="flex-1 text-sm text-gray">{{ $t('demo.select_specialty') }}</span>
+                                </template>
+                                <svg
+                                    class="shrink-0 w-4 h-4 text-gray transition-transform"
+                                    :class="{ 'rotate-180': specialtyOpen }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown panel -->
+                            <Transition
+                                enter-active-class="transition duration-200 ease-out"
+                                enter-from-class="opacity-0 -translate-y-2"
+                                enter-to-class="opacity-100 translate-y-0"
+                                leave-active-class="transition duration-150 ease-in"
+                                leave-from-class="opacity-100 translate-y-0"
+                                leave-to-class="opacity-0 -translate-y-2"
+                            >
+                                <div
+                                    v-if="specialtyOpen"
+                                    class="absolute z-30 top-full inset-x-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+                                >
+                                    <!-- Search bar -->
+                                    <div class="p-3 border-b border-gray-100 bg-gradient-to-r from-light-blue/40 to-light-gold/30">
+                                        <div class="relative">
+                                            <svg class="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                            <input
+                                                v-model="specialtySearch"
+                                                type="text"
+                                                autofocus
+                                                class="w-full ps-9 pe-3 py-2 rounded-xl text-sm bg-white border border-gray-light/50 focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none"
+                                                :placeholder="locale === 'ar' ? 'ابحث عن تخصص...' : 'Search specialty...'"
+                                                @keydown.esc="specialtyOpen = false"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <!-- Options -->
+                                    <div class="max-h-72 overflow-y-auto p-2">
+                                        <button
+                                            v-for="s in filteredSpecialties"
+                                            :key="s.value"
+                                            type="button"
+                                            @click="pickSpecialty(s)"
+                                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-start transition-all"
+                                            :class="form.specialty === s.value
+                                                ? `${s.tint} ring-1`
+                                                : 'hover:bg-gray-50'"
+                                        >
+                                            <span
+                                                class="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ring-1 text-lg"
+                                                :class="s.tint"
+                                            >{{ s.icon }}</span>
+                                            <span class="flex-1 text-sm font-medium text-dark">{{ s.label }}</span>
+                                            <svg
+                                                v-if="form.specialty === s.value"
+                                                class="w-4 h-4 text-secondary shrink-0"
+                                                fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"
+                                            >
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </button>
+                                        <div v-if="!filteredSpecialties.length" class="py-6 text-center text-sm text-gray">
+                                            {{ locale === 'ar' ? 'لا توجد نتائج' : 'No matches' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </Transition>
+
                             <p v-if="form.errors.specialty" class="text-danger text-xs mt-1">{{ form.errors.specialty }}</p>
                         </div>
 
