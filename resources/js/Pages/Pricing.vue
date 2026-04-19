@@ -5,23 +5,38 @@ import FaqAccordion from '@/Components/FaqAccordion.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
-import { useCurrency } from '@/composables/useCurrency';
 import { Head, Link } from '@inertiajs/vue3';
 import SeoHead from '@/Components/SeoHead.vue';
 import { ref, computed } from 'vue';
 
 const { t, locale } = useI18n();
 const { localizedField } = useLocale();
-const { formatPrice, currentCurrencyCode } = useCurrency();
 useScrollAnimation();
 
 const props = defineProps({
     plans: { type: Array, default: () => [] },
     faqs: { type: Array, default: () => [] },
-    currencies: Array,
-    currentCurrency: String,
     addons: { type: Array, default: () => [] },
+    // Currency active for the visitor's country (resolved server-side).
+    // All non-plan amounts (add-ons) are converted from their EGP base
+    // using rate_from_egp, so the whole page speaks one currency.
+    activeCurrency: {
+        type: Object,
+        default: () => ({ code: 'EGP', symbol: 'ج.م', rate_from_egp: 1, decimal_places: 2, symbol_position: 'after' }),
+    },
 });
+
+// Format an EGP-denominated amount in the active country's currency.
+function formatLocal(amountInEgp) {
+    const cur = props.activeCurrency;
+    const converted = Number(amountInEgp) * (cur.rate_from_egp || 1);
+    const rounded = Number(converted.toFixed(cur.decimal_places || 0));
+    const formatted = new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US', {
+        minimumFractionDigits: cur.decimal_places || 0,
+        maximumFractionDigits: cur.decimal_places || 0,
+    }).format(rounded);
+    return cur.symbol_position === 'before' ? `${cur.symbol}${formatted}` : `${formatted} ${cur.symbol}`;
+}
 
 const billingCycle = ref('monthly');
 const isYearly = computed(() => billingCycle.value === 'yearly');
@@ -486,7 +501,7 @@ const pricingJsonLd = computed(() => ({
                                     {{ locale === 'ar' ? addon.description_ar : addon.description_en }}
                                 </p>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatPrice(addon.price_egp) }}</span>
+                                    <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatLocal(addon.price_egp) }}</span>
                                     <span class="text-xs text-gray-400">
                                         /
                                         <template v-if="addon.period === 'yearly'">{{ locale === 'ar' ? 'سنوياً' : 'year' }}</template>
