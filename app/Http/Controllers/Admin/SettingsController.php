@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
+use App\Services\LaunchOfferService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -104,5 +105,51 @@ class SettingsController extends Controller
         SiteSetting::put('banner_enabled', !empty($data['banner_enabled']) ? '1' : '0', 'general');
 
         return back()->with('success', 'تم حفظ الإعدادات العامة');
+    }
+
+    /** Launch-offer controls: toggle, total slots, and reCAPTCHA keys. */
+    public function launch(): Response
+    {
+        $snapshot = app(LaunchOfferService::class)->snapshot();
+
+        return Inertia::render('Admin/SettingsLaunch', [
+            'launch' => [
+                'active' => SiteSetting::get('launch_offer_active', '1') === '1',
+                'total_slots' => (int) SiteSetting::get('launch_offer_total', 50),
+                'used_slots' => $snapshot['used_slots'],
+                'remaining_slots' => $snapshot['remaining_slots'],
+                'progress_percent' => $snapshot['progress_percent'],
+            ],
+            'recaptcha' => [
+                'site_key' => SiteSetting::get('recaptcha_site_key'),
+                'secret_key_set' => (bool) SiteSetting::get('recaptcha_secret_key'),
+            ],
+        ]);
+    }
+
+    public function updateLaunch(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'active' => ['nullable', 'boolean'],
+            'total_slots' => ['required', 'integer', 'min:1', 'max:10000'],
+            'recaptcha_site_key' => ['nullable', 'string', 'max:120'],
+            'recaptcha_secret_key' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        SiteSetting::put('launch_offer_active', !empty($data['active']) ? '1' : '0', 'launch');
+        SiteSetting::put('launch_offer_total', (string) $data['total_slots'], 'launch');
+
+        // Only overwrite reCAPTCHA keys if the admin actually submitted
+        // a new value — empty string means "leave current key in place".
+        if (array_key_exists('recaptcha_site_key', $data) && $data['recaptcha_site_key'] !== null) {
+            SiteSetting::put('recaptcha_site_key', $data['recaptcha_site_key'] ?: null, 'security');
+        }
+        if (!empty($data['recaptcha_secret_key'])) {
+            SiteSetting::put('recaptcha_secret_key', $data['recaptcha_secret_key'], 'security');
+        }
+
+        LaunchOfferService::flush();
+
+        return back()->with('success', 'تم حفظ إعدادات الإطلاق');
     }
 }

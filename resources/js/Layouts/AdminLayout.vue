@@ -119,6 +119,7 @@ const menuGroups = computed(() => [
         label: 'الإعدادات',
         items: [
             { label: 'الإعدادات العامة', icon: 'cog', route: '/admin/settings/general', perm: 'dashboard.view' },
+            { label: 'عرض الإطلاق والحماية', icon: 'shield', route: '/admin/settings/launch', perm: 'dashboard.view' },
             { label: 'Pixels وتتبع الإعلانات', icon: 'target', route: '/admin/settings/tracking', perm: 'dashboard.view' },
             { label: 'قوالب البريد', icon: 'mail', route: '/admin/email-templates', perm: 'dashboard.view' },
         ],
