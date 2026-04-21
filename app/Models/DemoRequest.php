@@ -25,6 +25,8 @@ class DemoRequest extends Model
         'referral_source',
         'notes',
         'status',
+        'is_instant_trial',
+        'subdomain',
         'admin_notes',
         'contacted_at',
         'trial_started_at',
@@ -43,6 +45,7 @@ class DemoRequest extends Model
         'trial_expiry_notified' => 'boolean',
         'trial_expiry_notified_at' => 'datetime',
         'admin_reminder_seen' => 'boolean',
+        'is_instant_trial' => 'boolean',
     ];
 
     protected $appends = [
