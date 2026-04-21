@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -37,7 +38,8 @@ class CurrencyController extends Controller
         // different currencies. Validation already enforced size:3.
         $validated['code'] = strtoupper(trim($validated['code']));
 
-        Currency::create($validated);
+        $currency = Currency::create($validated);
+        ActivityLog::record('created', $currency, "أضاف عملة: {$currency->code}");
         return back()->with('success', 'تم إضافة العملة بنجاح');
     }
 
@@ -62,6 +64,7 @@ class CurrencyController extends Controller
         $validated['code'] = strtoupper(trim($validated['code']));
 
         $currency->update($validated);
+        ActivityLog::record('updated', $currency, "عدّل عملة: {$currency->code}");
         return back()->with('success', 'تم تحديث العملة بنجاح');
     }
 
@@ -73,7 +76,9 @@ class CurrencyController extends Controller
         if ($inUse > 0) {
             return back()->with('error', "لا يمكن حذف {$currency->code} — فيه {$inUse} اشتراك يستخدمها.");
         }
+        $code = $currency->code;
         $currency->delete();
+        ActivityLog::record('deleted', null, "حذف عملة: {$code}");
         return back()->with('success', 'تم حذف العملة بنجاح');
     }
 }

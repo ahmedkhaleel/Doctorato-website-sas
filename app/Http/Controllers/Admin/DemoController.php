@@ -55,7 +55,7 @@ class DemoController extends Controller
     public function markReminderSeen(DemoRequest $demo)
     {
         $demo->update(['admin_reminder_seen' => true]);
-        return back();
+        return back()->with('success', 'تم تعليم التذكير كمقروء');
     }
 
     public function destroy(DemoRequest $demo)

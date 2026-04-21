@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\PricingPlan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -46,7 +47,8 @@ class PlanController extends Controller
         $validated['modules_included'] = $validated['modules_included'] ?? [];
         $validated['support_level'] = $validated['support_level'] ?? 'standard';
 
-        PricingPlan::create($validated);
+        $plan = PricingPlan::create($validated);
+        ActivityLog::record('created', $plan, "أضاف خطة: {$plan->name_ar}");
         return back()->with('success', 'تم إضافة الخطة بنجاح');
     }
 
@@ -73,6 +75,7 @@ class PlanController extends Controller
         ]);
 
         $plan->update($validated);
+        ActivityLog::record('updated', $plan, "عدّل خطة: {$plan->name_ar}");
         return back()->with('success', 'تم تحديث الخطة بنجاح');
     }
 
@@ -90,7 +93,9 @@ class PlanController extends Controller
             return back()->with('error', "لا يمكن حذف الخطة — فيها {$prices} سعر حسب الدولة. احذف الأسعار أولاً من /admin/plan-prices.");
         }
 
+        $name = $plan->name_ar;
         $plan->delete();
+        ActivityLog::record('deleted', null, "حذف خطة: {$name}");
         return back()->with('success', 'تم حذف الخطة بنجاح');
     }
 }

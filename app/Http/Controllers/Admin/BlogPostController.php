@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use Illuminate\Http\JsonResponse;
@@ -55,7 +56,8 @@ class BlogPostController extends Controller
         // instead of indexing directly.
         $data['slug'] = $this->uniqueSlug(($data['slug'] ?? null) ?: ($data['title_en'] ?? '') ?: ($data['title_ar'] ?? ''));
 
-        BlogPost::create($data);
+        $post = BlogPost::create($data);
+        ActivityLog::record('created', $post, "أنشأ مقال: {$post->title_ar}");
 
         return back()->with('success', 'تم إنشاء المقال');
     }
@@ -72,6 +74,7 @@ class BlogPostController extends Controller
         }
 
         $post->update($data);
+        ActivityLog::record('updated', $post, "عدّل مقال: {$post->title_ar}");
 
         return back()->with('success', 'تم تحديث المقال');
     }
@@ -84,7 +87,9 @@ class BlogPostController extends Controller
             Storage::disk('public')->delete($relative);
         }
 
+        $title = $post->title_ar;
         $post->delete();
+        ActivityLog::record('deleted', null, "حذف مقال: {$title}");
 
         return back()->with('success', 'تم حذف المقال');
     }

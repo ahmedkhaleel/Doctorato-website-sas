@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\AddOn;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class AddOnController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        AddOn::create($this->validateAddon($request));
+        $addon = AddOn::create($this->validateAddon($request));
+        ActivityLog::record('created', $addon, "أضاف إضافة: {$addon->name_ar}");
 
         return back()->with('success', 'تمت إضافة الـ Add-on');
     }
@@ -28,13 +30,16 @@ class AddOnController extends Controller
     public function update(Request $request, AddOn $addon): RedirectResponse
     {
         $addon->update($this->validateAddon($request));
+        ActivityLog::record('updated', $addon, "عدّل إضافة: {$addon->name_ar}");
 
         return back()->with('success', 'تم التحديث');
     }
 
     public function destroy(AddOn $addon): RedirectResponse
     {
+        $name = $addon->name_ar;
         $addon->delete();
+        ActivityLog::record('deleted', null, "حذف إضافة: {$name}");
 
         return back()->with('success', 'تم الحذف');
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,7 +35,8 @@ class TestimonialController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        Testimonial::create($validated);
+        $t = Testimonial::create($validated);
+        ActivityLog::record('created', $t, "أضاف شهادة من: {$t->client_name_ar}");
         return back()->with('success', 'تم إضافة الشهادة بنجاح');
     }
 
@@ -57,12 +59,15 @@ class TestimonialController extends Controller
         ]);
 
         $testimonial->update($validated);
+        ActivityLog::record('updated', $testimonial, "عدّل شهادة: {$testimonial->client_name_ar}");
         return back()->with('success', 'تم تحديث الشهادة بنجاح');
     }
 
     public function destroy(Testimonial $testimonial)
     {
+        $name = $testimonial->client_name_ar;
         $testimonial->delete();
+        ActivityLog::record('deleted', null, "حذف شهادة: {$name}");
         return back()->with('success', 'تم حذف الشهادة بنجاح');
     }
 }

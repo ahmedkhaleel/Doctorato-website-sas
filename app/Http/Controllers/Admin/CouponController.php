@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Coupon;
 use App\Models\PricingPlan;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +32,8 @@ class CouponController extends Controller
     {
         $data = $this->validateCoupon($request);
         $data['code'] = strtoupper(trim($data['code']));
-        Coupon::create($data);
+        $coupon = Coupon::create($data);
+        ActivityLog::record('created', $coupon, "أنشأ كوبون: {$coupon->code}");
 
         return back()->with('success', 'تم إنشاء الكوبون');
     }
@@ -41,13 +43,16 @@ class CouponController extends Controller
         $data = $this->validateCoupon($request, $coupon->id);
         $data['code'] = strtoupper(trim($data['code']));
         $coupon->update($data);
+        ActivityLog::record('updated', $coupon, "عدّل كوبون: {$coupon->code}");
 
         return back()->with('success', 'تم تحديث الكوبون');
     }
 
     public function destroy(Coupon $coupon): RedirectResponse
     {
+        $code = $coupon->code;
         $coupon->delete();
+        ActivityLog::record('deleted', null, "حذف كوبون: {$code}");
 
         return back()->with('success', 'تم حذف الكوبون');
     }

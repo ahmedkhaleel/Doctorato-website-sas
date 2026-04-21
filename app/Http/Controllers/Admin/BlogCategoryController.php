@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\BlogCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,8 @@ class BlogCategoryController extends Controller
         $data = $this->validateCategory($request);
         $data['slug'] = $this->uniqueSlug($data['name_en'] ?: $data['name_ar']);
 
-        BlogCategory::create($data);
+        $cat = BlogCategory::create($data);
+        ActivityLog::record('created', $cat, "أنشأ تصنيف: {$cat->name_ar}");
 
         return back()->with('success', 'تم إنشاء التصنيف');
     }
@@ -38,6 +40,7 @@ class BlogCategoryController extends Controller
             $data['slug'] = $this->uniqueSlug($data['name_en'] ?: $data['name_ar'], $category->id);
         }
         $category->update($data);
+        ActivityLog::record('updated', $category, "عدّل تصنيف: {$category->name_ar}");
 
         return back()->with('success', 'تم تحديث التصنيف');
     }
@@ -53,7 +56,9 @@ class BlogCategoryController extends Controller
                 "لا يمكن حذف التصنيف لأنه يحتوي على {$postCount} مقال — انقل المقالات أو احذفها أولاً.");
         }
 
+        $name = $category->name_ar;
         $category->delete();
+        ActivityLog::record('deleted', null, "حذف تصنيف: {$name}");
 
         return back()->with('success', 'تم حذف التصنيف');
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\CaseStudy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,7 +47,8 @@ class CaseStudyController extends Controller
         $data = $this->validateCase($request);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title_en'] ?: $data['title_ar']);
 
-        CaseStudy::create($data);
+        $case = CaseStudy::create($data);
+        ActivityLog::record('created', $case, "أنشأ دراسة حالة: {$case->title_ar}");
 
         return back()->with('success', 'تم إنشاء دراسة الحالة');
     }
@@ -62,13 +64,16 @@ class CaseStudyController extends Controller
         }
 
         $caseStudy->update($data);
+        ActivityLog::record('updated', $caseStudy, "عدّل دراسة حالة: {$caseStudy->title_ar}");
 
         return back()->with('success', 'تم تحديث دراسة الحالة');
     }
 
     public function destroy(CaseStudy $caseStudy): RedirectResponse
     {
+        $title = $caseStudy->title_ar;
         $caseStudy->delete();
+        ActivityLog::record('deleted', null, "حذف دراسة حالة: {$title}");
 
         return back()->with('success', 'تم حذف دراسة الحالة');
     }
