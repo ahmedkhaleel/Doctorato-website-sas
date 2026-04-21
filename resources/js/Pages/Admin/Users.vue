@@ -43,6 +43,9 @@ function openCreate() {
 }
 
 function openEdit(user) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editing.value = user;
     form.name = user.name;
     form.email = user.email;

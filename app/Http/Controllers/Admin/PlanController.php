@@ -78,6 +78,18 @@ class PlanController extends Controller
 
     public function destroy(PricingPlan $plan)
     {
+        // Protect against FK violations — killing a plan with live
+        // subscriptions or seeded prices would throw a raw MySQL error.
+        // We surface a readable message and ask the admin to clean up first.
+        $subs = $plan->subscriptions()->count();
+        if ($subs > 0) {
+            return back()->with('error', "لا يمكن حذف الخطة — مرتبطة بـ {$subs} اشتراك. عطّل الخطة بدلاً من حذفها.");
+        }
+        $prices = $plan->prices()->count();
+        if ($prices > 0) {
+            return back()->with('error', "لا يمكن حذف الخطة — فيها {$prices} سعر حسب الدولة. احذف الأسعار أولاً من /admin/plan-prices.");
+        }
+
         $plan->delete();
         return back()->with('success', 'تم حذف الخطة بنجاح');
     }

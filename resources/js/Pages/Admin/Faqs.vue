@@ -68,6 +68,9 @@ function openAdd() {
 
 function openEdit(faq) {
     editingFaq.value = faq;
+    // Clear previous edit/add state so fields don't mix between sessions.
+    form.reset();
+    form.clearErrors();
     form.category = faq.category;
     form.question_ar = faq.question_ar;
     form.question_en = faq.question_en;

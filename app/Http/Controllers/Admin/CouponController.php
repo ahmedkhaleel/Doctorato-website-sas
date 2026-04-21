@@ -7,6 +7,7 @@ use App\Models\Coupon;
 use App\Models\PricingPlan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -56,7 +57,10 @@ class CouponController extends Controller
         return $request->validate([
             'code' => [
                 'required', 'string', 'max:40', 'regex:/^[A-Z0-9_-]+$/i',
-                'unique:coupons,code' . ($ignoreId ? ',' . $ignoreId : ''),
+                // Use Rule::unique so the current record is properly excluded
+                // on update — the string form silently misbehaves when
+                // $ignoreId is null or comes from a different column.
+                Rule::unique('coupons', 'code')->ignore($ignoreId),
             ],
             'description_ar' => ['nullable', 'string', 'max:160'],
             'description_en' => ['nullable', 'string', 'max:160'],

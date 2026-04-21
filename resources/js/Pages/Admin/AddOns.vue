@@ -38,6 +38,9 @@ function openCreate() {
 }
 
 function openEdit(addon) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editing.value = addon;
     Object.keys(form.data()).forEach((k) => {
         if (addon[k] !== undefined && addon[k] !== null) form[k] = addon[k];

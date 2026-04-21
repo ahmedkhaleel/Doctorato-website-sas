@@ -52,6 +52,11 @@ class PricingPlan extends Model
         return $this->hasMany(PlanPrice::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
     /**
      * Resolve the pricing row for a given country, falling back to the
      * plan's default (monthly_price/yearly_price on the plan itself).

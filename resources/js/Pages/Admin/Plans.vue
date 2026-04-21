@@ -49,6 +49,10 @@ function openAdd() {
 
 function openEdit(plan) {
     editingPlan.value = plan;
+    // Reset first so previously-edited data (from a different row or
+    // an abandoned "Add") doesn't bleed into this edit session.
+    form.reset();
+    form.clearErrors();
     Object.keys(form.data()).forEach(key => {
         if (plan[key] !== undefined && plan[key] !== null) form[key] = plan[key];
     });

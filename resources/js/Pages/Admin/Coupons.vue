@@ -65,6 +65,9 @@ function openCreate() {
 }
 
 function openEdit(c) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editing.value = c;
     form.code = c.code;
     form.description_ar = c.description_ar || '';

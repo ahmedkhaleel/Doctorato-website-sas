@@ -62,6 +62,9 @@ function openAdd() {
 }
 
 function openEdit(currency) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editingCurrency.value = currency;
     Object.keys(form.data()).forEach(key => {
         if (currency[key] !== undefined) form[key] = currency[key];

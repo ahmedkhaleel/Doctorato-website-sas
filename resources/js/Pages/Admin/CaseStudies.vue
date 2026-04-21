@@ -69,6 +69,9 @@ function openCreate() {
 }
 
 function openEdit(c) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editing.value = c;
     Object.keys(form.data()).forEach((key) => {
         if (c[key] !== undefined && c[key] !== null) {

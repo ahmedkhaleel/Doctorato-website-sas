@@ -8,6 +8,7 @@ use App\Models\PricingPlan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -70,9 +71,21 @@ class PlanPriceController extends Controller
 
     protected function validatePrice(Request $request, ?int $ignoreId = null): array
     {
+        $planId = (int) $request->input('pricing_plan_id');
+        $country = strtoupper((string) $request->input('country_code'));
+
         return $request->validate([
             'pricing_plan_id' => ['required', 'integer', 'exists:pricing_plans,id'],
-            'country_code' => ['required', 'string', 'size:2'],
+            'country_code' => [
+                'required', 'string', 'size:2',
+                // Unique composite (plan, country). Skip on the current
+                // row so editing the monthly/yearly figures doesn't
+                // collide with itself. `pricing_plan_id` matcher means
+                // one (Basic, EG) can coexist with (Pro, EG).
+                Rule::unique('plan_prices', 'country_code')
+                    ->where(fn ($q) => $q->where('pricing_plan_id', $planId))
+                    ->ignore($ignoreId),
+            ],
             'country_name_ar' => ['required', 'string', 'max:80'],
             'country_name_en' => ['required', 'string', 'max:80'],
             'country_flag' => ['nullable', 'string', 'max:8'],

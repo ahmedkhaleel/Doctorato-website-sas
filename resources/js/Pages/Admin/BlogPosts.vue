@@ -62,6 +62,9 @@ function openCreate() {
 }
 
 function openEdit(post) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editing.value = post;
     form.category_id = post.category_id;
     form.title_ar = post.title_ar;

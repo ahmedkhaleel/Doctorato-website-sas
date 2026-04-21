@@ -25,8 +25,10 @@ class TestimonialController extends Controller
             'clinic_name_en' => 'nullable|string',
             'role_ar' => 'nullable|string',
             'role_en' => 'nullable|string',
-            'review_ar' => 'required|string',
-            'review_en' => 'required|string',
+            // min:3 prevents a single space / punctuation character from
+            // passing the required rule as a valid review.
+            'review_ar' => 'required|string|min:3',
+            'review_en' => 'required|string|min:3',
             'rating' => 'required|integer|min:1|max:5',
             'display_order' => 'integer',
             'is_active' => 'boolean',
@@ -45,8 +47,10 @@ class TestimonialController extends Controller
             'clinic_name_en' => 'nullable|string',
             'role_ar' => 'nullable|string',
             'role_en' => 'nullable|string',
-            'review_ar' => 'required|string',
-            'review_en' => 'required|string',
+            // min:3 prevents a single space / punctuation character from
+            // passing the required rule as a valid review.
+            'review_ar' => 'required|string|min:3',
+            'review_en' => 'required|string|min:3',
             'rating' => 'required|integer|min:1|max:5',
             'display_order' => 'integer',
             'is_active' => 'boolean',

@@ -49,6 +49,9 @@ function openAdd() {
 }
 
 function openEdit(item) {
+    // Reset any state from a prior add/edit session before populating.
+    form.reset();
+    form.clearErrors();
     editingItem.value = item;
     Object.keys(form.data()).forEach((key) => {
         if (item[key] !== undefined && item[key] !== null) form[key] = item[key];
