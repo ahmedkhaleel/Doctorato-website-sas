@@ -196,7 +196,7 @@ function initials(name) {
                             <td class="px-5 py-4">
                                 <div class="text-xs text-gray-600">
                                     <span v-if="user.role === 'super_admin'" class="text-[#C4A265] font-semibold">جميع الصلاحيات</span>
-                                    <span v-else>{{ user.permissions.length }} صلاحية</span>
+                                    <span v-else>{{ (user.permissions || []).length }} صلاحية</span>
                                 </div>
                             </td>
                             <td class="px-5 py-4">
