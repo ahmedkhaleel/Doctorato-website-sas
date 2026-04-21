@@ -2,6 +2,7 @@
 import MainLayout from '@/Layouts/MainLayout.vue';
 import PricingCards from '@/Components/PricingCards.vue';
 import FaqAccordion from '@/Components/FaqAccordion.vue';
+import RoiPreview from '@/Components/RoiPreview.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
@@ -619,6 +620,9 @@ const pricingJsonLd = computed(() => ({
                 </p>
             </div>
         </section>
+
+        <!-- ROI Preview — plant a number in the visitor's head before the comparison table -->
+        <RoiPreview />
 
         <!-- Feature Comparison Table -->
         <section class="py-20 lg:py-28 bg-white">
