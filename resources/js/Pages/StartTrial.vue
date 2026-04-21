@@ -11,7 +11,8 @@ import SeoHead from '@/Components/SeoHead.vue';
 import { useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useTracking } from '@/composables/useTracking';
-import { computed, ref, watch } from 'vue';
+import { useRecaptcha } from '@/composables/useRecaptcha';
+import { computed, ref, watch, onMounted } from 'vue';
 
 const { locale } = useI18n();
 const track = useTracking();
@@ -26,7 +27,15 @@ const form = useForm({
     country_code: '+20',
     country: 'EG',
     subdomain: '',
+    // Bot defenses: hidden field real users don't touch, plus a
+    // rendered-at timestamp the backend uses to reject <1.5s submits.
+    hp_trap: '',
+    form_rendered_at: Date.now(),
+    recaptcha_token: '',
 });
+
+const captcha = useRecaptcha();
+onMounted(() => captcha.ensureReady());
 
 // Live subdomain availability check (debounced).
 const subdomainState = ref({ status: 'idle', message: '' }); // idle | checking | ok | error
@@ -74,9 +83,10 @@ const benefits = computed(() => [
     locale.value === 'ar' ? 'بياناتك تنتقل للاشتراك المدفوع' : 'Your data stays when you subscribe',
 ]);
 
-function submit() {
-    // Don't submit while a check is in flight or shows an error.
+async function submit() {
     if (subdomainState.value.status === 'error' || subdomainState.value.status === 'checking') return;
+    // Fetch a fresh reCAPTCHA token at submit-time — they expire in 2 min.
+    form.recaptcha_token = (await captcha.execute('trial_signup')) || '';
     track.formSubmit('trial_signup', { clinic: form.clinic_name });
     form.post(route('trial.store'));
 }
@@ -129,6 +139,10 @@ function submit() {
                         @submit.prevent="submit"
                         class="lg:col-span-3 bg-white rounded-3xl shadow-2xl p-6 md:p-8 space-y-5 animate-fade-up"
                     >
+                        <!-- Honeypot: hidden input that real users never touch. -->
+                        <div class="absolute opacity-0 pointer-events-none -z-10" aria-hidden="true">
+                            <label>Website <input v-model="form.hp_trap" type="text" tabindex="-1" autocomplete="off" /></label>
+                        </div>
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-dark mb-1.5">{{ locale === 'ar' ? 'اسم العيادة' : 'Clinic name' }} *</label>

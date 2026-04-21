@@ -7,6 +7,7 @@ use App\Models\DemoRequest;
 use App\Models\SiteSetting;
 use App\Services\CountryDetector;
 use App\Services\LaunchOfferService;
+use App\Services\RecaptchaService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,6 +36,13 @@ class HandleInertiaRequests extends Middleware
             // Live scarcity counter for the launch offer. Lazy closure so
             // the DB hit is only paid on pages that actually read it.
             'launchOffer' => fn () => app(LaunchOfferService::class)->snapshot(),
+            // Expose the reCAPTCHA site key to forms that need it. Null
+            // when reCAPTCHA isn't configured — frontend falls back to
+            // the honeypot + timing defenses only.
+            'recaptcha' => fn () => [
+                'site_key' => app(RecaptchaService::class)->siteKey(),
+                'enabled' => app(RecaptchaService::class)->isEnabled(),
+            ],
             'auth' => [
                 'user' => $request->user(),
             ],

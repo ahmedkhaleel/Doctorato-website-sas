@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\DemoRequest;
+use App\Services\RecaptchaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class DemoRequestController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, RecaptchaService $captcha)
     {
+        // Bot filter (honeypot + timing + optional reCAPTCHA v3).
+        $check = $captcha->verify($request->only(['hp_trap', 'form_rendered_at', 'recaptcha_token']), 'demo_request');
+        if (!$check['ok']) {
+            return back()->withInput()->withErrors(['clinic_name' => 'تعذر التحقق من الطلب، حاول مرة أخرى.']);
+        }
+
         $validated = $request->validate([
             'clinic_name' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',

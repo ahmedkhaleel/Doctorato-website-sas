@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DemoRequest;
 use App\Services\CountryDetector;
+use App\Services\RecaptchaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -30,8 +31,18 @@ class TrialController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, RecaptchaService $captcha): RedirectResponse
     {
+        // Bot defenses — honeypot + time-to-submit + optional reCAPTCHA.
+        // On failure we return a generic error so real automation can't
+        // deduce which layer rejected them.
+        $check = $captcha->verify($request->only(['hp_trap', 'form_rendered_at', 'recaptcha_token']), 'trial_signup');
+        if (!$check['ok']) {
+            return back()->withInput()->withErrors([
+                'clinic_name' => 'تعذر التحقق من الطلب، حاول مرة أخرى.',
+            ]);
+        }
+
         $data = $request->validate([
             'clinic_name' => ['required', 'string', 'max:150'],
             'full_name' => ['required', 'string', 'max:120'],

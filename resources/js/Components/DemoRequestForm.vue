@@ -4,6 +4,7 @@ import { useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useTracking } from '@/composables/useTracking';
+import { useRecaptcha } from '@/composables/useRecaptcha';
 
 const { t, locale } = useI18n();
 useScrollAnimation();
@@ -22,7 +23,13 @@ const form = useForm({
     interested_modules: [],
     referral_source: '',
     notes: '',
+    // Bot defenses (honeypot + rendered-at timestamp + reCAPTCHA token).
+    hp_trap: '',
+    form_rendered_at: Date.now(),
+    recaptcha_token: '',
 });
+
+const captcha = useRecaptcha();
 
 const countryCodes = [
     { code: '+966', flag: '\u{1F1F8}\u{1F1E6}', label: 'SA' },
@@ -152,12 +159,14 @@ const benefits = computed(() => [
 
 const track = useTracking();
 
-function submitForm() {
+async function submitForm() {
+    form.recaptcha_token = (await captcha.execute('demo_request')) || '';
     form.post(route('demo.store'), {
         onSuccess: () => {
             track.lead({ form: 'demo_request', clinic: form.clinic_name });
             showSuccess.value = true;
             form.reset();
+            form.form_rendered_at = Date.now();
         },
     });
 }
@@ -209,6 +218,11 @@ function toggleModule(moduleValue) {
                     </Transition>
 
                     <form v-if="!showSuccess" @submit.prevent="submitForm" class="space-y-5">
+                        <!-- Honeypot: hidden from real users, bots fill it. -->
+                        <div class="absolute opacity-0 pointer-events-none -z-10" aria-hidden="true">
+                            <label>Website <input v-model="form.hp_trap" type="text" tabindex="-1" autocomplete="off" /></label>
+                        </div>
+
                         <!-- Clinic Name -->
                         <div>
                             <label class="block text-sm font-medium text-dark mb-1.5">{{ $t('demo.clinic_name') }} *</label>
