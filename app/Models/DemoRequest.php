@@ -34,6 +34,8 @@ class DemoRequest extends Model
         'trial_status',
         'trial_expiry_notified',
         'trial_expiry_notified_at',
+        'trial_ending_soon_notified',
+        'trial_ending_soon_notified_at',
         'admin_reminder_seen',
     ];
 
@@ -44,6 +46,8 @@ class DemoRequest extends Model
         'trial_ends_at' => 'datetime',
         'trial_expiry_notified' => 'boolean',
         'trial_expiry_notified_at' => 'datetime',
+        'trial_ending_soon_notified' => 'boolean',
+        'trial_ending_soon_notified_at' => 'datetime',
         'admin_reminder_seen' => 'boolean',
         'is_instant_trial' => 'boolean',
     ];
@@ -117,5 +121,18 @@ class DemoRequest extends Model
         return $query->where('trial_status', 'active')
             ->where('trial_ends_at', '<=', now())
             ->where('trial_expiry_notified', false);
+    }
+
+    /**
+     * Trials that still have 1–3 days left and haven't gotten the
+     * heads-up email yet. Gives the scheduler something simple and
+     * idempotent to pull each hour.
+     */
+    public function scopeNeedsEndingSoonNotification($query)
+    {
+        return $query->where('trial_status', 'active')
+            ->where('trial_ends_at', '>', now())
+            ->where('trial_ends_at', '<=', now()->addDays(3))
+            ->where('trial_ending_soon_notified', false);
     }
 }
