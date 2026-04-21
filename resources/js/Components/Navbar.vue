@@ -187,11 +187,23 @@ onUnmounted(() => {
 
                     <LanguageSwitcher variant="default" />
 
+                    <!-- Secondary outline CTA: books a demo call (slow path) -->
                     <Link
                         href="/demo"
-                        class="px-6 py-2.5 bg-secondary hover:bg-secondary-dark text-white text-sm font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-secondary/25 hover:-translate-y-0.5"
+                        class="hidden xl:inline-flex items-center px-4 py-2.5 text-sm font-semibold rounded-full border border-gray-light/40 text-dark hover:border-secondary hover:text-secondary transition"
                     >
                         {{ $t('nav.cta') }}
+                    </Link>
+                    <!-- Primary gold CTA: self-serve trial (fast path) -->
+                    <Link
+                        href="/start-trial"
+                        class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-[#C4A265] to-[#D4B876] hover:shadow-[#C4A265]/30 text-white text-sm font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                    >
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                        </span>
+                        {{ locale === 'ar' ? 'ابدأ تجربتك مجاناً' : 'Start free trial' }}
                     </Link>
                 </div>
 
@@ -353,12 +365,23 @@ onUnmounted(() => {
                     </div>
                 </div>
 
-                <!-- Drawer CTA -->
-                <div class="p-4">
+                <!-- Drawer CTAs — primary self-serve + secondary demo call -->
+                <div class="p-4 space-y-3">
+                    <Link
+                        href="/start-trial"
+                        @click="closeMobileMenu"
+                        class="flex items-center justify-center gap-2 w-full text-center px-6 py-3 bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-semibold rounded-full transition-colors"
+                    >
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                        </span>
+                        {{ locale === 'ar' ? 'ابدأ تجربتك مجاناً' : 'Start free trial' }}
+                    </Link>
                     <Link
                         href="/demo"
                         @click="closeMobileMenu"
-                        class="block w-full text-center px-6 py-3 bg-secondary hover:bg-secondary-dark text-white font-semibold rounded-full transition-colors"
+                        class="block w-full text-center px-6 py-3 border-2 border-gray-light/40 text-dark font-semibold rounded-full transition-colors"
                     >
                         {{ $t('nav.cta') }}
                     </Link>
