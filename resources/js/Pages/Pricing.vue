@@ -23,6 +23,7 @@ const props = defineProps({
     plans: { type: Array, default: () => [] },
     faqs: { type: Array, default: () => [] },
     addons: { type: Array, default: () => [] },
+    testimonials: { type: Array, default: () => [] },
     // Currency active for the visitor's country (resolved server-side).
     // All non-plan amounts (add-ons) are converted from their EGP base
     // using rate_from_egp, so the whole page speaks one currency.
@@ -785,6 +786,98 @@ const pricingJsonLd = computed(() => ({
                             </Link>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Proof: testimonials from actual doctors -->
+        <section v-if="testimonials.length" class="py-20 lg:py-28 bg-gradient-to-b from-white to-light-blue/40 relative overflow-hidden">
+            <div class="absolute top-20 start-10 w-80 h-80 bg-[#C4A265]/5 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-20 end-10 w-96 h-96 bg-[#1B4F72]/5 rounded-full blur-[120px]"></div>
+
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-14 animate-fade-up">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C4A265]/10 border border-[#C4A265]/20 mb-5">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span class="text-sm text-[#C4A265] font-bold">{{ locale === 'ar' ? 'آراء عملائنا' : 'Customer Stories' }}</span>
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-extrabold text-[#1C2833] mb-4">
+                        {{ locale === 'ar' ? 'ثقة يستحقها عملاؤنا' : 'Trusted by clinic owners' }}
+                    </h2>
+                    <p class="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                        {{ locale === 'ar' ? 'أكثر من 200 عيادة اختارت دكتوراتو — إليك ما يقولونه' : 'Over 200 clinics chose Doctorato. Here is what they say.' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-stagger">
+                    <article
+                        v-for="t in testimonials"
+                        :key="t.id"
+                        class="group relative bg-white rounded-3xl p-7 border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col"
+                    >
+                        <!-- Quote mark -->
+                        <svg class="absolute top-5 end-5 w-10 h-10 text-[#C4A265]/15" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/>
+                        </svg>
+
+                        <!-- Rating stars -->
+                        <div class="flex items-center gap-0.5 mb-4">
+                            <svg
+                                v-for="n in 5" :key="n"
+                                class="w-4 h-4"
+                                :class="n <= t.rating ? 'text-[#C4A265]' : 'text-gray-200'"
+                                fill="currentColor" viewBox="0 0 20 20"
+                            >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        </div>
+
+                        <!-- Review -->
+                        <p class="text-sm text-gray-600 leading-relaxed mb-6 flex-1">
+                            "{{ locale === 'ar' ? t.review_ar : (t.review_en || t.review_ar) }}"
+                        </p>
+
+                        <!-- Author -->
+                        <div class="flex items-center gap-3 pt-5 border-t border-gray-100">
+                            <div
+                                v-if="t.photo"
+                                class="shrink-0 w-12 h-12 rounded-full bg-cover bg-center ring-2 ring-[#C4A265]/20"
+                                :style="{ backgroundImage: `url(${t.photo})` }"
+                            ></div>
+                            <div
+                                v-else
+                                class="shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#1B4F72] to-[#0A1628] flex items-center justify-center text-white font-bold text-base ring-2 ring-[#C4A265]/20"
+                            >
+                                {{ (locale === 'ar' ? t.client_name_ar : (t.client_name_en || t.client_name_ar) || '?').trim().split(' ').pop().charAt(0) }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-[#1C2833] truncate">
+                                    {{ locale === 'ar' ? t.client_name_ar : (t.client_name_en || t.client_name_ar) }}
+                                </p>
+                                <p class="text-xs text-gray-500 truncate">
+                                    {{ locale === 'ar' ? t.role_ar : (t.role_en || t.role_ar) }}
+                                </p>
+                                <p class="text-[11px] text-[#C4A265] font-semibold truncate mt-0.5">
+                                    {{ locale === 'ar' ? t.clinic_name_ar : (t.clinic_name_en || t.clinic_name_ar) }}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- "See all" link -->
+                <div class="text-center mt-10">
+                    <Link
+                        href="/testimonials"
+                        class="inline-flex items-center gap-2 text-sm font-semibold text-[#1B4F72] hover:text-[#C4A265] transition-colors"
+                    >
+                        {{ locale === 'ar' ? 'شاهد كل الآراء' : 'See all reviews' }}
+                        <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </Link>
                 </div>
             </div>
         </section>

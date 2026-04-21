@@ -6,6 +6,7 @@ use App\Models\AddOn;
 use App\Models\Currency;
 use App\Models\Faq;
 use App\Models\PricingPlan;
+use App\Models\Testimonial;
 use App\Services\CountryDetector;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -57,6 +58,13 @@ class PricingController extends Controller
             'faqs' => Faq::where('is_active', true)->where('category', 'pricing')->orderBy('display_order')->get(),
             'addons' => AddOn::active()->orderBy('display_order')->get(),
             'activeCurrency' => $activeCurrency,
+            // Top 3 active testimonials with 5 stars for the Pricing trust
+            // section. Falls back to fewer if the pool is small.
+            'testimonials' => Testimonial::where('is_active', true)
+                ->orderByDesc('rating')
+                ->orderBy('display_order')
+                ->limit(3)
+                ->get(),
         ]);
     }
 }
