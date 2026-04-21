@@ -42,6 +42,13 @@ Route::get('/solutions', [PageController::class, 'solutions'])->name('solutions'
 Route::get('/technology', [PageController::class, 'technology'])->name('technology');
 Route::get('/reports', [PageController::class, 'reports'])->name('reports');
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+
+// Country-specific landing pages — /sa, /ae, /eg, etc. Whitelisted via
+// regex so we don't collide with the other single-segment routes above.
+Route::get('/{countrySlug}', [\App\Http\Controllers\CountryLandingController::class, 'show'])
+    ->where('countrySlug', 'sa|ae|eg|kw|qa|bh|om|jo|iq|lb|ma|us')
+    ->name('country.landing');
+
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/demo', [PageController::class, 'demo'])->name('demo');
