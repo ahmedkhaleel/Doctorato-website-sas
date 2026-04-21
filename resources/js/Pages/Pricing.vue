@@ -5,9 +5,15 @@ import FaqAccordion from '@/Components/FaqAccordion.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { useLocale } from '@/composables/useLocale';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import SeoHead from '@/Components/SeoHead.vue';
 import { ref, computed } from 'vue';
+
+const page = usePage();
+// Read the launch-offer snapshot from shared props. Null-safe fallback
+// so the page still renders if the service is unavailable for any
+// reason (e.g. cache outage).
+const launchOffer = computed(() => page.props.launchOffer || { is_active: false, is_sold_out: false, remaining_slots: 0, total_slots: 50, used_slots: 0, progress_percent: 0 });
 
 const { t, locale } = useI18n();
 const { localizedField } = useLocale();
@@ -298,8 +304,8 @@ const pricingJsonLd = computed(() => ({
                     {{ t('pricing.approximate_note') }}
                 </p>
 
-                <!-- Launch Offer Banner -->
-                <div class="max-w-4xl mx-auto mb-10 animate-fade-up">
+                <!-- Launch Offer Banner — shows live remaining-seats counter -->
+                <div v-if="launchOffer.is_active || launchOffer.is_sold_out" class="max-w-4xl mx-auto mb-10 animate-fade-up">
                     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#C4A265] via-[#D4B876] to-[#C4A265] p-[1.5px] shadow-xl shadow-[#C4A265]/20">
                         <div class="relative rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] px-6 py-5 md:px-8 md:py-6 overflow-hidden">
                             <!-- Decorative glows -->
@@ -307,8 +313,11 @@ const pricingJsonLd = computed(() => ({
                             <div class="absolute -bottom-10 start-0 w-40 h-40 bg-[#2471A3]/20 rounded-full blur-3xl"></div>
 
                             <div class="relative flex flex-col md:flex-row items-center gap-5 md:gap-6">
-                                <!-- Fire icon -->
-                                <div class="shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/30 animate-pulse">
+                                <!-- Fire icon (pulses only when slots are running low) -->
+                                <div
+                                    class="shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/30"
+                                    :class="{ 'animate-pulse': launchOffer.remaining_slots <= 10 && launchOffer.is_active }"
+                                >
                                     <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
                                     </svg>
@@ -316,24 +325,68 @@ const pricingJsonLd = computed(() => ({
 
                                 <!-- Text -->
                                 <div class="flex-1 text-center md:text-start">
-                                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1 flex-wrap">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#C4A265] text-white uppercase tracking-wide">{{ locale === 'ar' ? 'عرض الإطلاق' : 'Launch Offer' }}</span>
-                                        <span class="text-xs text-white/50">{{ locale === 'ar' ? 'لفترة محدودة' : 'Limited time' }}</span>
+                                        <!-- Live seats badge: green > 20, amber 10-20, red <= 10 -->
+                                        <span
+                                            v-if="launchOffer.is_active"
+                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide"
+                                            :class="{
+                                                'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40': launchOffer.remaining_slots > 20,
+                                                'bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/40': launchOffer.remaining_slots > 10 && launchOffer.remaining_slots <= 20,
+                                                'bg-red-500/20 text-red-300 ring-1 ring-red-400/40 animate-pulse': launchOffer.remaining_slots <= 10,
+                                            }"
+                                        >
+                                            <span class="w-1.5 h-1.5 rounded-full" :class="launchOffer.remaining_slots <= 10 ? 'bg-red-400' : launchOffer.remaining_slots <= 20 ? 'bg-amber-400' : 'bg-emerald-400'"></span>
+                                            {{ locale === 'ar'
+                                                ? `باقي ${launchOffer.remaining_slots} من ${launchOffer.total_slots}`
+                                                : `${launchOffer.remaining_slots} of ${launchOffer.total_slots} left` }}
+                                        </span>
+                                        <span
+                                            v-else-if="launchOffer.is_sold_out"
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-500/30 text-gray-300 uppercase tracking-wide"
+                                        >
+                                            {{ locale === 'ar' ? 'نفذت الكمية' : 'Sold out' }}
+                                        </span>
                                     </div>
                                     <h3 class="text-lg md:text-xl font-extrabold text-white mb-1">
-                                        {{ locale === 'ar' ? 'خصم 30% لأول 50 عيادة' : '30% off for first 50 clinics' }}
+                                        <template v-if="launchOffer.is_sold_out">
+                                            {{ locale === 'ar' ? 'انتهى عرض الإطلاق — شكراً لثقتكم!' : 'Launch offer ended — thank you!' }}
+                                        </template>
+                                        <template v-else>
+                                            {{ locale === 'ar' ? 'خصم 30% + رسوم إعداد مجانية لأول 50 عيادة' : '30% off + free setup for the first 50 clinics' }}
+                                        </template>
                                     </h3>
-                                    <p class="text-sm text-white/60 leading-relaxed">
-                                        {{ locale === 'ar' ? 'اشترك الآن واحصل على خصم 30% لمدة 6 أشهر + تجهيز ونقل بيانات مجاني + تدريب كامل لفريقك' : 'Subscribe now, get 30% off for 6 months + free onboarding, data migration & team training' }}
+                                    <p class="text-sm text-white/60 leading-relaxed mb-3">
+                                        <template v-if="launchOffer.is_sold_out">
+                                            {{ locale === 'ar' ? 'كل المقاعد اتحجزت. تواصل معنا للاطلاع على العروض الحالية.' : 'All seats are taken. Contact us for current offers.' }}
+                                        </template>
+                                        <template v-else>
+                                            {{ locale === 'ar' ? 'اشترك الآن واحصل على خصم 30% لمدة 6 أشهر + تجهيز ونقل بيانات مجاني + تدريب كامل لفريقك' : 'Subscribe now, get 30% off for 6 months + free onboarding, data migration & team training' }}
+                                        </template>
                                     </p>
+
+                                    <!-- Progress bar — reinforces scarcity visually -->
+                                    <div v-if="launchOffer.is_active" class="relative h-1.5 bg-white/10 rounded-full overflow-hidden max-w-md mx-auto md:mx-0">
+                                        <div
+                                            class="absolute inset-y-0 start-0 rounded-full transition-all duration-700 ease-out"
+                                            :class="launchOffer.remaining_slots <= 10 ? 'bg-gradient-to-r from-red-400 to-orange-400' : 'bg-gradient-to-r from-[#C4A265] to-[#D4B876]'"
+                                            :style="{ width: launchOffer.progress_percent + '%' }"
+                                        ></div>
+                                    </div>
                                 </div>
 
                                 <!-- CTA -->
                                 <Link
-                                    href="/demo"
+                                    :href="launchOffer.is_sold_out ? '/contact' : '/demo'"
                                     class="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-white text-[#1B4F72] hover:bg-[#C4A265] hover:text-white transition-all duration-300 shadow-lg hover:-translate-y-0.5"
                                 >
-                                    {{ locale === 'ar' ? 'احجز الآن' : 'Claim now' }}
+                                    <template v-if="launchOffer.is_sold_out">
+                                        {{ locale === 'ar' ? 'تواصل معنا' : 'Contact us' }}
+                                    </template>
+                                    <template v-else>
+                                        {{ locale === 'ar' ? 'احجز مقعدك' : 'Claim your seat' }}
+                                    </template>
                                     <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                     </svg>

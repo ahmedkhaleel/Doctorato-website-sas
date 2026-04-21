@@ -6,6 +6,7 @@ use App\Models\Currency;
 use App\Models\DemoRequest;
 use App\Models\SiteSetting;
 use App\Services\CountryDetector;
+use App\Services\LaunchOfferService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -31,6 +32,9 @@ class HandleInertiaRequests extends Middleware
             // Navbar country switcher and the Pricing page to pick prices.
             'activeCountry' => $activeCountry,
             'supportedCountries' => fn () => $detector->supportedCountries(),
+            // Live scarcity counter for the launch offer. Lazy closure so
+            // the DB hit is only paid on pages that actually read it.
+            'launchOffer' => fn () => app(LaunchOfferService::class)->snapshot(),
             'auth' => [
                 'user' => $request->user(),
             ],

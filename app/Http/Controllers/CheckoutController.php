@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\PricingPlan;
 use App\Models\Subscription;
 use App\Services\CountryDetector;
+use App\Services\LaunchOfferService;
 use App\Services\PaymobService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -242,6 +243,10 @@ class CheckoutController extends Controller
                 'starts_at' => $starts,
                 'ends_at' => $ends,
             ]);
+
+            // One less launch-offer slot — bust the scarcity cache so
+            // the next Pricing page load shows the updated counter.
+            LaunchOfferService::flush();
 
             $invoice->payments()->create(array_merge([
                 'subscription_id' => $sub->id,
