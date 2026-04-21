@@ -173,6 +173,62 @@ const socialLinks = [
             </div>
         </div>
 
+        <!-- Trust strip — security/compliance badges, visible site-wide -->
+        <div class="border-t border-white/10 bg-black/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+                    <!-- SSL -->
+                    <div class="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span class="text-xs font-semibold tracking-wide">SSL 256-bit</span>
+                    </div>
+                    <span class="hidden sm:block w-px h-4 bg-white/10"></span>
+                    <!-- PCI DSS -->
+                    <div class="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        <span class="text-xs font-semibold tracking-wide">PCI DSS</span>
+                    </div>
+                    <span class="hidden sm:block w-px h-4 bg-white/10"></span>
+                    <!-- GDPR -->
+                    <div class="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span class="text-xs font-semibold tracking-wide">{{ $t('footer.gdpr', 'GDPR متوافق') }}</span>
+                    </div>
+                    <span class="hidden sm:block w-px h-4 bg-white/10"></span>
+                    <!-- HIPAA-aligned -->
+                    <div class="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
+                        <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span class="text-xs font-semibold tracking-wide">{{ $t('footer.hipaa', 'HIPAA متوافق') }}</span>
+                    </div>
+                    <span class="hidden sm:block w-px h-4 bg-white/10"></span>
+                    <!-- Uptime -->
+                    <div class="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                        </span>
+                        <span class="text-xs font-semibold tracking-wide">{{ $t('footer.uptime', '99.9% استقرار') }}</span>
+                    </div>
+                    <span class="hidden sm:block w-px h-4 bg-white/10"></span>
+                    <!-- 24/7 Support -->
+                    <div class="flex items-center gap-2 text-white/60 hover:text-white/90 transition-colors">
+                        <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-xs font-semibold tracking-wide">{{ $t('footer.support_247', 'دعم 24/7') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Bar -->
         <div class="border-t border-white/10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
