@@ -57,7 +57,47 @@ class AnalyticsController extends Controller
             ->groupBy('pricing_plans.id', 'pricing_plans.name_ar')
             ->get();
 
-        // Top sources (placeholder — would normally pull from request_logs / referer)
+        // Revenue split — subscription vs setup fee for last 30 days.
+        // `setup_fee_amount` is stored on invoices (see migration
+        // 2026_04_19_210000) so we don't need to walk the line_items JSON.
+        $paidThisMonth = Invoice::where('status', 'paid')
+            ->where('paid_at', '>=', $thirtyDaysAgo)
+            ->get(['total', 'discount', 'setup_fee_amount']);
+        $setupRevenue = (float) $paidThisMonth->sum('setup_fee_amount');
+        $subscriptionRevenue = max(0, (float) $paidThisMonth->sum('total') - $setupRevenue);
+        $revenueSplit = [
+            'subscription' => round($subscriptionRevenue, 2),
+            'setup_fee' => round($setupRevenue, 2),
+            'total' => round($subscriptionRevenue + $setupRevenue, 2),
+            'setup_fee_percent' => $subscriptionRevenue + $setupRevenue > 0
+                ? round(($setupRevenue / ($subscriptionRevenue + $setupRevenue)) * 100, 1)
+                : 0,
+        ];
+
+        // Revenue by country — top 8 markets last 30d. Keeps the chart
+        // legible and matches the countries we actively sell into.
+        $countryRevenue = Invoice::where('invoices.status', 'paid')
+            ->where('invoices.paid_at', '>=', $thirtyDaysAgo)
+            ->join('subscriptions', 'subscriptions.id', '=', 'invoices.subscription_id')
+            ->select('subscriptions.country', DB::raw('SUM(invoices.total) as revenue'), DB::raw('COUNT(*) as invoices'))
+            ->groupBy('subscriptions.country')
+            ->orderByDesc('revenue')
+            ->limit(8)
+            ->get()
+            ->map(fn ($r) => [
+                'country' => $r->country ?: 'EG',
+                'revenue' => round((float) $r->revenue, 2),
+                'invoices' => (int) $r->invoices,
+            ]);
+
+        // Trial funnel — demo calls vs instant self-serve trials last 30d.
+        $demoCallSignups = DemoRequest::where('created_at', '>=', $thirtyDaysAgo)
+            ->where(fn ($q) => $q->where('is_instant_trial', false)->orWhereNull('is_instant_trial'))
+            ->count();
+        $instantTrials = DemoRequest::where('created_at', '>=', $thirtyDaysAgo)
+            ->where('is_instant_trial', true)
+            ->count();
+
         return Inertia::render('Admin/Analytics', [
             'kpis' => [
                 'demos' => $demos,
@@ -69,9 +109,13 @@ class AnalyticsController extends Controller
                 'revenue_delta' => $revenueDelta,
                 'mrr' => round($mrr, 2),
                 'conversion_rate' => $conversionRate,
+                'demo_call_signups' => $demoCallSignups,
+                'instant_trials' => $instantTrials,
             ],
             'daily_series' => $dailySeries,
             'plan_distribution' => $planDistribution,
+            'revenue_split' => $revenueSplit,
+            'country_revenue' => $countryRevenue,
         ]);
     }
 

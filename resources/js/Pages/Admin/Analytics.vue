@@ -7,7 +7,15 @@ const props = defineProps({
     kpis: { type: Object, required: true },
     daily_series: { type: Array, default: () => [] },
     plan_distribution: { type: Array, default: () => [] },
+    revenue_split: { type: Object, default: () => ({ subscription: 0, setup_fee: 0, total: 0, setup_fee_percent: 0 }) },
+    country_revenue: { type: Array, default: () => [] },
 });
+
+// Flag emoji lookup for the country revenue table.
+const COUNTRY_FLAGS = {
+    EG: '🇪🇬', SA: '🇸🇦', AE: '🇦🇪', KW: '🇰🇼', QA: '🇶🇦', BH: '🇧🇭',
+    OM: '🇴🇲', JO: '🇯🇴', IQ: '🇮🇶', LB: '🇱🇧', MA: '🇲🇦', US: '🇺🇸',
+};
 
 function fmt(v) {
     return new Intl.NumberFormat('ar-EG').format(Math.round(v || 0));
@@ -111,6 +119,110 @@ const planTotal = computed(() => props.plan_distribution.reduce((s, p) => s + Nu
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Revenue split + country breakdown -->
+        <div class="grid lg:grid-cols-3 gap-6 mb-6">
+            <!-- Split card -->
+            <div class="bg-white border border-gray-100 rounded-2xl p-6">
+                <h3 class="font-bold text-gray-800 mb-1">تفصيل الإيرادات (30 يوم)</h3>
+                <p class="text-xs text-gray-400 mb-4">اشتراكات متكرّرة مقابل رسوم إعداد لمرة واحدة</p>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1.5">
+                            <span class="text-gray-700 font-medium">اشتراكات</span>
+                            <span class="font-bold text-gray-800 tabular-nums">{{ fmt(revenue_split.subscription) }} ج.م</span>
+                        </div>
+                        <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-l from-[#1B4F72] to-[#0A1628] transition-all" :style="{ width: `${100 - revenue_split.setup_fee_percent}%` }"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1.5">
+                            <span class="text-gray-700 font-medium">رسوم إعداد</span>
+                            <span class="font-bold text-[#C4A265] tabular-nums">{{ fmt(revenue_split.setup_fee) }} ج.م</span>
+                        </div>
+                        <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-l from-[#C4A265] to-[#D4B876] transition-all" :style="{ width: `${revenue_split.setup_fee_percent}%` }"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <span class="text-sm text-gray-500">الإجمالي</span>
+                    <span class="text-xl font-extrabold text-gray-900 tabular-nums">{{ fmt(revenue_split.total) }} ج.م</span>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-2">
+                    رسوم الإعداد {{ revenue_split.setup_fee_percent }}% من الإيراد الإجمالي
+                </p>
+            </div>
+
+            <!-- Country revenue breakdown -->
+            <div class="lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-6">
+                <h3 class="font-bold text-gray-800 mb-1">الإيرادات حسب الدولة (30 يوم)</h3>
+                <p class="text-xs text-gray-400 mb-4">أعلى 8 أسواق من حيث الإيراد</p>
+
+                <div v-if="country_revenue.length === 0" class="text-center text-gray-400 py-10 text-sm">
+                    لا توجد إيرادات حسب الدولة بعد
+                </div>
+                <div v-else class="space-y-2.5">
+                    <div v-for="c in country_revenue" :key="c.country" class="flex items-center gap-3">
+                        <span class="text-xl shrink-0">{{ COUNTRY_FLAGS[c.country] || '🏳️' }}</span>
+                        <span class="w-12 font-mono text-xs text-gray-500 shrink-0">{{ c.country }}</span>
+                        <div class="flex-1 h-6 bg-gray-100 rounded-md overflow-hidden relative">
+                            <div
+                                class="h-full bg-gradient-to-l from-[#C4A265] to-[#1B4F72] transition-all flex items-center px-2 text-[10px] font-bold text-white"
+                                :style="{ width: country_revenue[0]?.revenue ? `${(c.revenue / country_revenue[0].revenue) * 100}%` : '0%' }"
+                            >
+                                <span v-if="(c.revenue / country_revenue[0].revenue) > 0.2" class="tabular-nums">{{ fmt(c.revenue) }}</span>
+                            </div>
+                        </div>
+                        <span class="w-28 text-end font-bold text-sm text-gray-800 tabular-nums shrink-0">{{ fmt(c.revenue) }} ج.م</span>
+                        <span class="w-16 text-end text-xs text-gray-400 shrink-0">{{ c.invoices }} فاتورة</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trial source mix -->
+        <div class="grid lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white border border-gray-100 rounded-2xl p-6">
+                <h3 class="font-bold text-gray-800 mb-1">مصدر التجارب (30 يوم)</h3>
+                <p class="text-xs text-gray-400 mb-5">طلبات عرض تجريبي (مكالمة) مقابل تسجيل ذاتي فوري</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200">
+                        <p class="text-xs text-blue-700/70 font-semibold uppercase tracking-wider mb-1">Demo Call</p>
+                        <p class="text-3xl font-extrabold text-blue-900 tabular-nums">{{ fmt(kpis.demo_call_signups || 0) }}</p>
+                        <p class="text-[11px] text-blue-700/60 mt-1">طلبات مكالمة</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-200">
+                        <p class="text-xs text-emerald-700/70 font-semibold uppercase tracking-wider mb-1">Instant</p>
+                        <p class="text-3xl font-extrabold text-emerald-900 tabular-nums">{{ fmt(kpis.instant_trials || 0) }}</p>
+                        <p class="text-[11px] text-emerald-700/60 mt-1">تسجيل ذاتي</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-6">
+                <h3 class="font-bold text-gray-800 mb-4">مصدر التجارب — نسبة</h3>
+                <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden flex mb-3">
+                    <div
+                        class="h-full bg-blue-500 transition-all"
+                        :style="{ width: (kpis.demo_call_signups + kpis.instant_trials) > 0 ? `${(kpis.demo_call_signups / (kpis.demo_call_signups + kpis.instant_trials)) * 100}%` : '0%' }"
+                    ></div>
+                    <div
+                        class="h-full bg-emerald-500 transition-all"
+                        :style="{ width: (kpis.demo_call_signups + kpis.instant_trials) > 0 ? `${(kpis.instant_trials / (kpis.demo_call_signups + kpis.instant_trials)) * 100}%` : '0%' }"
+                    ></div>
+                </div>
+                <div class="flex gap-4 text-xs">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-500"></span> Demo Call</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-500"></span> Instant</span>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-4 leading-relaxed">
+                    التسجيل الذاتي عادة ما يحوّل بمعدل أقل لكن بحجم أعلى — راقب النسبة مع الوقت لتعرف أين تستثمر وقت الفريق.
+                </p>
             </div>
         </div>
 

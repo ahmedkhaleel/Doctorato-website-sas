@@ -168,6 +168,7 @@ class CheckoutController extends Controller
                 'subtotal' => $subtotal,
                 'tax' => 0,
                 'discount' => $discount,
+                'setup_fee_amount' => $setupFee,
                 'total' => $total,
                 'currency' => $sub->currency,
                 'status' => 'pending',
