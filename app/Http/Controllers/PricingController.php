@@ -26,6 +26,8 @@ class PricingController extends Controller
                 return array_merge($plan->toArray(), [
                     'monthly_price' => $price['monthly'],
                     'yearly_price' => $price['yearly'],
+                    'setup_fee' => $price['setup_fee'] ?? 0,
+                    'setup_fee_yearly' => $price['setup_fee_yearly'] ?? 0,
                     'currency' => $price['currency'],
                     'currency_symbol' => $price['currency_symbol'],
                     'country_code' => $price['country_code'],

@@ -74,6 +74,17 @@ function getCurrencySymbol(plan) {
     return plan?.currency_symbol || plan?.currency || '';
 }
 
+// Setup fee helpers — yearly subscribers see the 50%-off price with a
+// strikethrough on the full price. Monthly subscribers pay the full fee.
+function getSetupFee(plan) {
+    if (!plan || plan.is_custom) return 0;
+    return Number(isYearly.value ? plan.setup_fee_yearly : plan.setup_fee) || 0;
+}
+function getSetupFeeFull(plan) {
+    if (!plan || plan.is_custom) return 0;
+    return Number(plan.setup_fee) || 0;
+}
+
 // Comparison table data
 const comparisonCategories = computed(() => [
     {
@@ -380,6 +391,41 @@ const pricingJsonLd = computed(() => ({
                                     <p v-if="isYearly" class="text-xs mt-1" :class="plan.is_popular ? 'text-emerald-300' : 'text-emerald-500'">
                                         {{ t('pricing.save_20') }}
                                     </p>
+
+                                    <!-- One-time setup fee (50% off for yearly) -->
+                                    <div
+                                        v-if="getSetupFeeFull(plan) > 0"
+                                        class="mt-3 pt-3 border-t"
+                                        :class="plan.is_popular ? 'border-white/10' : 'border-gray-100'"
+                                    >
+                                        <div class="flex items-baseline gap-1.5 flex-wrap">
+                                            <span class="text-[11px] uppercase tracking-wide font-bold" :class="plan.is_popular ? 'text-[#C4A265]' : 'text-[#C4A265]'">
+                                                + {{ t('pricing.setup_fee_label') }}
+                                            </span>
+                                            <span
+                                                v-if="isYearly"
+                                                class="text-xs line-through tabular-nums"
+                                                :class="plan.is_popular ? 'text-white/40' : 'text-gray-400'"
+                                            >
+                                                {{ localeNumber(getSetupFeeFull(plan)) }}
+                                            </span>
+                                            <span class="text-sm font-extrabold tabular-nums" :class="plan.is_popular ? 'text-white' : 'text-[#1C2833]'">
+                                                {{ localeNumber(getSetupFee(plan)) }}
+                                            </span>
+                                            <span class="text-[11px] font-semibold" :class="plan.is_popular ? 'text-white/70' : 'text-gray-500'">
+                                                {{ getCurrencySymbol(plan) }}
+                                            </span>
+                                            <span class="text-[10px]" :class="plan.is_popular ? 'text-white/40' : 'text-gray-400'">
+                                                · {{ t('pricing.setup_fee_once') }}
+                                            </span>
+                                        </div>
+                                        <p v-if="isYearly" class="text-[11px] mt-1 font-semibold text-emerald-500">
+                                            🎁 {{ t('pricing.setup_fee_yearly_note') }}
+                                        </p>
+                                        <p class="text-[10px] mt-1 leading-relaxed" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">
+                                            {{ t('pricing.setup_fee_includes') }}
+                                        </p>
+                                    </div>
                                 </template>
                                 <template v-else>
                                     <span class="text-xl md:text-2xl font-extrabold text-[#C4A265]">

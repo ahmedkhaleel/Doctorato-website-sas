@@ -20,12 +20,14 @@ class PlanPrice extends Model
         'currency_symbol',
         'monthly_price',
         'yearly_price',
+        'setup_fee',
         'is_active',
     ];
 
     protected $casts = [
         'monthly_price' => 'decimal:2',
         'yearly_price' => 'decimal:2',
+        'setup_fee' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

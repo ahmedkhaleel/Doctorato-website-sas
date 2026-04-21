@@ -80,6 +80,7 @@ class PlanPriceController extends Controller
             'currency_symbol' => ['required', 'string', 'max:12'],
             'monthly_price' => ['required', 'numeric', 'min:0'],
             'yearly_price' => ['required', 'numeric', 'min:0'],
+            'setup_fee' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ]);
     }

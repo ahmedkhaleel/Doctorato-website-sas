@@ -67,9 +67,13 @@ class PricingPlan extends Model
         }
 
         if ($row) {
+            $setupFee = (float) ($row->setup_fee ?? 0);
             return [
                 'monthly' => (float) $row->monthly_price,
                 'yearly' => (float) $row->yearly_price,
+                'setup_fee' => $setupFee,
+                // Yearly subscribers get 50% off the one-time setup fee.
+                'setup_fee_yearly' => round($setupFee * 0.5, 2),
                 'currency' => $row->currency_code,
                 'currency_symbol' => $row->currency_symbol,
                 'country_code' => $row->country_code,
@@ -85,6 +89,8 @@ class PricingPlan extends Model
         return [
             'monthly' => (float) $this->monthly_price,
             'yearly' => (float) $this->yearly_price,
+            'setup_fee' => 0.0,
+            'setup_fee_yearly' => 0.0,
             'currency' => $this->currency ?: 'EGP',
             'currency_symbol' => 'ج.م',
             'country_code' => 'EG',

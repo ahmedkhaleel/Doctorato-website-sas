@@ -22,6 +22,7 @@ const form = useForm({
     currency_symbol: '',
     monthly_price: 0,
     yearly_price: 0,
+    setup_fee: 0,
     is_active: true,
 });
 
@@ -79,6 +80,7 @@ function openCell(planId, countryCode) {
         form.currency_symbol = existing.currency_symbol;
         form.monthly_price = parseFloat(existing.monthly_price);
         form.yearly_price = parseFloat(existing.yearly_price);
+        form.setup_fee = parseFloat(existing.setup_fee || 0);
         form.is_active = existing.is_active;
     } else {
         // Prefill from any existing row for this country, or from presets
@@ -213,6 +215,9 @@ function fmt(v) {
                                     <span class="text-[10px] text-gray-400 mt-0.5">
                                         /شهر · سنوي {{ fmt(priceFor(plan.id, country.country_code).yearly_price) }}
                                     </span>
+                                    <span v-if="Number(priceFor(plan.id, country.country_code).setup_fee) > 0" class="text-[10px] text-amber-600 mt-0.5 font-semibold">
+                                        إعداد: {{ fmt(priceFor(plan.id, country.country_code).setup_fee) }}
+                                    </span>
                                     <span v-if="!priceFor(plan.id, country.country_code).is_active" class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-red-50 text-red-600 mt-1">
                                         معطّل
                                     </span>
@@ -310,6 +315,14 @@ function fmt(v) {
                                 <label class="block text-xs font-bold text-gray-600 uppercase mb-1">السعر السنوي</label>
                                 <input v-model.number="form.yearly_price" type="number" min="0" step="0.01" required class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm" />
                             </div>
+                        </div>
+
+                        <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-4">
+                            <label class="block text-xs font-bold text-amber-700 uppercase mb-1">رسوم الإعداد (مرة واحدة)</label>
+                            <input v-model.number="form.setup_fee" type="number" min="0" step="0.01" class="w-full px-4 py-2.5 border border-amber-200 bg-white rounded-lg text-sm" />
+                            <p class="text-[11px] text-amber-700/80 mt-1.5">
+                                رسوم التسطيب والتدريب ونقل البيانات. المشتركين سنوياً يحصلون تلقائياً على خصم 50% منها.
+                            </p>
                         </div>
 
                         <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4">
