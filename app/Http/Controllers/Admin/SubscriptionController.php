@@ -69,16 +69,28 @@ class SubscriptionController extends Controller
 
     public function cancel(Subscription $subscription)
     {
-        $subscription->update([
-            'status' => 'cancelled',
-            'cancelled_at' => now(),
-        ]);
+        // Wrap in a transaction so the status flip + pending-invoice void
+        // + activity log land together. Previously an activity-log write
+        // failure would leave a cancelled subscription with no audit
+        // trail.
+        \Illuminate\Support\Facades\DB::transaction(function () use ($subscription) {
+            $subscription->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now(),
+            ]);
 
-        ActivityLog::record(
-            'cancelled',
-            $subscription,
-            "ألغى اشتراك {$subscription->customer_name} ({$subscription->reference})"
-        );
+            // Void any pending invoice so we don't keep chasing payment
+            // for a cancelled subscription.
+            $subscription->invoices()
+                ->where('status', 'pending')
+                ->update(['status' => 'cancelled']);
+
+            ActivityLog::record(
+                'cancelled',
+                $subscription,
+                "ألغى اشتراك {$subscription->customer_name} ({$subscription->reference})"
+            );
+        });
 
         return back()->with('success', 'تم إلغاء الاشتراك');
     }

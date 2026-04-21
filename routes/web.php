@@ -87,8 +87,11 @@ Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('che
 Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])->name('webhooks.paymob');
 
 // Admin Auth
+// Rate-limit admin auth endpoints — 5 tries per minute keeps brute-force
+// attackers out while staying out of the way of real admins fat-fingering
+// their password once.
 Route::get('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('admin.login');
-Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login']);
+Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/admin/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('admin.logout');
 
 // Admin Dashboard (Protected)
@@ -105,10 +108,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'update'])->name('plan-prices.update');
     Route::delete('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'destroy'])->name('plan-prices.destroy');
 
+    // Plan management is gated by plans.manage (admin + super_admin roles
+    // bypass automatically via User::hasPermission).
     Route::get('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'index'])->name('plans.index');
-    Route::post('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'store'])->name('plans.store');
-    Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'update'])->name('plans.update');
-    Route::delete('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'destroy'])->name('plans.destroy');
+    Route::post('/plans', [\App\Http\Controllers\Admin\PlanController::class, 'store'])->name('plans.store')->middleware('admin.perm:plans.manage');
+    Route::put('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'update'])->name('plans.update')->middleware('admin.perm:plans.manage');
+    Route::delete('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'destroy'])->name('plans.destroy')->middleware('admin.perm:plans.manage');
 
     Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');
     Route::post('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'store'])->name('testimonials.store');
@@ -148,17 +153,20 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/blog/categories/{category}', [\App\Http\Controllers\Admin\BlogCategoryController::class, 'update'])->name('blog.categories.update');
     Route::delete('/blog/categories/{category}', [\App\Http\Controllers\Admin\BlogCategoryController::class, 'destroy'])->name('blog.categories.destroy');
 
-    Route::get('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'tracking'])->name('settings.tracking');
-    Route::put('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'updateTracking'])->name('settings.tracking.update');
-    Route::get('/settings/general', [\App\Http\Controllers\Admin\SettingsController::class, 'general'])->name('settings.general');
-    Route::put('/settings/general', [\App\Http\Controllers\Admin\SettingsController::class, 'updateGeneral'])->name('settings.general.update');
-    Route::get('/settings/launch', [\App\Http\Controllers\Admin\SettingsController::class, 'launch'])->name('settings.launch');
-    Route::put('/settings/launch', [\App\Http\Controllers\Admin\SettingsController::class, 'updateLaunch'])->name('settings.launch.update');
+    // Settings — writes need settings.manage; reads only need dashboard.
+    Route::get('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'tracking'])->name('settings.tracking')->middleware('admin.perm:settings.manage');
+    Route::put('/settings/tracking', [\App\Http\Controllers\Admin\SettingsController::class, 'updateTracking'])->name('settings.tracking.update')->middleware('admin.perm:settings.manage');
+    Route::get('/settings/general', [\App\Http\Controllers\Admin\SettingsController::class, 'general'])->name('settings.general')->middleware('admin.perm:settings.manage');
+    Route::put('/settings/general', [\App\Http\Controllers\Admin\SettingsController::class, 'updateGeneral'])->name('settings.general.update')->middleware('admin.perm:settings.manage');
+    Route::get('/settings/launch', [\App\Http\Controllers\Admin\SettingsController::class, 'launch'])->name('settings.launch')->middleware('admin.perm:settings.manage');
+    Route::put('/settings/launch', [\App\Http\Controllers\Admin\SettingsController::class, 'updateLaunch'])->name('settings.launch.update')->middleware('admin.perm:settings.manage');
 
     Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/subscriptions/{subscription}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'show'])->name('subscriptions.show');
-    Route::post('/subscriptions/{subscription}/cancel', [\App\Http\Controllers\Admin\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
-    Route::post('/payments/{payment}/refund', [\App\Http\Controllers\Admin\SubscriptionController::class, 'refundPayment'])->name('payments.refund');
+    // Subscription cancel / payment refund are destructive + financial —
+    // require an explicit permission (super_admin/admin bypass).
+    Route::post('/subscriptions/{subscription}/cancel', [\App\Http\Controllers\Admin\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel')->middleware('admin.perm:plans.manage');
+    Route::post('/payments/{payment}/refund', [\App\Http\Controllers\Admin\SubscriptionController::class, 'refundPayment'])->name('payments.refund')->middleware('admin.perm:plans.manage');
 
     Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
@@ -185,9 +193,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/export/demos', [\App\Http\Controllers\Admin\ExportController::class, 'demos'])->name('export.demos');
     Route::get('/export/contacts', [\App\Http\Controllers\Admin\ExportController::class, 'contacts'])->name('export.contacts');
 
-    Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
-    Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
-    Route::put('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
-    Route::put('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UsersController::class, 'toggleActive'])->name('users.toggle');
+    // User management — lock to users.manage so a viewer can't create
+    // admin accounts.
+    Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index')->middleware('admin.perm:users.manage');
+    Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store')->middleware('admin.perm:users.manage');
+    Route::put('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update')->middleware('admin.perm:users.manage');
+    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy')->middleware('admin.perm:users.manage');
+    Route::put('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UsersController::class, 'toggleActive'])->name('users.toggle')->middleware('admin.perm:users.manage');
 });

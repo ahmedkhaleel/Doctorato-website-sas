@@ -72,6 +72,18 @@ class CaseStudyController extends Controller
     public function destroy(CaseStudy $caseStudy): RedirectResponse
     {
         $title = $caseStudy->title_ar;
+
+        // Best-effort cleanup: remove uploaded logo + hero image from
+        // storage before we drop the DB row. Without this the files sit
+        // on disk forever because nothing else points to them.
+        foreach (['logo', 'hero_image'] as $field) {
+            $path = $caseStudy->{$field} ?? null;
+            if ($path && \Illuminate\Support\Str::startsWith($path, '/storage/')) {
+                $relative = \Illuminate\Support\Str::after($path, '/storage/');
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($relative);
+            }
+        }
+
         $caseStudy->delete();
         ActivityLog::record('deleted', null, "حذف دراسة حالة: {$title}");
 

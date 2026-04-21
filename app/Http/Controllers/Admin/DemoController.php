@@ -42,10 +42,15 @@ class DemoController extends Controller
             ? $demo->trial_ends_at
             : now();
 
+        // Keep trial_status='active' so scopeNeedsEndingSoonNotification
+        // (which only fires on active trials) picks up the extended trial
+        // when its new end date is within 3 days. Also reset BOTH notified
+        // flags so the 3-day heads-up can re-fire for the new window.
         $demo->update([
             'trial_ends_at' => $base->copy()->addDays($days),
-            'trial_status' => 'extended',
+            'trial_status' => 'active',
             'trial_expiry_notified' => false,
+            'trial_ending_soon_notified' => false,
             'admin_reminder_seen' => true,
         ]);
 

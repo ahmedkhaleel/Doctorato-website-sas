@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminPermission;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             SetLocale::class,
+        ]);
+
+        // Register the per-permission gate so route definitions can use
+        // ->middleware('admin.perm:plans.manage') etc.
+        $middleware->alias([
+            'admin.perm' => AdminPermission::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
