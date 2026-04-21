@@ -23,12 +23,19 @@ class SitemapController extends Controller
         ['path' => '/about', 'priority' => '0.7', 'freq' => 'monthly'],
         ['path' => '/contact', 'priority' => '0.7', 'freq' => 'monthly'],
         ['path' => '/demo', 'priority' => '0.8', 'freq' => 'monthly'],
+        ['path' => '/start-trial', 'priority' => '0.95', 'freq' => 'weekly'],
         ['path' => '/faq', 'priority' => '0.7', 'freq' => 'monthly'],
         ['path' => '/blog', 'priority' => '0.8', 'freq' => 'weekly'],
         ['path' => '/case-studies', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/roi-calculator', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/privacy', 'priority' => '0.3', 'freq' => 'yearly'],
         ['path' => '/terms', 'priority' => '0.3', 'freq' => 'yearly'],
+        // Country-specific landing pages — high priority because they
+        // carry the local-SEO payload (LocalBusiness JSON-LD, native
+        // currency, regional insurers).
+        ['path' => '/sa', 'priority' => '0.95', 'freq' => 'monthly'],
+        ['path' => '/ae', 'priority' => '0.95', 'freq' => 'monthly'],
+        ['path' => '/eg', 'priority' => '0.95', 'freq' => 'monthly'],
     ];
 
     public function index(): Response
