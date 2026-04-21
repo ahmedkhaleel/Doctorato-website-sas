@@ -6,6 +6,7 @@ use App\Models\Coupon;
 use App\Models\Invoice;
 use App\Models\PricingPlan;
 use App\Models\Subscription;
+use App\Services\CountryDetector;
 use App\Services\PaymobService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -17,15 +18,20 @@ use Inertia\Response;
 class CheckoutController extends Controller
 {
     /** Show the checkout form for a given plan + billing cycle. */
-    public function show(Request $request, string $planSlug): Response|RedirectResponse
+    public function show(Request $request, string $planSlug, CountryDetector $detector): Response|RedirectResponse
     {
-        $plan = PricingPlan::where('slug', $planSlug)->active()->first();
+        $plan = PricingPlan::with(['prices' => fn ($q) => $q->where('is_active', true)])
+            ->where('slug', $planSlug)
+            ->active()
+            ->first();
 
         if (! $plan || $plan->is_custom) {
             return redirect()->route('contact');
         }
 
         $cycle = $request->query('cycle') === 'yearly' ? 'yearly' : 'monthly';
+        $country = $detector->resolve($request);
+        $price = $plan->priceFor($country);
 
         return Inertia::render('Checkout', [
             'plan' => [
@@ -33,16 +39,21 @@ class CheckoutController extends Controller
                 'slug' => $plan->slug,
                 'name_ar' => $plan->name_ar,
                 'name_en' => $plan->name_en,
-                'monthly_price' => (float) $plan->monthly_price,
-                'yearly_price' => (float) $plan->yearly_price,
-                'currency' => $plan->currency,
+                'monthly_price' => $price['monthly'],
+                'yearly_price' => $price['yearly'],
+                'setup_fee' => $price['setup_fee'],
+                'setup_fee_yearly' => $price['setup_fee_yearly'],
+                'currency' => $price['currency'],
+                'currency_symbol' => $price['currency_symbol'],
+                'country_code' => $price['country_code'],
+                'country_flag' => $price['country_flag'],
             ],
             'cycle' => $cycle,
         ]);
     }
 
     /** AJAX endpoint: validate a coupon against a plan+cycle and return the discount. */
-    public function validateCoupon(Request $request): JsonResponse
+    public function validateCoupon(Request $request, CountryDetector $detector): JsonResponse
     {
         $data = $request->validate([
             'code' => ['required', 'string', 'max:40'],
@@ -51,33 +62,38 @@ class CheckoutController extends Controller
         ]);
 
         $coupon = Coupon::where('code', strtoupper($data['code']))->first();
-        $plan = PricingPlan::find($data['plan_id']);
+        $plan = PricingPlan::with('prices')->find($data['plan_id']);
 
         if (!$coupon || !$plan) {
             return response()->json(['valid' => false, 'message' => 'كود غير صحيح'], 404);
         }
 
-        $amount = $data['cycle'] === 'yearly' ? (float) $plan->yearly_price : (float) $plan->monthly_price;
+        $country = $detector->resolve($request);
+        $price = $plan->priceFor($country);
+        // Coupon applies to the recurring subscription portion only — we
+        // don't discount the setup fee. That's intentional: the launch
+        // offer (50% yearly / full monthly) already handles onboarding.
+        $subscriptionAmount = $data['cycle'] === 'yearly' ? $price['yearly'] : $price['monthly'];
 
-        if (!$coupon->isValid($amount, $plan->id)) {
+        if (!$coupon->isValid($subscriptionAmount, $plan->id)) {
             return response()->json(['valid' => false, 'message' => 'الكوبون غير صالح أو منتهي'], 422);
         }
 
-        $discount = $coupon->computeDiscount($amount);
+        $discount = $coupon->computeDiscount($subscriptionAmount);
 
         return response()->json([
             'valid' => true,
             'code' => $coupon->code,
             'discount' => $discount,
-            'total' => round($amount - $discount, 2),
+            'total' => round($subscriptionAmount - $discount, 2), // subscription only — setup fee added client-side
             'label' => $coupon->type === 'percentage'
                 ? ((int) $coupon->value) . '% خصم'
-                : ((int) $coupon->value) . ' ج.م خصم',
+                : ((int) $coupon->value) . ' ' . ($price['currency_symbol'] ?: $price['currency']) . ' خصم',
         ]);
     }
 
     /** Create the subscription + invoice and redirect to Paymob iframe. */
-    public function start(Request $request, PaymobService $paymob): RedirectResponse
+    public function start(Request $request, PaymobService $paymob, CountryDetector $detector): RedirectResponse
     {
         $data = $request->validate([
             'plan_id' => ['required', 'integer', 'exists:pricing_plans,id'],
@@ -90,25 +106,31 @@ class CheckoutController extends Controller
             'coupon_code' => ['nullable', 'string', 'max:40'],
         ]);
 
-        $plan = PricingPlan::findOrFail($data['plan_id']);
+        $plan = PricingPlan::with('prices')->findOrFail($data['plan_id']);
         abort_if($plan->is_custom, 404);
 
-        $subtotal = $data['cycle'] === 'yearly'
-            ? (float) $plan->yearly_price
-            : (float) $plan->monthly_price;
+        $country = $detector->resolve($request);
+        $price = $plan->priceFor($country);
 
-        // Apply coupon if present and still valid at submit time
+        $subscriptionAmount = $data['cycle'] === 'yearly' ? $price['yearly'] : $price['monthly'];
+        // Yearly gets 50% off the one-time setup fee (pre-computed in
+        // PricingPlan::priceFor as setup_fee_yearly).
+        $setupFee = $data['cycle'] === 'yearly' ? $price['setup_fee_yearly'] : $price['setup_fee'];
+
+        // Apply coupon to the subscription portion only.
         $discount = 0;
         $coupon = null;
         if (!empty($data['coupon_code'])) {
             $coupon = Coupon::where('code', strtoupper($data['coupon_code']))->first();
-            if ($coupon && $coupon->isValid($subtotal, $plan->id)) {
-                $discount = $coupon->computeDiscount($subtotal);
+            if ($coupon && $coupon->isValid($subscriptionAmount, $plan->id)) {
+                $discount = $coupon->computeDiscount($subscriptionAmount);
             }
         }
-        $total = max(0, $subtotal - $discount);
 
-        [$subscription, $invoice] = DB::transaction(function () use ($data, $plan, $subtotal, $discount, $total, $coupon) {
+        $subtotal = round($subscriptionAmount + $setupFee, 2);
+        $total = max(0, round($subscriptionAmount - $discount + $setupFee, 2));
+
+        [$subscription, $invoice] = DB::transaction(function () use ($data, $plan, $price, $subscriptionAmount, $setupFee, $subtotal, $discount, $total, $coupon, $country) {
             $sub = Subscription::create([
                 'pricing_plan_id' => $plan->id,
                 'customer_name' => $data['customer_name'],
@@ -116,14 +138,29 @@ class CheckoutController extends Controller
                 'customer_phone' => $data['customer_phone'],
                 'clinic_name' => $data['clinic_name'] ?? null,
                 'city' => $data['city'] ?? null,
-                'country' => 'EG',
+                'country' => $country,
                 'billing_cycle' => $data['cycle'],
                 'amount' => $total,
                 'coupon_code' => $coupon?->code,
                 'discount_amount' => $discount,
-                'currency' => $plan->currency ?: 'EGP',
+                'currency' => $price['currency'] ?: 'EGP',
                 'status' => 'pending',
             ]);
+
+            $lineItems = [[
+                'name' => ($plan->name_ar ?: $plan->name_en) . ' — ' . ($data['cycle'] === 'yearly' ? 'سنوي' : 'شهري'),
+                'qty' => 1,
+                'unit_price' => $subscriptionAmount,
+                'total' => $subscriptionAmount,
+            ]];
+            if ($setupFee > 0) {
+                $lineItems[] = [
+                    'name' => 'رسوم الإعداد (لمرة واحدة)' . ($data['cycle'] === 'yearly' ? ' — خصم 50% سنوي' : ''),
+                    'qty' => 1,
+                    'unit_price' => $setupFee,
+                    'total' => $setupFee,
+                ];
+            }
 
             $inv = Invoice::create([
                 'subscription_id' => $sub->id,
@@ -134,13 +171,12 @@ class CheckoutController extends Controller
                 'currency' => $sub->currency,
                 'status' => 'pending',
                 'due_at' => now()->addDays(3),
-                'line_items' => [[
-                    'name' => ($plan->name_ar ?: $plan->name_en) . ' — ' . $data['cycle'],
-                    'qty' => 1,
-                    'unit_price' => $subtotal,
-                    'total' => $subtotal,
-                ]],
-                'metadata' => $coupon ? ['coupon' => $coupon->code] : null,
+                'line_items' => $lineItems,
+                'metadata' => array_filter([
+                    'coupon' => $coupon?->code,
+                    'setup_fee' => $setupFee ?: null,
+                    'country' => $country,
+                ]),
             ]);
 
             if ($coupon) {

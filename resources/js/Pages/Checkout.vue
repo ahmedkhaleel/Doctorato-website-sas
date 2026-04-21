@@ -76,9 +76,22 @@ function removeCoupon() {
 
 const planName = computed(() => (locale.value === 'ar' ? props.plan.name_ar : props.plan.name_en));
 
+// Currency symbol from the detected country (ج.م / ر.س / د.إ / ...)
+// with a fallback to the ISO code so the display never breaks.
+const currencyLabel = computed(() => props.plan.currency_symbol || props.plan.currency);
+
 const amount = computed(() =>
     cycle.value === 'yearly' ? props.plan.yearly_price : props.plan.monthly_price
 );
+
+// Setup fee due: full fee for monthly subscribers, 50% off for yearly.
+const setupFeeFull = computed(() => Number(props.plan.setup_fee) || 0);
+const setupFeeDue = computed(() => {
+    if (setupFeeFull.value <= 0) return 0;
+    return cycle.value === 'yearly'
+        ? (Number(props.plan.setup_fee_yearly) || 0)
+        : setupFeeFull.value;
+});
 
 const yearlySavings = computed(() => {
     const monthlyTotal = props.plan.monthly_price * 12;
@@ -94,9 +107,12 @@ function setCycle(value) {
     }
 }
 
+// Final = (subscription - coupon) + setup fee. Coupon applies to the
+// recurring subscription only; setup fee is added on top after the
+// discount, matching what the backend computes.
 const finalTotal = computed(() => {
-    if (couponApplied.value) return couponApplied.value.total;
-    return amount.value;
+    const subWithCoupon = couponApplied.value ? couponApplied.value.total : amount.value;
+    return Math.max(0, Number(subWithCoupon) + setupFeeDue.value);
 });
 
 const track = useTracking();
@@ -203,7 +219,7 @@ function formatPrice(v) {
                             class="w-full bg-secondary hover:bg-secondary-dark text-white font-semibold py-4 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-secondary/25 disabled:opacity-60"
                         >
                             {{ form.processing ? t('checkout.processing', 'جاري التحويل...') : t('checkout.pay_now', 'ادفع الآن') }}
-                            — {{ formatPrice(finalTotal) }} {{ plan.currency }}
+                            — {{ formatPrice(finalTotal) }} {{ currencyLabel }}
                         </button>
 
                         <p class="text-xs text-gray text-center">
@@ -275,26 +291,49 @@ function formatPrice(v) {
 
                             <div class="space-y-2 text-sm">
                                 <div class="flex justify-between">
-                                    <span class="text-gray">{{ t('checkout.subtotal', 'الإجمالي') }}</span>
-                                    <span class="font-semibold text-dark">{{ formatPrice(amount) }} {{ plan.currency }}</span>
+                                    <span class="text-gray">{{ cycle === 'yearly' ? t('checkout.sub_yearly', 'اشتراك سنوي') : t('checkout.sub_monthly', 'اشتراك شهري') }}</span>
+                                    <span class="font-semibold text-dark">{{ formatPrice(amount) }} {{ currencyLabel }}</span>
                                 </div>
                                 <div v-if="cycle === 'yearly' && yearlySavings > 0" class="flex justify-between text-success">
                                     <span>{{ t('checkout.savings', 'توفير سنوي') }}</span>
-                                    <span class="font-semibold">-{{ formatPrice(yearlySavings) }} {{ plan.currency }}</span>
+                                    <span class="font-semibold">-{{ formatPrice(yearlySavings) }} {{ currencyLabel }}</span>
                                 </div>
                                 <div v-if="couponApplied" class="flex justify-between text-emerald-600 font-semibold">
                                     <span>كوبون {{ couponApplied.code }}</span>
-                                    <span>-{{ formatPrice(couponApplied.discount) }} {{ plan.currency }}</span>
+                                    <span>-{{ formatPrice(couponApplied.discount) }} {{ currencyLabel }}</span>
                                 </div>
+
+                                <!-- Setup fee line (with launch strikethrough when yearly) -->
+                                <div v-if="setupFeeFull > 0" class="flex justify-between pt-2 mt-2 border-t border-dashed border-amber-200">
+                                    <span class="text-[#C4A265] font-semibold flex items-center gap-1">
+                                        <span>🛠️</span>
+                                        {{ t('checkout.setup_fee', 'رسوم إعداد (لمرة واحدة)') }}
+                                    </span>
+                                    <span class="font-semibold tabular-nums">
+                                        <span v-if="cycle === 'yearly'" class="line-through text-gray-400 me-1.5 font-normal">
+                                            {{ formatPrice(setupFeeFull) }}
+                                        </span>
+                                        <span class="text-[#C4A265]">{{ formatPrice(setupFeeDue) }}</span>
+                                        <span class="text-xs text-gray ms-1">{{ currencyLabel }}</span>
+                                    </span>
+                                </div>
+                                <p v-if="setupFeeFull > 0 && cycle === 'yearly'" class="text-[11px] text-emerald-600 font-semibold -mt-1">
+                                    🎁 {{ t('checkout.setup_yearly_discount', 'خصم 50% على رسوم الإعداد مع الاشتراك السنوي') }}
+                                </p>
                             </div>
 
                             <div class="border-t border-gray-100 pt-4 mt-4 flex justify-between items-center">
                                 <span class="font-bold text-dark">{{ t('checkout.total', 'المستحق') }}</span>
                                 <span class="text-2xl font-bold text-primary">
                                     {{ formatPrice(finalTotal) }}
-                                    <span class="text-sm font-normal">{{ plan.currency }}</span>
+                                    <span class="text-sm font-normal">{{ currencyLabel }}</span>
                                 </span>
                             </div>
+
+                            <!-- Setup fee tiny disclosure -->
+                            <p v-if="setupFeeFull > 0" class="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                                {{ t('checkout.setup_includes', 'رسوم الإعداد تشمل: تسطيب النظام، تدريب الفريق، نقل البيانات، وضبط الصلاحيات.') }}
+                            </p>
 
                             <ul class="mt-5 space-y-2 text-xs text-gray">
                                 <li class="flex items-start gap-2">
