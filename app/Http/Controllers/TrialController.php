@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TrialWelcomeMail;
 use App\Models\DemoRequest;
+use App\Models\SiteSetting;
 use App\Services\CountryDetector;
 use App\Services\RecaptchaService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -76,6 +80,22 @@ class TrialController extends Controller
             // The is_instant_trial flag is how we tell these apart from demo calls.
             'status' => 'new',
         ]);
+
+        // Fire-and-forget — a mail outage shouldn't block the signup flow.
+        // Logs + admin notification stream catch misses.
+        try {
+            Mail::to($trial->email)->send(new TrialWelcomeMail($trial));
+            // CC the operations mailbox so the team provisions credentials.
+            $adminEmail = SiteSetting::get('company_email') ?: config('mail.from.address');
+            if ($adminEmail && $adminEmail !== $trial->email) {
+                Mail::to($adminEmail)->send(new TrialWelcomeMail($trial));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Trial welcome email failed, signup still succeeded', [
+                'trial_id' => $trial->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()->route('trial.success', ['ref' => $trial->id])
             ->with('success', 'تجربتك جاهزة!');
