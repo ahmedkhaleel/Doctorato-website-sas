@@ -15,9 +15,20 @@
 
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-$HOME/doctorato-website}"
+# Default APP_DIR to the script's own directory — no more guessing based
+# on conventional paths. Caller can still override with `APP_DIR=... bash
+# deploy.sh`. Works regardless of whether the Laravel app lives at
+# ~/public_html, ~/doctorato-website, or anywhere else.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="${APP_DIR:-$SCRIPT_DIR}"
 BRANCH="${DEPLOY_BRANCH:-main}"
 LOG="$APP_DIR/storage/logs/deploy.log"
+
+# Some cPanel PHP builds disable fileinfo/iconv. Composer has a flag to
+# skip those platform checks so install doesn't abort. Admin should
+# enable them via cPanel → Select PHP Version for real — this is a
+# pragmatic fallback.
+COMPOSER_EXTRA_FLAGS="${COMPOSER_EXTRA_FLAGS:---ignore-platform-req=ext-fileinfo --ignore-platform-req=ext-iconv}"
 
 # Ensure log dir exists the very first time.
 mkdir -p "$(dirname "$LOG")"
@@ -56,7 +67,7 @@ fi
 log "using composer: $COMPOSER_CMD"
 
 log "installing production PHP deps"
-$COMPOSER_CMD install --no-dev --optimize-autoloader --no-interaction
+$COMPOSER_CMD install --no-dev --optimize-autoloader --no-interaction $COMPOSER_EXTRA_FLAGS
 
 log "entering maintenance mode"
 php artisan down || true
