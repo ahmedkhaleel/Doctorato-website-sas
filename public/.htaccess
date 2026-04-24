@@ -1,3 +1,15 @@
+# Force PHP 8.4 for every .php request served out of this public/ tree.
+# Laravel 13 + the locked Symfony 8 packages need 8.4. Without this
+# directive, cPanel can serve requests through the account's default
+# PHP version (which may be 8.3 or older even when the CLI is 8.4),
+# and Composer's platform_check.php bails out with:
+#     "Your Composer dependencies require a PHP version >= 8.4.0".
+# AddHandler is the standard cPanel/EasyApache way to pin a per-vhost
+# PHP version per directory.
+<IfModule mime_module>
+    AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
