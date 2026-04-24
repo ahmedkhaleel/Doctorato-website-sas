@@ -87,7 +87,7 @@ onMounted(() => {
 <template>
     <section
         ref="heroRef"
-        class="relative min-h-screen flex flex-col overflow-hidden bg-[#0A1628]"
+        class="relative min-h-[78vh] md:min-h-[82vh] flex flex-col overflow-hidden bg-[#0A1628]"
     >
         <!-- Layer 1: Gradient Mesh Background -->
         <div class="absolute inset-0 hero-gradient-mesh" />
