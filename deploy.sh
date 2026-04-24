@@ -14,6 +14,18 @@
 
 set -euo pipefail
 
+# Ensure $HOME is set. When deploy.sh is spawned from the webhook's
+# background launch, the PHP-FPM child doesn't always forward $HOME
+# into the subprocess — composer then bails with "HOME or COMPOSER_HOME
+# must be set". Fall back to the passwd entry for the current uid.
+if [ -z "${HOME:-}" ]; then
+    export HOME="$(getent passwd "$(id -u)" | cut -d: -f6)"
+fi
+# COMPOSER_HOME keeps composer's cache + config out of the web root and
+# inside the user's dot-files directory.
+export COMPOSER_HOME="${COMPOSER_HOME:-$HOME/.composer}"
+mkdir -p "$COMPOSER_HOME"
+
 # Default APP_DIR to the script's own directory — no more guessing based
 # on conventional paths. Caller can still override with `APP_DIR=... bash
 # deploy.sh`. Works regardless of whether the Laravel app lives at
