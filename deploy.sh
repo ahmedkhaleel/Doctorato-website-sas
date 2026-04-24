@@ -33,16 +33,30 @@ log "pulling latest from origin/$BRANCH"
 git fetch --prune origin
 git reset --hard "origin/$BRANCH"
 
-# Some hosts ship composer as `composer`, some as `composer.phar`, some at
-# /usr/local/bin/composer. Try whichever is available.
-COMPOSER="$(command -v composer || echo /usr/local/bin/composer)"
-if [ ! -x "$COMPOSER" ] && [ ! -f "$COMPOSER" ]; then
-    log "composer not found on PATH; aborting"
+# cPanel shared hosts ship composer in many places. Probe for:
+#   1. `composer` on PATH
+#   2. /opt/cpanel/composer/bin/composer (cPanel's bundled copy)
+#   3. /usr/local/bin/composer
+#   4. A composer.phar shipped in the repo root
+# Fall back to running the .phar with php directly if nothing else exists.
+PHP_BIN="$(command -v php || echo /usr/local/bin/php)"
+COMPOSER_CMD=""
+if command -v composer >/dev/null 2>&1; then
+    COMPOSER_CMD="composer"
+elif [ -x /opt/cpanel/composer/bin/composer ]; then
+    COMPOSER_CMD="/opt/cpanel/composer/bin/composer"
+elif [ -x /usr/local/bin/composer ]; then
+    COMPOSER_CMD="/usr/local/bin/composer"
+elif [ -f "$APP_DIR/composer.phar" ]; then
+    COMPOSER_CMD="$PHP_BIN $APP_DIR/composer.phar"
+else
+    log "composer not found (no 'composer' binary or composer.phar); aborting"
     exit 1
 fi
+log "using composer: $COMPOSER_CMD"
 
 log "installing production PHP deps"
-"$COMPOSER" install --no-dev --optimize-autoloader --no-interaction
+$COMPOSER_CMD install --no-dev --optimize-autoloader --no-interaction
 
 log "entering maintenance mode"
 php artisan down || true
