@@ -23,11 +23,40 @@
  *   * * * * * [ -f ~/doctorato-website/storage/framework/.deploy-flag ] && rm ~/doctorato-website/storage/framework/.deploy-flag && bash ~/doctorato-website/deploy.sh >> ~/doctorato-website/storage/logs/deploy.log 2>&1
  */
 
-$SECRET = getenv('DEPLOY_WEBHOOK_SECRET') ?: 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
-$BRANCH = getenv('DEPLOY_BRANCH') ?: 'main';
 $APP_DIR = dirname(__DIR__); // public/ is inside the app root
 $FLAG = $APP_DIR . '/storage/framework/.deploy-flag';
 $LOG = $APP_DIR . '/storage/logs/deploy-webhook.log';
+
+/**
+ * Read a value directly from .env — the PHP-FPM process that serves
+ * this file doesn't necessarily have the .env variables in $_ENV /
+ * getenv(), so we parse the file ourselves. Only looks at the first
+ * matching line and strips quotes. Returns null if the key is absent.
+ */
+function readEnv(string $key, string $appDir): ?string {
+    $file = $appDir . '/.env';
+    if (!is_readable($file)) return null;
+    foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = ltrim($line);
+        if ($line === '' || $line[0] === '#') continue;
+        $eq = strpos($line, '=');
+        if ($eq === false) continue;
+        $k = trim(substr($line, 0, $eq));
+        if ($k !== $key) continue;
+        $v = trim(substr($line, $eq + 1));
+        // Strip surrounding single or double quotes if present.
+        if (strlen($v) >= 2 && ($v[0] === '"' || $v[0] === "'") && substr($v, -1) === $v[0]) {
+            $v = substr($v, 1, -1);
+        }
+        return $v;
+    }
+    return null;
+}
+
+$SECRET = readEnv('DEPLOY_WEBHOOK_SECRET', $APP_DIR)
+    ?: getenv('DEPLOY_WEBHOOK_SECRET')
+    ?: 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
+$BRANCH = readEnv('DEPLOY_BRANCH', $APP_DIR) ?: (getenv('DEPLOY_BRANCH') ?: 'main');
 
 function logline(string $msg, string $LOG): void {
     @file_put_contents($LOG, '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n", FILE_APPEND);
