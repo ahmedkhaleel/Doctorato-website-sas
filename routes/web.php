@@ -60,6 +60,10 @@ Route::get('/demo', [PageController::class, 'demo'])->name('demo');
 
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 
+// Legal pages — Inertia renders the bilingual content. Footer links here.
+Route::get('/privacy', fn () => \Inertia\Inertia::render('Privacy'))->name('privacy');
+Route::get('/terms', fn () => \Inertia\Inertia::render('Terms'))->name('terms');
+
 // Forms
 Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo.store')->middleware('throttle:3,1');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
