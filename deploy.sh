@@ -2,14 +2,13 @@
 #
 # Manual / webhook-triggered deploy for cPanel shared hosting.
 #
-# Run by hand:     bash ~/doctorato-website/deploy.sh
-# Run from cron:   * * * * * test -f /tmp/doctorato-deploy.flag && rm /tmp/doctorato-deploy.flag && bash ~/doctorato-website/deploy.sh >> ~/doctorato-website/storage/logs/deploy.log 2>&1
+# Run by hand:     bash ~/public_html/deploy.sh
+# Run from cron:   * * * * * [ -f ~/public_html/storage/framework/.deploy-flag ] && rm ~/public_html/storage/framework/.deploy-flag && bash ~/public_html/deploy.sh >> ~/public_html/storage/logs/deploy.log 2>&1
 # Run from webhook (see public/deploy.php).
 #
 # Expects:
 #   - Git remote `origin` already set to the GitHub repo.
 #   - .env, storage/, and public/build/ already live on the server.
-#   - composer available on $PATH (fallback: /usr/local/bin/composer).
 #
 # Exits non-zero on any step's failure so callers see a meaningful status.
 
@@ -44,13 +43,33 @@ log "pulling latest from origin/$BRANCH"
 git fetch --prune origin
 git reset --hard "origin/$BRANCH"
 
-# cPanel shared hosts ship composer in many places. Probe for:
-#   1. `composer` on PATH
-#   2. /opt/cpanel/composer/bin/composer (cPanel's bundled copy)
-#   3. /usr/local/bin/composer
-#   4. A composer.phar shipped in the repo root
-# Fall back to running the .phar with php directly if nothing else exists.
-PHP_BIN="$(command -v php || echo /usr/local/bin/php)"
+# PHP binary — prefer the cPanel ea-php84 build if present, since most
+# shared hosts ship an older `/usr/local/bin/php` (8.3 or lower) on the
+# CLI even when the account is configured for 8.4 on the web. Laravel 13
+# needs 8.4, so this matters. Override with `PHP_BIN=... bash deploy.sh`.
+PHP_BIN="${PHP_BIN:-}"
+if [ -z "$PHP_BIN" ]; then
+    for candidate in \
+        /opt/cpanel/ea-php84/root/usr/bin/php \
+        /opt/cpanel/ea-php83/root/usr/bin/php \
+        /opt/cpanel/ea-php82/root/usr/bin/php \
+        /usr/local/bin/php \
+        "$(command -v php 2>/dev/null)"; do
+        if [ -x "$candidate" ]; then
+            PHP_BIN="$candidate"
+            break
+        fi
+    done
+fi
+if [ -z "$PHP_BIN" ]; then
+    log "no PHP binary found; aborting"
+    exit 1
+fi
+log "using php: $PHP_BIN ($($PHP_BIN --version 2>&1 | head -1))"
+
+# Composer — probe the usual cPanel spots, then fall back to the
+# composer.phar in the repo root. Runs with whatever $PHP_BIN we chose
+# above so Composer and the app agree on the PHP version.
 COMPOSER_CMD=""
 if command -v composer >/dev/null 2>&1; then
     COMPOSER_CMD="composer"
@@ -70,24 +89,24 @@ log "installing production PHP deps"
 $COMPOSER_CMD install --no-dev --optimize-autoloader --no-interaction $COMPOSER_EXTRA_FLAGS
 
 log "entering maintenance mode"
-php artisan down || true
+$PHP_BIN artisan down || true
 
 log "running migrations"
-php artisan migrate --force
+$PHP_BIN artisan migrate --force
 
 log "ensuring storage symlink"
-php artisan storage:link || true
+$PHP_BIN artisan storage:link || true
 
 log "flushing + rebuilding caches"
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+$PHP_BIN artisan cache:clear
+$PHP_BIN artisan config:clear
+$PHP_BIN artisan route:clear
+$PHP_BIN artisan view:clear
+$PHP_BIN artisan config:cache
+$PHP_BIN artisan route:cache
+$PHP_BIN artisan view:cache
 
 log "leaving maintenance mode"
-php artisan up
+$PHP_BIN artisan up
 
 log "── deploy done ──"
