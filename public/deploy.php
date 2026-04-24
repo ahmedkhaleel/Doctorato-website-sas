@@ -103,24 +103,42 @@ if ($ref !== "refs/heads/$BRANCH") {
     reject(202, "Ignoring push to $ref (only $BRANCH deploys)", $LOG);
 }
 
-// 4. Drop a flag file; the cron picks it up on the next tick and runs
-//    deploy.sh. No shell exec from the web request — the trigger is just
-//    a filesystem write, which is safe on shared hosting and avoids
-//    PHP-FPM timeouts for long deploys.
-@mkdir(dirname($FLAG), 0775, true);
-$written = @file_put_contents($FLAG, json_encode([
-    'at' => date('c'),
-    'pusher' => $body['pusher']['name'] ?? null,
-    'commit' => substr($body['after'] ?? '', 0, 7),
-    'ref' => $ref,
-]));
+// 4. Trigger the deploy immediately — no cron wait.
+//    Strategy:
+//      a) Try to spawn deploy.sh as a detached background process so
+//         this request returns in milliseconds while deploy keeps
+//         running (nohup ... > log 2>&1 &).
+//      b) Always write a flag file too. If (a) is blocked by
+//         disable_functions or a picky shared-hosting setup, the cron
+//         picks up the flag within a minute — so we never lose a push.
+$pusher = $body['pusher']['name'] ?? 'unknown';
+$commit = substr($body['after'] ?? '', 0, 7);
 
-if ($written === false) {
-    reject(500, 'Could not write deploy flag', $LOG);
+// (a) Background spawn — runs in < 1 ms from the webhook's POV.
+$deployedInline = false;
+$deployScript = escapeshellarg($APP_DIR . '/deploy.sh');
+$deployLog    = escapeshellarg($APP_DIR . '/storage/logs/deploy.log');
+$cmd = "nohup bash $deployScript >> $deployLog 2>&1 < /dev/null &";
+
+// exec may be in disable_functions on some shared hosts — check first.
+$disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+if (function_exists('exec') && !in_array('exec', $disabled, true)) {
+    @exec($cmd, $__out, $__rc);
+    $deployedInline = ($__rc === 0);
 }
 
-logline("flag written — push by " . ($body['pusher']['name'] ?? 'unknown') .
-        " @ " . substr($body['after'] ?? '', 0, 7), $LOG);
+// (b) Flag-file fallback — the cron (if configured) picks this up.
+@mkdir(dirname($FLAG), 0775, true);
+@file_put_contents($FLAG, json_encode([
+    'at' => date('c'),
+    'pusher' => $pusher,
+    'commit' => $commit,
+    'ref' => $ref,
+    'inline_spawn' => $deployedInline,
+]));
+
+logline(($deployedInline ? 'spawned' : 'flagged') .
+        " — push by $pusher @ $commit", $LOG);
 
 http_response_code(202);
-echo "Deploy queued\n";
+echo $deployedInline ? "Deploy started\n" : "Deploy queued (cron)\n";
