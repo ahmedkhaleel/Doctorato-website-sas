@@ -9,7 +9,7 @@
  * home + demo. Skipped on checkout/success/admin routes.
  *
  * Offers a bumped discount ("15% extra على أول شهر") and a one-click
- * route to /start-trial so the visitor doesn't have to retype
+ * route to /demo so the visitor doesn't have to retype
  * anything they might already have open in the demo form.
  *
  * Sets a sessionStorage flag so the modal never nags the same
@@ -24,7 +24,7 @@ const page = usePage();
 
 const STORAGE_KEY = 'doctorato_exit_intent_shown';
 const TRIGGER_DELAY_MS = 8000; // minimum time on page before we're willing to intercept
-const SKIP_ROUTES = ['/checkout', '/start-trial', '/admin', '/payment', '/privacy', '/terms'];
+const SKIP_ROUTES = ['/checkout', '/demo', '/admin', '/payment', '/privacy', '/terms'];
 
 const isOpen = ref(false);
 const mountedAt = Date.now();
@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
                             <!-- CTAs -->
                             <div class="space-y-3">
                                 <Link
-                                    href="/start-trial"
+                                    href="/demo"
                                     class="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition"
                                     @click="close"
                                 >

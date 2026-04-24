@@ -290,8 +290,8 @@ const stats = computed(() => [
                     {{ tr('جرّب النظام مجاناً لمدة 14 يوم — بدون بطاقة ائتمان أو التزام', 'Try the system free for 14 days — no credit card, no commitment') }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link href="/start-trial" class="px-8 py-3.5 bg-gradient-to-br from-[#EC4899] to-[#A855F7] text-white font-bold rounded-full transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#EC4899]/30">
-                        {{ tr('ابدأ تجربتي مجاناً', 'Start my free trial') }}
+                    <Link href="/demo" class="px-8 py-3.5 bg-gradient-to-br from-[#EC4899] to-[#A855F7] text-white font-bold rounded-full transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#EC4899]/30">
+                        {{ tr('احجز عرضاً تجريبياً', 'Book a demo') }}
                     </Link>
                     <Link href="/pricing" class="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full backdrop-blur-sm border border-white/20 transition-all">
                         {{ tr('تعرّف على الأسعار', 'View pricing') }}

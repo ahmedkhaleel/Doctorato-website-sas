@@ -909,31 +909,22 @@ const homeJsonLd = computed(() => ({
                         </div>
                     </div>
 
-                    <!-- CTA below steps — primary self-serve + secondary book-demo -->
+                    <!-- CTA below steps — single demo CTA. The self-serve
+                         trial path was removed because the clinic system
+                         is provisioned manually on a separate hosting
+                         account, not auto-spun. -->
                     <div class="mt-14 text-center animate-fade-up" style="animation-delay: 500ms">
-                        <div class="inline-flex flex-col sm:flex-row items-center justify-center gap-3">
-                            <Link
-                                href="/start-trial"
-                                class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold text-sm shadow-xl shadow-[#C4A265]/30 hover:shadow-2xl hover:shadow-[#C4A265]/40 hover:-translate-y-0.5 transition-all duration-300"
-                            >
-                                <span class="relative flex h-2 w-2">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                                </span>
-                                <span>{{ locale === 'ar' ? 'ابدأ تجربتك فوراً' : 'Start your trial instantly' }}</span>
-                                <svg class="w-4 h-4 rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </Link>
-                            <Link
-                                href="/demo"
-                                class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border-2 border-[#1B4F72]/20 text-[#1B4F72] hover:border-[#1B4F72] hover:bg-[#1B4F72] hover:text-white font-semibold text-sm transition-all duration-300"
-                            >
-                                {{ locale === 'ar' ? 'أو احجز عرضاً مع فريقنا' : 'Or book a demo with our team' }}
-                            </Link>
-                        </div>
+                        <Link
+                            href="/demo"
+                            class="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#1B4F72] to-[#0D2B45] text-white font-bold text-sm shadow-xl shadow-[#1B4F72]/20 hover:shadow-2xl hover:shadow-[#1B4F72]/30 hover:-translate-y-0.5 transition-all duration-300"
+                        >
+                            <span>{{ locale === 'ar' ? 'ابدأ الآن مجاناً' : 'Start Now for Free' }}</span>
+                            <svg class="w-4 h-4 rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </Link>
                         <p class="text-xs text-gray-400 mt-3">
-                            {{ locale === 'ar' ? 'بدون بطاقة ائتمانية • 14 يوم مجاناً • إعداد فوري' : 'No credit card • 14 days free • instant setup' }}
+                            {{ locale === 'ar' ? 'لا حاجة لبطاقة ائتمانية • تجربة 15 يوم مجاناً' : 'No credit card needed • 15-day free trial' }}
                         </p>
                     </div>
                 </div>

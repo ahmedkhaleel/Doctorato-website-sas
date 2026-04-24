@@ -54,11 +54,10 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/demo', [PageController::class, 'demo'])->name('demo');
 
-// Self-serve free trial — no demo call required.
-Route::get('/start-trial', [\App\Http\Controllers\TrialController::class, 'show'])->name('trial.show');
-Route::post('/start-trial', [\App\Http\Controllers\TrialController::class, 'store'])->name('trial.store')->middleware('throttle:3,1');
-Route::get('/start-trial/success', [\App\Http\Controllers\TrialController::class, 'success'])->name('trial.success');
-Route::get('/start-trial/check', [\App\Http\Controllers\TrialController::class, 'checkSubdomain'])->name('trial.check');
+// Self-serve trial routes were removed — the clinic system is
+// provisioned manually on a separate hosting account, so a self-serve
+// signup form would mislead visitors. /demo is the canonical CTA.
+
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 
 // Forms
