@@ -1,11 +1,49 @@
 ---
+# cPanel Git Version Control deployment pipeline.
+#
+# How it fires:
+#   1. Add this repo in cPanel → Git Version Control → Create (URL = GitHub repo).
+#   2. Click "Update from Remote" to pull the latest main into the cPanel
+#      repository clone (usually ~/repositories/doctorato-website).
+#   3. Click "Deploy HEAD Commit" — cPanel runs the tasks below in order.
+#
+# Assumes the live Laravel app directory is ~/doctorato-website/ and
+# ~/public_html symlinks to ~/doctorato-website/public. Edit DEPLOYPATH
+# below if your host uses a different path.
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/%USER%/public_html
-    - /bin/cp -R . $DEPLOYPATH
-    - cd $DEPLOYPATH
-    - /usr/local/bin/php artisan migrate --force
-    - /usr/local/bin/php artisan config:cache
-    - /usr/local/bin/php artisan route:cache
-    - /usr/local/bin/php artisan view:cache
-    - /usr/local/bin/php artisan storage:link
+    - export DEPLOYPATH=$HOME/doctorato-website
+
+    # Mirror the freshly-pulled repo into the live app directory. rsync
+    # preserves timestamps, deletes removed files, and keeps .env +
+    # uploaded storage out of the way so local secrets/uploads survive.
+    - /usr/bin/rsync -a --delete --exclude=.git --exclude=node_modules --exclude=.env --exclude=storage/app --exclude=storage/framework/cache --exclude=storage/framework/sessions --exclude=storage/framework/views --exclude=storage/logs $HOME/repositories/doctorato-website/ $DEPLOYPATH/
+
+    # Put the site in maintenance mode so in-flight requests don't hit a
+    # half-migrated DB.
+    - cd $DEPLOYPATH && php artisan down || true
+
+    # Install production PHP deps.
+    - cd $DEPLOYPATH && composer install --no-dev --optimize-autoloader --no-interaction
+
+    # Apply pending migrations. --force bypasses the "are you sure" prompt.
+    - cd $DEPLOYPATH && php artisan migrate --force
+
+    # Idempotent — creates public/storage symlink if missing, noop otherwise.
+    - cd $DEPLOYPATH && php artisan storage:link || true
+
+    # Flush + rebuild caches so new config/routes/views take effect.
+    - cd $DEPLOYPATH && php artisan cache:clear
+    - cd $DEPLOYPATH && php artisan config:clear
+    - cd $DEPLOYPATH && php artisan route:clear
+    - cd $DEPLOYPATH && php artisan view:clear
+    - cd $DEPLOYPATH && php artisan config:cache
+    - cd $DEPLOYPATH && php artisan route:cache
+    - cd $DEPLOYPATH && php artisan view:cache
+
+    # Bring the site back online.
+    - cd $DEPLOYPATH && php artisan up
+
+    # Deploy log (tails into storage/logs so it's visible from the admin
+    # panel's Activity Logs page or SSH).
+    - date "+%F %T — cPanel deploy" >> $DEPLOYPATH/storage/logs/deploy.log

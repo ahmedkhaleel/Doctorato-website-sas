@@ -27,6 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'webhooks/paymob',
+            // public/deploy.php is called by GitHub with an HMAC
+            // signature, not a CSRF token — the path never actually
+            // hits Laravel's middleware because it's a raw .php file,
+            // but we list it here for clarity.
+            'deploy.php',
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
