@@ -182,21 +182,23 @@ function toggleModule(moduleValue) {
 </script>
 
 <template>
-    <section id="demo" class="py-20 bg-white">
+    <section id="demo" class="py-12 sm:py-16 lg:py-20 bg-white scroll-mt-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12 animate-fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">
+            <div class="text-center mb-8 sm:mb-12 animate-fade-up">
+                <p class="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#C4A265] mb-2">
+                    {{ locale === 'ar' ? 'املأ الفورم' : 'Fill the form' }}
+                </p>
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833] mb-3 leading-tight">
                     {{ $t('demo.title') }}
                 </h2>
-                <p class="text-lg text-gray max-w-2xl mx-auto">
+                <p class="text-sm sm:text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
                     {{ $t('demo.subtitle') }}
                 </p>
-                <div class="w-20 h-1 bg-secondary mx-auto mt-6 rounded-full"></div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start">
                 <!-- Form Side -->
-                <div class="bg-light-blue rounded-2xl p-6 sm:p-8 shadow-md animate-fade-up">
+                <div class="lg:col-span-3 bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 lg:p-8 shadow-xl border border-gray-100 animate-fade-up">
                     <!-- Success Message -->
                     <Transition
                         enter-active-class="transition duration-500 ease-out"
@@ -534,37 +536,38 @@ function toggleModule(moduleValue) {
                     </form>
                 </div>
 
-                <!-- Benefits Side -->
-                <div class="animate-fade-up">
-                    <h3 class="text-2xl font-bold text-dark mb-8">{{ $t('demo.why_try') }}</h3>
-                    <div class="space-y-6">
-                        <div
-                            v-for="(benefit, idx) in benefits"
-                            :key="idx"
-                            class="flex items-start gap-4"
-                        >
-                            <div class="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-dark font-medium">{{ benefit.text }}</p>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Benefits Side — sits next to the form on desktop, hidden
+                     on tablet/mobile so the form has room to breathe. -->
+                <aside class="hidden lg:block lg:col-span-2 animate-fade-up">
+                    <div class="lg:sticky lg:top-28 space-y-6">
+                        <h3 class="text-xl font-bold text-[#1C2833]">{{ $t('demo.why_try') }}</h3>
+                        <ul class="space-y-3.5">
+                            <li
+                                v-for="(benefit, idx) in benefits"
+                                :key="idx"
+                                class="flex items-start gap-3"
+                            >
+                                <span class="shrink-0 w-7 h-7 rounded-full bg-emerald-50 ring-1 ring-emerald-200 flex items-center justify-center mt-0.5">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </span>
+                                <p class="text-sm text-gray-700 leading-relaxed pt-1">{{ benefit.text }}</p>
+                            </li>
+                        </ul>
 
-                    <!-- Trust indicators -->
-                    <div class="mt-12 p-6 bg-light-gold rounded-2xl">
-                        <div class="flex items-center gap-3 mb-3">
-                            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                            <h4 class="text-lg font-bold text-dark">{{ $t('demo.trust_title') }}</h4>
+                        <!-- Trust card -->
+                        <div class="rounded-2xl p-5 bg-gradient-to-br from-light-gold/60 to-[#C4A265]/15 border border-[#C4A265]/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <h4 class="text-sm font-bold text-[#1C2833]">{{ $t('demo.trust_title') }}</h4>
+                            </div>
+                            <p class="text-xs text-gray-600 leading-relaxed">{{ $t('demo.trust_description') }}</p>
                         </div>
-                        <p class="text-sm text-gray leading-relaxed">{{ $t('demo.trust_description') }}</p>
                     </div>
-                </div>
+                </aside>
             </div>
         </div>
     </section>

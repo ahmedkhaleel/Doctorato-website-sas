@@ -1,322 +1,307 @@
 <script setup>
+/**
+ * /demo — request-a-demo page, mobile-first redesign.
+ *
+ * Hero gives a single hook + 3 promises, with a primary CTA that
+ * smooth-scrolls to the form. The DemoRequestForm component lives
+ * directly under it (no double hero, no buried form). After the form
+ * we show a compact "what your demo will cover" strip, light social
+ * proof, FAQ accordion, and a contact bar — every section optimized
+ * for thumb scrolling on phones.
+ */
 import MainLayout from '@/Layouts/MainLayout.vue';
 import DemoRequestForm from '@/Components/DemoRequestForm.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
 useScrollAnimation();
 
-const featureCategories = computed(() => [
-    {
-        key: 'clinic',
-        title: t('demo.cat_clinic_title'),
-        subtitle: t('demo.cat_clinic_subtitle'),
-        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />`,
-        features: [
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />`,
-                title: t('demo.feature_ehr_title'),
-                description: t('demo.feature_ehr_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
-                title: t('demo.feature_scheduling_title'),
-                description: t('demo.feature_scheduling_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />`,
-                title: t('demo.feature_crm_title'),
-                description: t('demo.feature_crm_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />`,
-                title: t('demo.feature_dental_title'),
-                description: t('demo.feature_dental_desc'),
-            },
-        ],
-    },
-    {
-        key: 'specialized',
-        title: t('demo.cat_specialized_title'),
-        subtitle: t('demo.cat_specialized_subtitle'),
-        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />`,
-        features: [
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />`,
-                title: t('demo.feature_telemedicine_title'),
-                description: t('demo.feature_telemedicine_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />`,
-                title: t('demo.feature_pediatrics_title'),
-                description: t('demo.feature_pediatrics_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />`,
-                title: t('demo.feature_patient_portal_title'),
-                description: t('demo.feature_patient_portal_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />`,
-                title: t('demo.feature_multiclinic_title'),
-                description: t('demo.feature_multiclinic_desc'),
-            },
-        ],
-    },
-    {
-        key: 'operations',
-        title: t('demo.cat_ops_title'),
-        subtitle: t('demo.cat_ops_subtitle'),
-        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />`,
-        features: [
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />`,
-                title: t('demo.feature_billing_title'),
-                description: t('demo.feature_billing_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />`,
-                title: t('demo.feature_hr_title'),
-                description: t('demo.feature_hr_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />`,
-                title: t('demo.feature_inventory_title'),
-                description: t('demo.feature_inventory_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />`,
-                title: t('demo.feature_insurance_title'),
-                description: t('demo.feature_insurance_desc'),
-            },
-        ],
-    },
-    {
-        key: 'tech',
-        title: t('demo.cat_tech_title'),
-        subtitle: t('demo.cat_tech_subtitle'),
-        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />`,
-        features: [
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />`,
-                title: t('demo.feature_security_title'),
-                description: t('demo.feature_security_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />`,
-                title: t('demo.feature_cloud_title'),
-                description: t('demo.feature_cloud_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />`,
-                title: t('demo.feature_mobile_title'),
-                description: t('demo.feature_mobile_desc'),
-            },
-            {
-                icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />`,
-                title: t('demo.feature_reports_title'),
-                description: t('demo.feature_reports_desc'),
-            },
-        ],
-    },
+// What the demo will actually cover — kept tight (4 items) so the
+// section reads in one phone screen.
+const agenda = computed(() => isAr.value ? [
+    { icon: '🩺', title: 'تعرّف على عيادتك', body: 'نسأل عن تخصصك وحجم العيادة، ونرتّب العرض حول احتياجاتك تحديداً.' },
+    { icon: '🖥️', title: 'جولة حية في النظام', body: 'نشاركك الشاشة ونمشي على المسارات اليومية: الحجز، السجلات، الفواتير.' },
+    { icon: '💡', title: 'أسئلة وأجوبة', body: 'مساحة مفتوحة لكل استفساراتك التقنية والتجارية — بدون عجلة.' },
+    { icon: '💰', title: 'خطة سعرية واضحة', body: 'نحسبلك الباقة المناسبة بسعر بلدك مع الإعداد والتدريب المحاسب.' },
+] : [
+    { icon: '🩺', title: 'Get to know your clinic', body: 'We ask about your specialty and clinic size, then tailor the demo around your real needs.' },
+    { icon: '🖥️', title: 'Live system walkthrough', body: 'We share our screen and run through the daily flows: booking, records, billing.' },
+    { icon: '💡', title: 'Q&A', body: 'Open space for every technical and business question — no rush.' },
+    { icon: '💰', title: 'Clear pricing plan', body: 'We compute the right plan for your country, with onboarding + training included.' },
 ]);
+
+const benefits = computed(() => isAr.value ? [
+    'تجربة مجانية 14 يوم',
+    'بدون بطاقة ائتمان',
+    'إعداد كامل لفريقك',
+    'دعم باللغة العربية',
+] : [
+    '14-day free trial',
+    'No credit card required',
+    'Full team onboarding',
+    'Arabic-first support',
+]);
+
+const stats = computed(() => [
+    { value: '+200', label: isAr.value ? 'عيادة نشطة' : 'Active clinics' },
+    { value: '12', label: isAr.value ? 'دولة' : 'Countries' },
+    { value: '99.9%', label: isAr.value ? 'استقرار' : 'Uptime' },
+    { value: '24/7', label: isAr.value ? 'دعم فني' : 'Support' },
+]);
+
+const faqs = computed(() => isAr.value ? [
+    { q: 'كم يستغرق العرض التجريبي؟', a: 'عادةً 30-45 دقيقة، حسب حجم عيادتك وعدد الأسئلة. نمشي بإيقاعك مش بإيقاعنا.' },
+    { q: 'هل يوجد التزام مالي للحجز؟', a: 'لا. العرض مجاني تماماً ولا يلزمك بأي اشتراك. حتى التجربة المجانية بعده 14 يوم بدون بطاقة ائتمان.' },
+    { q: 'في أي وقت ممكن نحدّد الموعد؟', a: 'مرونة كاملة — نحجز معاك في أي يوم من السبت للخميس بين 9 صباحاً و8 مساءً (بتوقيت عيادتك).' },
+    { q: 'هل يدعم النظام تخصصي؟', a: 'نخدم عيادات الأسنان، الجلدية والتجميل، طب الأطفال، النساء، العظام، القلب، أنف وأذن وحنجرة، العيون، والمتعدد التخصصات.' },
+    { q: 'كم عدد الأطباء اللي يستوعبهم النظام؟', a: 'من طبيب واحد لأكثر من 100 طبيب. الباقات مرنة وتتوسع مع نمو عيادتك.' },
+] : [
+    { q: 'How long does the demo take?', a: 'Typically 30-45 minutes, depending on your clinic size and questions. We move at your pace, not ours.' },
+    { q: 'Is there any commitment to book?', a: 'None. The demo is completely free with no obligation. Even the trial after it is 14 days, no credit card required.' },
+    { q: 'When can we schedule it?', a: 'Full flexibility — Saturdays through Thursdays, 9 AM to 8 PM in your clinic\'s timezone.' },
+    { q: 'Does the system support my specialty?', a: 'We serve dentistry, dermatology + cosmetics, pediatrics, OB-GYN, orthopedics, cardiology, ENT, ophthalmology, and multi-specialty clinics.' },
+    { q: 'How many doctors can the system handle?', a: 'From 1 doctor to 100+ doctors. Plans are flexible and scale with your clinic\'s growth.' },
+]);
+
+// FAQ open/close state — single open at a time for cleaner mobile UX.
+const openFaq = ref(null);
+function toggleFaq(idx) {
+    openFaq.value = openFaq.value === idx ? null : idx;
+}
 </script>
 
 <template>
-    <Head :title="t('demo.page_title')" />
+    <Head :title="t('demo.page_title') || (isAr ? 'احجز عرضاً تجريبياً' : 'Book a demo')" />
     <MainLayout>
-        <!-- Hero Section -->
-        <section class="relative pt-32 pb-24 md:pt-40 md:pb-28 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
-            <!-- Background pattern -->
+        <!-- ─── Hero ─────────────────────────────────────────────── -->
+        <section class="relative pt-28 pb-16 sm:pt-32 sm:pb-20 md:pt-40 md:pb-24 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
+            <!-- backdrop -->
             <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+            <div class="absolute -top-20 -start-20 w-72 h-72 sm:w-96 sm:h-96 bg-[#C4A265]/15 rounded-full blur-[120px]"></div>
+            <div class="absolute -bottom-20 -end-20 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-[#2471A3]/20 rounded-full blur-[120px]"></div>
 
-            <!-- Glow orbs -->
-            <div class="absolute top-20 -start-20 w-96 h-96 bg-[#C4A265]/15 rounded-full blur-[120px]"></div>
-            <div class="absolute -bottom-10 -end-20 w-[28rem] h-[28rem] bg-[#2471A3]/20 rounded-full blur-[120px]"></div>
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#C4A265]/5 rounded-full blur-[100px]"></div>
+            <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <!-- Live pill -->
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 backdrop-blur-sm ring-1 ring-emerald-400/30 mb-5 sm:mb-6 animate-fade-up">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                    </span>
+                    <span class="text-xs sm:text-sm text-emerald-200 font-semibold">
+                        {{ isAr ? 'متاحون اليوم — نرد خلال ساعة عمل' : 'Available today · we reply within 1 business hour' }}
+                    </span>
+                </div>
 
-            <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <!-- Live badge -->
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/[0.12] mb-6 animate-fade-up">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-                        </span>
-                        <span class="text-sm text-white/80 font-medium">{{ t('demo.hero_badge') }}</span>
-                    </div>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-5 animate-fade-up leading-tight">
+                    {{ isAr ? 'شوف دكتوراتو في عيادتك،' : 'See Doctorato in your clinic,' }}
+                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#C4A265] to-[#D4B876]">
+                        {{ isAr ? 'قبل ما تدفع جنيه' : 'before you pay a dollar' }}
+                    </span>
+                </h1>
 
-                    <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 animate-fade-up leading-tight">
-                        {{ t('demo.hero_title') }}
-                    </h1>
-                    <p class="text-base md:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-10 animate-fade-up">
-                        {{ t('demo.hero_subtitle') }}
-                    </p>
+                <p class="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 animate-fade-up">
+                    {{ isAr
+                        ? 'عرض حي مع فريقنا — نمشي على النظام بكامل تفاصيله، نجاوب على كل أسئلتك، ونرتّب لك تجربة مجانية 14 يوم بعدها مباشرة.'
+                        : 'A live walkthrough with our team — we run through every detail, answer your questions, and set up a 14-day free trial right after.' }}
+                </p>
 
-                    <!-- Inline stats -->
-                    <div class="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto mb-10 animate-fade-up">
-                        <div class="text-center">
-                            <div class="text-2xl md:text-4xl font-extrabold text-[#C4A265] mb-1 tabular-nums">+200</div>
-                            <div class="text-[11px] md:text-xs text-white/60 uppercase tracking-wider">{{ t('demo.hero_stat_clinics') }}</div>
-                        </div>
-                        <div class="text-center border-x border-white/10">
-                            <div class="text-2xl md:text-4xl font-extrabold text-[#C4A265] mb-1 tabular-nums">12</div>
-                            <div class="text-[11px] md:text-xs text-white/60 uppercase tracking-wider">{{ t('demo.hero_stat_countries') }}</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl md:text-4xl font-extrabold text-[#C4A265] mb-1 tabular-nums">99.9%</div>
-                            <div class="text-[11px] md:text-xs text-white/60 uppercase tracking-wider">{{ t('demo.hero_stat_uptime') }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Scroll CTA -->
-                    <a
-                        href="#demo"
-                        class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold text-sm shadow-lg shadow-[#C4A265]/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 animate-fade-up"
+                <!-- Inline benefits chip row -->
+                <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-7 sm:mb-9 animate-fade-up">
+                    <span
+                        v-for="(b, idx) in benefits"
+                        :key="idx"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-sm border border-white/[0.1] text-xs sm:text-sm text-white/85"
                     >
-                        {{ t('demo.hero_scroll_cta') }}
-                        <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
-                    </a>
+                        {{ b }}
+                    </span>
+                </div>
+
+                <!-- CTA -->
+                <a
+                    href="#demo"
+                    class="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold text-sm sm:text-base shadow-xl shadow-[#C4A265]/25 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 animate-fade-up"
+                >
+                    {{ isAr ? 'املأ الفورم في 60 ثانية' : 'Fill the form in 60 seconds' }}
+                    <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </a>
+
+                <!-- Stats row -->
+                <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl mx-auto mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-white/10 animate-fade-up">
+                    <div v-for="s in stats" :key="s.label" class="text-center">
+                        <div class="text-lg sm:text-2xl md:text-3xl font-extrabold text-[#C4A265] tabular-nums">{{ s.value }}</div>
+                        <div class="text-[9px] sm:text-[11px] md:text-xs text-white/55 uppercase tracking-wider mt-0.5">{{ s.label }}</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Bottom wave/fade -->
-            <div class="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-light-blue to-transparent"></div>
+            <!-- Soft fade into next section -->
+            <div class="absolute bottom-0 inset-x-0 h-16 sm:h-24 bg-gradient-to-t from-light-blue to-transparent"></div>
         </section>
 
-        <!-- Features Overview -->
-        <section class="relative py-20 bg-gradient-to-b from-light-blue via-white to-light-blue overflow-hidden">
-            <!-- Decorative background -->
-            <div class="absolute inset-0 pointer-events-none opacity-40">
-                <div class="absolute top-10 start-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
-                <div class="absolute bottom-10 end-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
-            </div>
-
-            <div class="relative container mx-auto px-4">
-                <div class="max-w-7xl mx-auto">
-                    <!-- Section heading -->
-                    <div class="text-center mb-14 animate-fade-up">
-                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-                            <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                            {{ t('demo.features_badge') }}
-                        </div>
-                        <h2 class="text-3xl md:text-4xl font-bold text-dark mb-3">
-                            {{ t('demo.features_title') }}
-                        </h2>
-                        <p class="text-gray max-w-2xl mx-auto">
-                            {{ t('demo.features_subtitle') }}
-                        </p>
-                    </div>
-
-                    <!-- Categories -->
-                    <div class="space-y-14">
-                        <div
-                            v-for="(category, cIdx) in featureCategories"
-                            :key="category.key"
-                            class="animate-fade-up"
-                        >
-                            <!-- Category header -->
-                            <div class="flex items-center gap-4 mb-6">
-                                <div class="relative shrink-0">
-                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
-                                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="category.icon"></svg>
-                                    </div>
-                                    <div class="absolute -top-1 -end-1 w-5 h-5 rounded-full bg-secondary text-white text-[10px] font-bold flex items-center justify-center shadow-md">
-                                        {{ cIdx + 1 }}
-                                    </div>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="text-xl md:text-2xl font-bold text-dark">{{ category.title }}</h3>
-                                    <p class="text-sm text-gray">{{ category.subtitle }}</p>
-                                </div>
-                                <div class="hidden md:block flex-1 h-px bg-gradient-to-r from-primary/20 via-secondary/20 to-transparent"></div>
-                            </div>
-
-                            <!-- Features grid -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                                <div
-                                    v-for="(feature, fIdx) in category.features"
-                                    :key="fIdx"
-                                    class="group relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/20 transition-all duration-500 overflow-hidden"
-                                >
-                                    <!-- Gold accent line -->
-                                    <div class="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                                    <!-- Icon -->
-                                    <div class="relative mb-4">
-                                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="feature.icon"></svg>
-                                        </div>
-                                    </div>
-
-                                    <h4 class="font-bold text-dark mb-2 group-hover:text-primary transition-colors">{{ feature.title }}</h4>
-                                    <p class="text-gray text-sm leading-relaxed">{{ feature.description }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stats bar -->
-                    <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 p-6 md:p-8 rounded-3xl bg-gradient-to-br from-primary to-primary-dark text-white shadow-2xl shadow-primary/20 animate-fade-up">
-                        <div class="text-center">
-                            <div class="text-3xl md:text-4xl font-bold text-secondary mb-1">800+</div>
-                            <div class="text-xs md:text-sm text-white/70 uppercase tracking-wide">{{ t('demo.stat_features') }}</div>
-                        </div>
-                        <div class="text-center border-s border-white/10">
-                            <div class="text-3xl md:text-4xl font-bold text-secondary mb-1">6</div>
-                            <div class="text-xs md:text-sm text-white/70 uppercase tracking-wide">{{ t('demo.stat_portals') }}</div>
-                        </div>
-                        <div class="text-center border-s border-white/10">
-                            <div class="text-3xl md:text-4xl font-bold text-secondary mb-1">95+</div>
-                            <div class="text-xs md:text-sm text-white/70 uppercase tracking-wide">{{ t('demo.stat_modules') }}</div>
-                        </div>
-                        <div class="text-center border-s border-white/10">
-                            <div class="text-3xl md:text-4xl font-bold text-secondary mb-1">24/7</div>
-                            <div class="text-xs md:text-sm text-white/70 uppercase tracking-wide">{{ t('demo.stat_support') }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Demo Request Form (full-page usage) -->
+        <!-- ─── Demo request form ─────────────────────────────────── -->
         <DemoRequestForm />
 
-        <!-- Bottom CTA -->
-        <section class="py-16 bg-light-blue">
-            <div class="container mx-auto px-4 text-center animate-fade-up">
-                <div class="max-w-2xl mx-auto">
-                    <h2 class="text-2xl font-bold text-dark mb-4">{{ t('demo.bottom_title') }}</h2>
-                    <p class="text-gray mb-4">{{ t('demo.bottom_subtitle') }}</p>
-                    <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-sm text-gray">
-                        <a href="tel:+201012967285" class="flex items-center gap-2 hover:text-primary transition-colors">
-                            <span class="text-lg leading-none">🇪🇬</span>
-                            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            <span dir="ltr">+20 101 296 7285</span>
-                        </a>
-                        <span class="text-gray-light hidden sm:inline">|</span>
-                        <a href="tel:+971557961688" class="flex items-center gap-2 hover:text-primary transition-colors">
-                            <span class="text-lg leading-none">🇦🇪</span>
-                            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            <span dir="ltr">+971 55 796 1688</span>
-                        </a>
-                        <span class="text-gray-light hidden sm:inline">|</span>
-                        <a href="mailto:info@markeza-group.com" class="flex items-center gap-2 hover:text-primary transition-colors">
-                            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            <span dir="ltr">info@markeza-group.com</span>
-                        </a>
+        <!-- ─── What your demo will cover ─────────────────────────── -->
+        <section class="py-14 sm:py-20 bg-gradient-to-b from-light-blue/40 via-white to-white">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-8 sm:mb-12 animate-fade-up">
+                    <p class="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#C4A265] mb-2">
+                        {{ isAr ? 'أجندة العرض' : 'Demo agenda' }}
+                    </p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833]">
+                        {{ isAr ? 'إيه اللي بتشوفه في الـ 30 دقيقة؟' : 'What you\'ll see in 30 minutes' }}
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    <article
+                        v-for="(item, idx) in agenda"
+                        :key="idx"
+                        class="group relative bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-up"
+                    >
+                        <div class="flex items-start gap-3 sm:gap-4">
+                            <span class="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-light-blue/60 to-light-gold/40 ring-1 ring-[#C4A265]/20 flex items-center justify-center text-xl sm:text-2xl">
+                                {{ item.icon }}
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-baseline gap-2 mb-1">
+                                    <span class="text-[11px] font-mono text-[#C4A265] font-bold">{{ String(idx + 1).padStart(2, '0') }}</span>
+                                    <h3 class="text-base sm:text-lg font-bold text-[#1C2833]">{{ item.title }}</h3>
+                                </div>
+                                <p class="text-sm text-gray-600 leading-relaxed">{{ item.body }}</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── FAQ ───────────────────────────────────────────────── -->
+        <section class="py-14 sm:py-20 bg-light-blue/30">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-8 sm:mb-12 animate-fade-up">
+                    <p class="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#C4A265] mb-2">
+                        {{ isAr ? 'أسئلة شائعة' : 'Common questions' }}
+                    </p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833]">
+                        {{ isAr ? 'قبل ما تحجز' : 'Before you book' }}
+                    </h2>
+                </div>
+
+                <div class="space-y-3 animate-fade-up">
+                    <div
+                        v-for="(f, idx) in faqs"
+                        :key="idx"
+                        class="bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all"
+                        :class="openFaq === idx ? 'shadow-lg ring-1 ring-[#C4A265]/30' : 'shadow-sm'"
+                    >
+                        <button
+                            type="button"
+                            @click="toggleFaq(idx)"
+                            class="w-full flex items-center justify-between gap-3 px-5 py-4 sm:px-6 sm:py-5 text-start"
+                            :aria-expanded="openFaq === idx"
+                        >
+                            <span class="text-sm sm:text-base font-bold text-[#1C2833] leading-snug flex-1">{{ f.q }}</span>
+                            <span
+                                class="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all"
+                                :class="openFaq === idx ? 'bg-[#C4A265] text-white rotate-45' : 'bg-gray-100 text-gray-500'"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </span>
+                        </button>
+                        <Transition
+                            enter-active-class="transition-all duration-300 ease-out"
+                            enter-from-class="opacity-0 max-h-0"
+                            enter-to-class="opacity-100 max-h-96"
+                            leave-active-class="transition-all duration-200 ease-in"
+                            leave-from-class="opacity-100 max-h-96"
+                            leave-to-class="opacity-0 max-h-0"
+                        >
+                            <div v-if="openFaq === idx" class="px-5 pb-5 sm:px-6 sm:pb-6 -mt-1">
+                                <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-4"></div>
+                                <p class="text-sm sm:text-base text-gray-600 leading-relaxed">{{ f.a }}</p>
+                            </div>
+                        </Transition>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── Contact strip — phone-friendly tap targets ────────── -->
+        <section class="py-12 sm:py-16 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] text-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-6 sm:mb-8 animate-fade-up">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold mb-2">
+                        {{ isAr ? 'مفضّل تتواصل مباشرة؟' : 'Prefer to reach us directly?' }}
+                    </h2>
+                    <p class="text-sm sm:text-base text-white/60">
+                        {{ isAr ? 'اختر الطريقة اللي تريحك — نرد خلال ساعة عمل' : 'Pick your channel — we reply within 1 business hour' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-fade-up">
+                    <!-- WhatsApp Egypt -->
+                    <a
+                        href="https://wa.me/201012967285"
+                        target="_blank"
+                        rel="noopener"
+                        class="group flex items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/20 hover:border-emerald-400/40 transition-all duration-300"
+                    >
+                        <span class="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-300 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] uppercase tracking-widest text-white/50 font-bold">WhatsApp 🇪🇬</p>
+                            <p class="text-sm font-semibold text-white truncate" dir="ltr">+20 101 296 7285</p>
+                        </div>
+                    </a>
+
+                    <!-- WhatsApp UAE -->
+                    <a
+                        href="https://wa.me/971557961688"
+                        target="_blank"
+                        rel="noopener"
+                        class="group flex items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/20 hover:border-emerald-400/40 transition-all duration-300"
+                    >
+                        <span class="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-300 group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] uppercase tracking-widest text-white/50 font-bold">WhatsApp 🇦🇪</p>
+                            <p class="text-sm font-semibold text-white truncate" dir="ltr">+971 55 796 1688</p>
+                        </div>
+                    </a>
+
+                    <!-- Email -->
+                    <a
+                        href="mailto:info@markeza-group.com"
+                        class="group flex items-center gap-3 p-4 rounded-2xl bg-[#C4A265]/10 hover:bg-[#C4A265]/20 border border-[#C4A265]/20 hover:border-[#C4A265]/40 transition-all duration-300"
+                    >
+                        <span class="shrink-0 w-11 h-11 rounded-xl bg-[#C4A265]/20 flex items-center justify-center text-[#C4A265] group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] uppercase tracking-widest text-white/50 font-bold">{{ isAr ? 'البريد' : 'Email' }}</p>
+                            <p class="text-sm font-semibold text-white truncate" dir="ltr">info@markeza-group.com</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </section>
