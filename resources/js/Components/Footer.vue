@@ -92,17 +92,17 @@ const trustBadges = computed(() => [
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24rem] h-[24rem] rounded-full bg-[#2E86C1]/15 blur-[120px] footer-aurora" style="animation-delay: -16s"></div>
         </div>
 
-        <!-- ─── Layer 5 — diagonal grid (drifts) ─── -->
-        <div class="absolute inset-0 footer-diagonal-grid pointer-events-none"></div>
+        <!-- ─── Layer 5 — diagonal grid (drifts) — desktop only to save mobile battery + reduce visual noise on small screens ─── -->
+        <div class="absolute inset-0 footer-diagonal-grid pointer-events-none hidden sm:block"></div>
 
         <!-- ──────────── Content ──────────── -->
         <div class="relative">
-            <!-- Tagline bar — sits above the columns to add hierarchy -->
+            <!-- Tagline bar — centered stack on mobile, side-by-side on desktop -->
             <div class="border-b border-white/[0.06]">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
-                        <div class="flex items-center gap-3 sm:gap-4">
-                            <div class="relative">
+                        <div class="flex flex-col sm:flex-row items-center text-center sm:text-start gap-3 sm:gap-4 w-full sm:w-auto">
+                            <div class="relative shrink-0">
                                 <div class="absolute inset-0 rounded-2xl bg-[#C4A265]/20 blur-xl footer-pulse"></div>
                                 <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/20">
                                     <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -110,10 +110,10 @@ const trustBadges = computed(() => [
                                     </svg>
                                 </div>
                             </div>
-                            <div>
-                                <p class="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#C4A265] font-bold">{{ isAr ? 'مهمتنا' : 'Our mission' }}</p>
-                                <p class="text-sm sm:text-base font-semibold text-white/90">
-                                    {{ isAr ? 'تحويل العيادات الطبية للعصر الرقمي — بكفاءة وأمان وحب' : 'Bringing clinics into the digital age — with care, security, and craft' }}
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#C4A265] font-bold mb-0.5">{{ isAr ? 'مهمتنا' : 'Our mission' }}</p>
+                                <p class="text-xs sm:text-base font-semibold text-white/90 leading-snug">
+                                    {{ isAr ? 'تحويل العيادات الطبية للعصر الرقمي — بكفاءة وأمان' : 'Clinics in the digital age — efficient, secure, beautiful' }}
                                 </p>
                             </div>
                         </div>
@@ -130,20 +130,21 @@ const trustBadges = computed(() => [
                 </div>
             </div>
 
-            <!-- Main columns -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12">
-                    <!-- Brand + about + social — wider column -->
-                    <div class="md:col-span-12 lg:col-span-4 footer-fade" style="--delay: 0ms">
-                        <Link href="/" class="inline-block mb-5 group">
-                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-40 h-auto logo-white group-hover:scale-105 transition-transform duration-300" />
+            <!-- Main columns — 2-col on mobile (link blocks side-by-side),
+                 12-col on md+ for full layout flexibility. -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+                <div class="grid grid-cols-2 md:grid-cols-12 gap-8 sm:gap-10 lg:gap-12">
+                    <!-- Brand + about + social — full width on mobile, centered. -->
+                    <div class="col-span-2 md:col-span-12 lg:col-span-4 footer-fade text-center md:text-start" style="--delay: 0ms">
+                        <Link href="/" class="inline-block mb-4 sm:mb-5 group">
+                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 sm:w-40 h-auto logo-white group-hover:scale-105 transition-transform duration-300" />
                         </Link>
-                        <p class="text-white/55 text-sm leading-relaxed mb-6 max-w-md">
+                        <p class="text-white/55 text-sm leading-relaxed mb-5 sm:mb-6 max-w-md mx-auto md:mx-0">
                             {{ $t('footer.description') }}
                         </p>
 
-                        <!-- Social icons — pop with brand color on hover -->
-                        <div class="flex items-center gap-2.5">
+                        <!-- Social icons — centered on mobile -->
+                        <div class="flex items-center justify-center md:justify-start gap-2 sm:gap-2.5">
                             <a
                                 v-for="social in socialLinks"
                                 :key="social.name"
@@ -154,7 +155,6 @@ const trustBadges = computed(() => [
                                 class="group relative w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:scale-110 overflow-hidden"
                                 :style="{ '--brand-color': social.color }"
                             >
-                                <!-- Animated brand-color sweep on hover -->
                                 <span class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" :style="{ background: social.color }"></span>
                                 <svg class="relative w-4 h-4 fill-current text-white/70 group-hover:text-white transition-colors" viewBox="0 0 24 24">
                                     <path :d="social.icon" />
@@ -163,8 +163,8 @@ const trustBadges = computed(() => [
                         </div>
                     </div>
 
-                    <!-- Product links -->
-                    <div class="md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 100ms">
+                    <!-- Product links — 1/2 width on mobile (side-by-side with Support) -->
+                    <div class="col-span-1 md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 100ms">
                         <h4 class="relative inline-flex items-center gap-2 mb-5 text-base font-bold text-white">
                             <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
                             {{ $t('footer.quick_links') }}
@@ -182,8 +182,8 @@ const trustBadges = computed(() => [
                         </ul>
                     </div>
 
-                    <!-- Company links -->
-                    <div class="md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 200ms">
+                    <!-- Company links — 1/2 width on mobile -->
+                    <div class="col-span-1 md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 200ms">
                         <h4 class="relative inline-flex items-center gap-2 mb-5 text-base font-bold text-white">
                             <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
                             {{ $t('footer.support') }}
@@ -201,8 +201,8 @@ const trustBadges = computed(() => [
                         </ul>
                     </div>
 
-                    <!-- Newsletter — featured card with glowing border -->
-                    <div class="md:col-span-4 lg:col-span-4 footer-fade" style="--delay: 300ms">
+                    <!-- Newsletter — full width on mobile, 1/3 on md, 1/3 on lg -->
+                    <div class="col-span-2 md:col-span-4 lg:col-span-4 footer-fade" style="--delay: 300ms">
                         <div class="relative rounded-2xl p-5 sm:p-6 bg-white/[0.03] border border-white/[0.08] overflow-hidden footer-newsletter-card">
                             <!-- Soft glow behind card -->
                             <div class="absolute -top-10 -end-10 w-32 h-32 rounded-full bg-[#C4A265]/15 blur-3xl pointer-events-none"></div>
@@ -214,22 +214,24 @@ const trustBadges = computed(() => [
                             <p class="text-xs sm:text-sm text-white/55 mb-4 leading-relaxed">{{ $t('footer.newsletter_desc') }}</p>
 
                             <form @submit.prevent="submitNewsletter" class="space-y-2.5">
-                                <div class="relative flex items-stretch gap-2 rounded-xl">
+                                <!-- Stack vertically on mobile so each touch target is full-width
+                                     and easy to tap with a thumb. Inline on sm+ for compactness. -->
+                                <div class="flex flex-col sm:flex-row gap-2 sm:gap-2 rounded-xl">
                                     <input
                                         v-model="newsletterForm.email"
                                         type="email"
                                         required
                                         :placeholder="$t('footer.email_placeholder')"
-                                        class="flex-1 min-w-0 px-3.5 py-2.5 rounded-lg bg-white/[0.06] border border-white/[0.12] text-white placeholder-white/35 text-sm focus:border-[#C4A265]/60 focus:bg-white/[0.10] focus:ring-2 focus:ring-[#C4A265]/20 outline-none transition-all"
+                                        class="w-full sm:flex-1 sm:min-w-0 px-3.5 py-3 sm:py-2.5 rounded-lg bg-white/[0.06] border border-white/[0.12] text-white placeholder-white/35 text-sm focus:border-[#C4A265]/60 focus:bg-white/[0.10] focus:ring-2 focus:ring-[#C4A265]/20 outline-none transition-all"
                                         dir="ltr"
                                     />
                                     <button
                                         type="submit"
                                         :disabled="newsletterForm.processing"
-                                        class="group inline-flex items-center justify-center px-4 sm:px-5 py-2.5 bg-gradient-to-r from-[#C4A265] to-[#D4B876] hover:shadow-lg hover:shadow-[#C4A265]/25 text-white text-sm font-bold rounded-lg transition-all duration-300 disabled:opacity-50 hover:-translate-y-0.5"
+                                        class="group inline-flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 sm:px-5 py-3 sm:py-2.5 bg-gradient-to-r from-[#C4A265] to-[#D4B876] hover:shadow-lg hover:shadow-[#C4A265]/25 text-white text-sm font-bold rounded-lg transition-all duration-300 disabled:opacity-50 hover:-translate-y-0.5"
                                     >
-                                        <span class="hidden sm:inline">{{ $t('footer.subscribe') }}</span>
-                                        <svg class="w-4 h-4 sm:hidden rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <span>{{ $t('footer.subscribe') }}</span>
+                                        <svg class="w-4 h-4 rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                         </svg>
                                     </button>
@@ -256,47 +258,49 @@ const trustBadges = computed(() => [
                 </div>
             </div>
 
-            <!-- Trust strip — sits between main + bottom bar -->
+            <!-- Trust strip — 3-col grid on mobile (2 rows of 3), inline on desktop -->
             <div class="border-t border-white/[0.06] bg-black/30 backdrop-blur-sm">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                    <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+                    <div class="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 gap-y-3">
                         <div
                             v-for="badge in trustBadges"
                             :key="badge.label"
-                            class="group flex items-center gap-1.5 text-white/55 hover:text-white/95 transition-colors"
+                            class="group flex items-center justify-center gap-1.5 text-white/55 hover:text-white/95 transition-colors"
                         >
-                            <span v-if="badge.live" class="relative flex h-2 w-2">
+                            <span v-if="badge.live" class="relative flex h-2 w-2 shrink-0">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                             </span>
-                            <svg v-else class="w-3.5 h-3.5 sm:w-4 sm:h-4" :class="badge.color" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg v-else class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" :class="badge.color" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="badge.icon" />
                             </svg>
-                            <span class="text-[11px] sm:text-xs font-semibold tracking-wide whitespace-nowrap">{{ badge.label }}</span>
+                            <span class="text-[10px] sm:text-xs font-semibold tracking-wide whitespace-nowrap">{{ badge.label }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom bar -->
+            <!-- Bottom bar — center on mobile, split on desktop -->
             <div class="border-t border-white/[0.06]">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-white/45">
-                        <p class="flex items-center gap-2 text-center sm:text-start">
-                            <span>&copy; {{ new Date().getFullYear() }} Doctorato</span>
-                            <span class="text-white/20">·</span>
-                            <span>{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
-                            <span class="hidden sm:inline text-white/20">·</span>
-                            <span class="hidden sm:inline">{{ $t('footer.rights') }}</span>
-                        </p>
-                        <div class="flex items-center gap-5">
+                        <!-- Privacy/terms shown FIRST on mobile (smaller, but more important
+                             for visitors looking for legal). Copyright second, broken across
+                             two lines on small screens to fit. -->
+                        <div class="flex items-center gap-4 sm:gap-5 order-1 sm:order-2">
                             <Link href="/privacy" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.privacy') }}</Link>
                             <span class="w-px h-3 bg-white/15"></span>
                             <Link href="/terms" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.terms') }}</Link>
                         </div>
+                        <p class="text-center sm:text-start text-[11px] sm:text-sm leading-relaxed order-2 sm:order-1">
+                            <span class="block sm:inline">&copy; {{ new Date().getFullYear() }} Doctorato</span>
+                            <span class="hidden sm:inline text-white/20"> · </span>
+                            <span class="block sm:inline">{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
+                        </p>
                     </div>
                 </div>
             </div>
+
         </div>
     </footer>
 </template>
