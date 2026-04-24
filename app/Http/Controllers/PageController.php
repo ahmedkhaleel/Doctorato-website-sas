@@ -23,6 +23,11 @@ class PageController extends Controller
         return Inertia::render('Dental');
     }
 
+    public function dermatology()
+    {
+        return Inertia::render('Dermatology');
+    }
+
     public function pediatrics()
     {
         return Inertia::render('Pediatrics');

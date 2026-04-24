@@ -340,7 +340,7 @@ const homeJsonLd = computed(() => ({
                         </span>
                     </div>
                     <h2 class="text-3xl md:text-5xl font-extrabold text-[#1C2833] mb-4 leading-tight">
-                        {{ locale === 'ar' ? 'نظام واحد، 3 تخصّصات جاهزة' : 'One platform, 3 ready-made specialties' }}
+                        {{ locale === 'ar' ? 'نظام واحد، 4 تخصّصات جاهزة' : 'One platform, 4 ready-made specialties' }}
                     </h2>
                     <p class="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
                         {{ locale === 'ar'
@@ -349,8 +349,51 @@ const homeJsonLd = computed(() => ({
                     </p>
                 </div>
 
-                <!-- 3 spotlight cards -->
-                <div class="grid md:grid-cols-3 gap-6 animate-stagger">
+                <!-- 4 spotlight cards: Dermatology (flagship) + Dental + Pediatrics + Telemedicine -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 animate-stagger">
+                    <!-- Dermatology & Cosmetics — flagship specialty (rose→fuchsia accent) -->
+                    <Link
+                        href="/dermatology"
+                        class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1A0B2E] via-[#0D1B3E] to-[#0A1628] text-white p-8 border border-white/10 hover:border-[#EC4899]/40 hover:-translate-y-1 transition-all duration-500 shadow-lg"
+                    >
+                        <div class="absolute -top-24 -end-24 w-64 h-64 bg-[#EC4899]/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                        <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="hx-derma" x="0" y="0" width="48" height="56" patternUnits="userSpaceOnUse">
+                                    <polygon points="24,2 44,14 44,42 24,54 4,42 4,14" fill="none" stroke="white" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#hx-derma)"/>
+                        </svg>
+
+                        <!-- Flagship badge -->
+                        <div class="absolute top-5 end-5 px-2.5 py-1 rounded-full bg-[#EC4899]/20 border border-[#EC4899]/30 text-[#F9A8D4] text-[10px] font-bold uppercase tracking-widest">
+                            {{ locale === 'ar' ? 'الأساسي' : 'Flagship' }}
+                        </div>
+
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center mb-5 shadow-lg shadow-[#EC4899]/30 group-hover:rotate-6 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-extrabold mb-2">
+                                {{ locale === 'ar' ? 'الجلدية والتجميل' : 'Dermatology & Cosmetics' }}
+                            </h3>
+                            <p class="text-white/60 text-sm leading-relaxed mb-5">
+                                {{ locale === 'ar'
+                                    ? 'صور قبل/بعد احترافية، باقات جلسات ليزر وفيلر، موافقات رقمية، مخزون منتجات، وتحليلات بالإجراء.'
+                                    : 'Pro before/after galleries, laser and filler packages, digital consents, product inventory, and per-procedure analytics.' }}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-[#F9A8D4] text-sm font-bold group-hover:gap-3 transition-all">
+                                {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </Link>
+
                     <!-- Dental System -->
                     <Link
                         href="/dental"
