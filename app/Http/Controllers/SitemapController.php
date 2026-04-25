@@ -41,6 +41,10 @@ class SitemapController extends Controller
         ['path' => '/sa', 'priority' => '0.95', 'freq' => 'monthly'],
         ['path' => '/ae', 'priority' => '0.95', 'freq' => 'monthly'],
         ['path' => '/eg', 'priority' => '0.95', 'freq' => 'monthly'],
+        ['path' => '/kw', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/qa', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/bh', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/om', 'priority' => '0.9', 'freq' => 'monthly'],
     ];
 
     public function index(): Response
