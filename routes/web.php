@@ -60,6 +60,11 @@ Route::get('/demo', [PageController::class, 'demo'])->name('demo');
 
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 
+// SEO landing pages — Inertia renders bilingual content with FAQ + schema.
+// Targeted at high-intent keyword queries (EMR Arabic, Medical CRM, etc).
+Route::get('/emr', fn () => \Inertia\Inertia::render('Emr'))->name('emr');
+Route::get('/medical-crm', fn () => \Inertia\Inertia::render('MedicalCrm'))->name('medical-crm');
+
 // Legal pages — Inertia renders the bilingual content. Footer links here.
 Route::get('/privacy', fn () => \Inertia\Inertia::render('Privacy'))->name('privacy');
 Route::get('/terms', fn () => \Inertia\Inertia::render('Terms'))->name('terms');

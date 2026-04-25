@@ -1,5 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
+import RelatedModules from '@/Components/RelatedModules.vue';
 import SectionTitle from '@/Components/SectionTitle.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
@@ -749,5 +750,6 @@ const notificationFeatures = computed(() => [
                 </div>
             </div>
         </section>
+            <RelatedModules current="dental" />
     </MainLayout>
 </template>

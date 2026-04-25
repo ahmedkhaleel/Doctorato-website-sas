@@ -11,6 +11,7 @@
  * filler, botox runs), product inventory, consent forms.
  */
 import MainLayout from '@/Layouts/MainLayout.vue';
+import RelatedModules from '@/Components/RelatedModules.vue';
 import SeoHead from '@/Components/SeoHead.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
@@ -299,5 +300,6 @@ const stats = computed(() => [
                 </div>
             </div>
         </section>
+            <RelatedModules current="dermatology" />
     </MainLayout>
 </template>
