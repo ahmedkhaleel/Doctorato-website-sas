@@ -907,7 +907,14 @@
         "back_to_blog": "العودة للمدونة",
         "breadcrumb_home": "الرئيسية",
         "breadcrumb_blog": "المدونة",
-        "categories": "الفئات"
+        "categories": "الفئات",
+        "toc_title": "محتويات المقال",
+        "cta_title": "جاهز تشوف Doctorato بنفسك؟",
+        "cta_subtitle": "احجز عرض توضيحي مجاني (15 دقيقة) أو احسب الـ ROI لعيادتك بأرقامك الفعلية.",
+        "cta_demo": "احجز عرض توضيحي مجاني",
+        "cta_roi": "حاسبة ROI",
+        "sticky_cta_title": "جرّب Doctorato",
+        "sticky_cta_subtitle": "عرض توضيحي مجاني 15 دقيقة. شوف بنفسك إزاي بيشتغل في عيادتك."
     },
     "currency": {
         "select": "اختر العملة",

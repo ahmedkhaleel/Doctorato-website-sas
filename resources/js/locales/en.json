@@ -891,7 +891,14 @@
         "back_to_blog": "Back to Blog",
         "breadcrumb_home": "Home",
         "breadcrumb_blog": "Blog",
-        "categories": "Categories"
+        "categories": "Categories",
+        "toc_title": "Table of contents",
+        "cta_title": "Ready to see Doctorato in action?",
+        "cta_subtitle": "Book a free 15-minute demo, or run the ROI calculator on your clinic's real numbers.",
+        "cta_demo": "Book a free demo",
+        "cta_roi": "ROI calculator",
+        "sticky_cta_title": "Try Doctorato",
+        "sticky_cta_subtitle": "Free 15-minute demo. See exactly how it fits your clinic."
     },
     "currency": {
         "select": "Select Currency",

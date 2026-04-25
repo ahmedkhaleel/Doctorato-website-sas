@@ -74,6 +74,53 @@ const wordCount = computed(() => {
     return plain ? plain.split(' ').length : 0;
 });
 
+// Estimated reading time. Arabic readers are slightly slower (~180 wpm)
+// vs English (~225 wpm) for technical content; round up to 1 minute min.
+const readingTime = computed(() => {
+    if (props.post.reading_time) return props.post.reading_time;
+    const wpm = isRtl.value ? 180 : 225;
+    return Math.max(1, Math.ceil(wordCount.value / wpm));
+});
+
+// Build a slug from a heading's text — used as both the anchor id and
+// the TOC link target. Strips HTML, normalises whitespace, and keeps
+// Arabic letters intact.
+function slugifyHeading(text) {
+    return (text || '')
+        .replace(/<[^>]*>/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s ]+/g, '-')
+        .replace(/[^؀-ۿa-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 80) || 'heading';
+}
+
+// Walk the rendered HTML, extract every H2, and inject a deterministic
+// id so the table of contents can scroll-link to it. We compute both
+// the anchored HTML and the TOC list in one pass so they stay in sync.
+const processedContent = computed(() => {
+    const raw = content.value || '';
+    if (!raw) return { html: '', toc: [] };
+    const seen = new Map();
+    const toc = [];
+    const html = raw.replace(/<h2(\s[^>]*)?>([\s\S]*?)<\/h2>/gi, (match, attrs = '', inner) => {
+        let slug = slugifyHeading(inner);
+        const count = seen.get(slug) || 0;
+        seen.set(slug, count + 1);
+        if (count > 0) slug = `${slug}-${count + 1}`;
+        toc.push({ id: slug, text: inner.replace(/<[^>]*>/g, '').trim() });
+        // Preserve any pre-existing attributes (e.g. class) and add id.
+        const existingAttrs = (attrs || '').replace(/\sid="[^"]*"/i, '');
+        return `<h2${existingAttrs} id="${slug}">${inner}</h2>`;
+    });
+    return { html, toc };
+});
+
+const renderedContent = computed(() => processedContent.value.html);
+const tableOfContents = computed(() => processedContent.value.toc);
+
 // Resolve absolute URLs at SSR-safe time. window only exists in the
 // browser; on the server we fall back to the canonical app URL via
 // the inertia page props (set by app.blade.php as a meta tag).
@@ -187,11 +234,11 @@ const articleJsonLd = computed(() => ({
                             </svg>
                             {{ formatDate(post.published_at || post.created_at) }}
                         </span>
-                        <span v-if="post.reading_time" class="flex items-center gap-2">
+                        <span class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {{ post.reading_time }} {{ t('blog.min_read') }}
+                            {{ readingTime }} {{ t('blog.min_read') }}
                         </span>
                     </div>
                 </div>
@@ -214,39 +261,62 @@ const articleJsonLd = computed(() => ({
             <div class="container mx-auto px-4">
                 <div class="max-w-4xl mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                        <!-- Share Sidebar (desktop) -->
-                        <aside class="hidden lg:block lg:col-span-1">
-                            <div class="sticky top-24 space-y-3">
-                                <p class="text-xs text-gray font-medium mb-2">{{ t('blog.share') }}</p>
-                                <a
-                                    v-for="link in shareLinks"
-                                    :key="link.name"
-                                    :href="link.url"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    :aria-label="link.name"
-                                    class="w-10 h-10 bg-light-blue text-gray rounded-xl flex items-center justify-center transition-all duration-300 hover:text-white"
-                                    :class="link.color"
-                                >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" :d="link.icon" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </aside>
-
                         <!-- Content -->
-                        <article class="lg:col-span-11">
+                        <article class="lg:col-span-8">
+                            <!-- Inline TOC for mobile (desktop has the sidebar version) -->
+                            <nav
+                                v-if="tableOfContents.length > 1"
+                                class="lg:hidden mb-8 p-5 bg-light-blue rounded-xl"
+                                :aria-label="t('blog.toc_title')"
+                            >
+                                <p class="text-sm font-bold text-dark mb-3">{{ t('blog.toc_title') }}</p>
+                                <ol class="space-y-1.5 text-sm">
+                                    <li v-for="(item, i) in tableOfContents" :key="item.id">
+                                        <a
+                                            :href="`#${item.id}`"
+                                            class="text-secondary hover:text-primary transition-colors flex items-start gap-2"
+                                        >
+                                            <span class="text-gray text-xs mt-0.5">{{ i + 1 }}.</span>
+                                            <span>{{ item.text }}</span>
+                                        </a>
+                                    </li>
+                                </ol>
+                            </nav>
                             <div
                                 class="prose prose-lg max-w-none text-dark
                                     prose-headings:text-dark prose-headings:font-bold
+                                    prose-h2:scroll-mt-24
                                     prose-a:text-secondary prose-a:no-underline hover:prose-a:underline
                                     prose-img:rounded-xl prose-img:shadow-md
                                     prose-blockquote:border-s-4 prose-blockquote:border-secondary prose-blockquote:bg-light-blue prose-blockquote:rounded-e-xl prose-blockquote:py-2 prose-blockquote:px-4
                                     prose-code:bg-light-blue prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+                                    prose-table:w-full prose-th:bg-light-blue prose-th:p-3 prose-td:p-3 prose-td:border-t prose-td:border-gray-light/20
                                     animate-fade-up"
-                                v-html="content"
+                                v-html="renderedContent"
                             ></div>
+
+                            <!-- Inline CTA — fires after the article body to convert engaged readers -->
+                            <div class="mt-12 p-6 md:p-8 bg-gradient-to-br from-primary to-primary-dark rounded-2xl text-white animate-fade-up">
+                                <h3 class="text-xl md:text-2xl font-bold mb-3">{{ t('blog.cta_title') }}</h3>
+                                <p class="text-white/85 mb-5 text-sm md:text-base">{{ t('blog.cta_subtitle') }}</p>
+                                <div class="flex flex-wrap gap-3">
+                                    <Link
+                                        href="/demo"
+                                        class="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold rounded-full hover:bg-light-blue transition-colors"
+                                    >
+                                        {{ t('blog.cta_demo') }}
+                                        <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </Link>
+                                    <Link
+                                        href="/roi-calculator"
+                                        class="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white font-bold rounded-full border border-white/30 hover:bg-white/20 transition-colors"
+                                    >
+                                        {{ t('blog.cta_roi') }}
+                                    </Link>
+                                </div>
+                            </div>
 
                             <!-- Tags -->
                             <div v-if="post.tags?.length" class="mt-10 pt-6 border-t border-gray-light/20 animate-fade-up">
@@ -262,7 +332,7 @@ const articleJsonLd = computed(() => ({
                                 </div>
                             </div>
 
-                            <!-- Share (mobile) -->
+                            <!-- Share (mobile + tablet) -->
                             <div class="lg:hidden mt-8 pt-6 border-t border-gray-light/20 animate-fade-up">
                                 <p class="text-sm font-medium text-dark mb-3">{{ t('blog.share') }}</p>
                                 <div class="flex gap-3">
@@ -283,6 +353,69 @@ const articleJsonLd = computed(() => ({
                                 </div>
                             </div>
                         </article>
+
+                        <!-- Sidebar (desktop only): TOC + share + sticky CTA -->
+                        <aside class="hidden lg:block lg:col-span-4">
+                            <div class="sticky top-24 space-y-6">
+                                <!-- Table of contents -->
+                                <nav
+                                    v-if="tableOfContents.length > 1"
+                                    class="p-5 bg-light-blue rounded-xl"
+                                    :aria-label="t('blog.toc_title')"
+                                >
+                                    <p class="text-sm font-bold text-dark mb-3 flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+                                        </svg>
+                                        {{ t('blog.toc_title') }}
+                                    </p>
+                                    <ol class="space-y-1.5 text-sm max-h-[40vh] overflow-y-auto pr-1">
+                                        <li v-for="(item, i) in tableOfContents" :key="item.id">
+                                            <a
+                                                :href="`#${item.id}`"
+                                                class="text-secondary hover:text-primary transition-colors flex items-start gap-2 leading-snug"
+                                            >
+                                                <span class="text-gray text-xs mt-0.5 shrink-0">{{ i + 1 }}.</span>
+                                                <span>{{ item.text }}</span>
+                                            </a>
+                                        </li>
+                                    </ol>
+                                </nav>
+
+                                <!-- Sticky CTA: convert engaged readers without disrupting flow -->
+                                <div class="p-5 bg-gradient-to-br from-primary to-primary-dark rounded-xl text-white">
+                                    <p class="font-bold mb-1.5 text-base">{{ t('blog.sticky_cta_title') }}</p>
+                                    <p class="text-white/85 text-xs mb-4 leading-relaxed">{{ t('blog.sticky_cta_subtitle') }}</p>
+                                    <Link
+                                        href="/demo"
+                                        class="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white text-primary text-sm font-bold rounded-full hover:bg-light-blue transition-colors"
+                                    >
+                                        {{ t('blog.cta_demo') }}
+                                    </Link>
+                                </div>
+
+                                <!-- Share -->
+                                <div>
+                                    <p class="text-xs text-gray font-medium mb-2">{{ t('blog.share') }}</p>
+                                    <div class="flex gap-2">
+                                        <a
+                                            v-for="link in shareLinks"
+                                            :key="link.name"
+                                            :href="link.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            :aria-label="link.name"
+                                            class="w-10 h-10 bg-light-blue text-gray rounded-xl flex items-center justify-center transition-all duration-300 hover:text-white"
+                                            :class="link.color"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" :d="link.icon" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
                     </div>
                 </div>
             </div>
