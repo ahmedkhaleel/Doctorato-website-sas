@@ -61,7 +61,11 @@ class CountryDetector
     protected function fromCloudflare(Request $request): ?string
     {
         $cf = $request->header('CF-IPCountry');
-        return ($cf && strlen($cf) === 2 && $cf !== 'XX') ? $cf : null;
+        // XX = unknown, T1 = Tor exit, EU = aggregated continent — all unusable
+        // for pricing decisions. Fall through to ip-api.com lookup instead.
+        return ($cf && strlen($cf) === 2 && !in_array($cf, ['XX', 'T1', 'EU'], true))
+            ? $cf
+            : null;
     }
 
     protected function fromIpLookup(Request $request): ?string

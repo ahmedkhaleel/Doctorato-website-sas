@@ -19,6 +19,19 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
         ]);
 
+        // Trust Cloudflare (and any other proxy in front of the app) so
+        // request()->ip() returns the real visitor IP and request()->isSecure()
+        // honours the original HTTPS scheme. '*' is permissive — once the
+        // Cloudflare front-door is the only path, switch this to the
+        // pinned Cloudflare IP list at https://www.cloudflare.com/ips-v4
+        $middleware->trustProxies(at: '*', headers:
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_AWS_ELB
+        );
+
         // Register the per-permission gate so route definitions can use
         // ->middleware('admin.perm:plans.manage') etc.
         $middleware->alias([
