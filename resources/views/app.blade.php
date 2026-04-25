@@ -89,6 +89,8 @@
     <link rel="alternate" hreflang="ar" href="{{ $canonical }}">
     <link rel="alternate" hreflang="en" href="{{ $canonical }}">
     <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
+    {{-- RSS autodiscovery — feed readers and Google/Bing will find this --}}
+    <link rel="alternate" type="application/rss+xml" title="Doctorato Blog RSS" href="{{ url('/blog/rss.xml') }}">
 
     {{-- Open Graph --}}
     <meta property="og:site_name" content="{{ $siteName }}" head-key="og:site_name">

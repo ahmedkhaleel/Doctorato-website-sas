@@ -34,3 +34,6 @@ Crawl-delay: 0
 Sitemap: https://doctorato.com/sitemap-index.xml
 Sitemap: https://doctorato.com/sitemap.xml
 Sitemap: https://doctorato.com/sitemap-images.xml
+# RSS feed — Google treats RSS/Atom as a lightweight sitemap and pulls
+# new posts faster than the regular crawl cadence.
+Sitemap: https://doctorato.com/blog/rss.xml

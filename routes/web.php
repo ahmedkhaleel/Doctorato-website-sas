@@ -80,6 +80,10 @@ Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsle
 
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+// RSS feed — Google/Bing pull this for faster indexing of new posts.
+// Must be defined BEFORE the {slug} route or '/blog/rss.xml' would be
+// matched as a slug.
+Route::get('/blog/rss.xml', [BlogController::class, 'rss'])->name('blog.rss');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Case Studies
