@@ -66,6 +66,8 @@ Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 // Targeted at high-intent keyword queries (EMR Arabic, Medical CRM, etc).
 Route::get('/emr', fn () => \Inertia\Inertia::render('Emr'))->name('emr');
 Route::get('/medical-crm', fn () => \Inertia\Inertia::render('MedicalCrm'))->name('medical-crm');
+Route::get('/glossary', fn () => \Inertia\Inertia::render('Glossary'))->name('glossary');
+Route::get('/compare', fn () => \Inertia\Inertia::render('Compare'))->name('compare');
 
 // Legal pages — Inertia renders the bilingual content. Footer links here.
 Route::get('/privacy', fn () => \Inertia\Inertia::render('Privacy'))->name('privacy');

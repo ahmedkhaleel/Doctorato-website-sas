@@ -119,6 +119,11 @@
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://connect.facebook.net">
+    {{-- WhatsApp + payment gateway prefetch — saves time on the most-
+         clicked outbound destinations from any conversion CTA. --}}
+    <link rel="dns-prefetch" href="https://wa.me">
+    <link rel="dns-prefetch" href="https://accept.paymob.com">
+    <link rel="dns-prefetch" href="https://www.youtube.com">
 
     {{-- Preload the hero logo so it ships in the same network round-trip
          as the HTML. This used to render after the main bundle, hurting

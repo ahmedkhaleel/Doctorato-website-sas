@@ -24,6 +24,8 @@ class SitemapController extends Controller
         // High-priority SEO landing pages — keyword-targeted for organic search.
         ['path' => '/emr', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/medical-crm', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/glossary', 'priority' => '0.85', 'freq' => 'monthly'],
+        ['path' => '/compare', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/about', 'priority' => '0.7', 'freq' => 'monthly'],
         ['path' => '/contact', 'priority' => '0.7', 'freq' => 'monthly'],
         ['path' => '/demo', 'priority' => '0.95', 'freq' => 'weekly'],

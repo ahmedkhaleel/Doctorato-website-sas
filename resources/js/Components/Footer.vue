@@ -51,6 +51,8 @@ const companyLinks = [
     { label: 'nav.technology', href: '/technology' },
     { label: 'nav.reports', href: '/reports' },
     { label: 'nav.blog', href: '/blog' },
+    { label: 'footer.link_glossary', href: '/glossary', fallback: { ar: 'قاموس المصطلحات', en: 'Glossary' } },
+    { label: 'footer.link_compare', href: '/compare', fallback: { ar: 'مقارنة بالمنافسين', en: 'Compare alternatives' } },
 ];
 
 const socialLinks = [
@@ -195,7 +197,7 @@ const trustBadges = computed(() => [
                                     class="group inline-flex items-center gap-1.5 text-sm text-white/55 hover:text-white transition-colors"
                                 >
                                     <span class="w-0 group-hover:w-2 h-px bg-[#C4A265] transition-all duration-300"></span>
-                                    <span>{{ $t(link.label) }}</span>
+                                    <span>{{ linkLabel(link) }}</span>
                                 </Link>
                             </li>
                         </ul>
