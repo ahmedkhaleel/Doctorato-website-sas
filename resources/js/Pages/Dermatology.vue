@@ -108,8 +108,8 @@ const stats = computed(() => [
 
 <template>
     <SeoHead
-        :title="tr('نظام إدارة عيادات الجلدية والتجميل', 'Dermatology & Cosmetic Clinic System')"
-        :description="tr('نظام متخصص لعيادات الجلدية والتجميل: سجلات جلدية، صور قبل/بعد، باقات جلسات، موافقات رقمية، مخزون منتجات، وتحليلات بالإجراء.', 'Specialized clinic system for dermatology and aesthetics: skin records, before/after photos, session packages, digital consents, product inventory, and revenue analytics per procedure.')"
+        :title="tr('نظام إدارة عيادات الجلدية والتجميل | برنامج عيادة تجميل وليزر — دكتوراتو', 'Dermatology & Cosmetic Clinic Software | Best Aesthetic CRM — Doctorato')"
+        :description="tr('أفضل نظام إدارة لعيادات الجلدية والتجميل والليزر: خرائط جلد تفاعلية، أرشيف صور قبل/بعد، بروتوكولات بوتكس وفيلر معتمدة، باقات جلسات، موافقات رقمية، مخزون منتجات، وتحليلات بالإجراء. جرّب 14 يوم مجاناً.', 'The leading dermatology + cosmetic clinic software: interactive skin maps, before/after photo archive, approved Botox/filler/laser protocols, session packages, digital consents, product inventory, per-procedure analytics. 14-day free trial.')"
     />
 
     <MainLayout>

@@ -117,8 +117,8 @@ const useCases = computed(() => [
 
 <template>
     <SeoHead
-        :title="tr('خدمة الاستشارات الأون لاين', 'Online Consultations')"
-        :description="tr('خدمة الاستشارات الطبية عن بُعد من دكتوراتو: مكالمات فيديو HD، وصفات إلكترونية، دفع فوري، سجل طبي متزامن، تذكيرات ذكية.', 'Doctorato telemedicine: HD video consultations, digital prescriptions, instant payments, live-synced medical records, smart reminders.')"
+        :title="tr('استشارات طبية اون لاين | منصة Telemedicine للعيادات — دكتوراتو', 'Telemedicine Platform for Clinics | Online Consultations — Doctorato')"
+        :description="tr('منصة الاستشارات الطبية عن بُعد الأولى في الشرق الأوسط: مكالمات فيديو HD آمنة، وصفات إلكترونية موقّعة رقمياً، دفع فوري بالبطاقة قبل الجلسة، تكامل كامل مع السجل الطبي، تذكيرات ذكية. جرّب 14 يوم مجاناً.', 'The leading telemedicine platform for Middle East clinics: secure HD video, digitally signed e-prescriptions, instant card payment before sessions, full EMR integration, smart reminders. 14-day free trial.')"
     />
 
     <MainLayout>

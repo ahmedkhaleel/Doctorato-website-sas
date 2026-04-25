@@ -75,7 +75,11 @@
     {{-- Title + description (Inertia pages override via <Head>) --}}
     <title inertia>{{ $defaultTitle }}</title>
     <meta name="description" content="{{ $defaultDescription }}" head-key="description">
-    <meta name="keywords" content="نظام إدارة عيادات، برنامج عيادات، نظام حجز مواعيد، إدارة مرضى، فواتير طبية، طب أسنان، CRM عيادات، clinic management, medical software, dental software, Doctorato">
+    {{-- Keyword pool — covers AR + EN, all specialties, all GCC + EG markets,
+         all major intent groups (CRM/EMR/EHR/booking/billing). Search engines
+         de-prioritise the "keywords" tag for ranking but use it as a relevance
+         signal in some markets, and ad networks (Bing) still consult it. --}}
+    <meta name="keywords" content="نظام إدارة عيادات، برنامج إدارة العيادات، نظام عيادات أسنان، برنامج عيادة أسنان، برنامج عيادات أطفال، نظام عيادة جلدية، نظام تجميل وجلدية، استشارات طبية اون لاين، telemedicine عربي، EMR عربي، EHR للعيادات، سجلات طبية إلكترونية، نظام مواعيد عيادة، فواتير طبية، CRM عيادات، نظام إدارة مرضى، برنامج محاسبة عيادات، نظام إدارة عيادات السعودية، نظام عيادات الإمارات، نظام عيادات مصر، أفضل نظام عيادات، clinic management software, clinic management system, dental clinic software, pediatric clinic software, dermatology clinic software, cosmetic clinic software, EMR software, EHR system, telemedicine platform, medical CRM, healthcare appointment system, multi-branch clinic software, HIPAA-compliant clinic, GCC clinic software, Doctorato">
     <meta name="author" content="Markeza Group">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
     <meta name="theme-color" content="#1B4F72">

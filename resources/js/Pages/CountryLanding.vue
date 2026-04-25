@@ -49,31 +49,62 @@ const startingPrice = computed(() => {
     return sorted[0];
 });
 
-// Structured data — a LocalBusiness schema tied to the country
-// improves local-SEO rankings and enables rich cards in SERPs.
-const ldJson = computed(() => ({
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'Doctorato',
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
-    areaServed: {
-        '@type': 'Country',
-        name: props.market.name_en,
-        identifier: props.market.country_code,
-    },
-    offers: props.plans.map(p => ({
-        '@type': 'Offer',
-        name: locale.value === 'ar' ? p.name_ar : p.name_en,
-        price: String(p.monthly_price),
-        priceCurrency: p.currency,
-    })),
-    aggregateRating: props.testimonials.length ? {
-        '@type': 'AggregateRating',
-        ratingValue: (props.testimonials.reduce((s, t) => s + Number(t.rating || 5), 0) / props.testimonials.length).toFixed(1),
-        reviewCount: props.testimonials.length,
-    } : undefined,
-}));
+// Structured data — emit BOTH SoftwareApplication AND LocalBusiness.
+// LocalBusiness is the schema Google's local-pack picks up on country
+// SERPs; SoftwareApplication keeps the rich product card. The two are
+// emitted as a @graph so we don't double-claim the same URL.
+const ldJson = computed(() => {
+    const avgRating = props.testimonials.length
+        ? (props.testimonials.reduce((s, t) => s + Number(t.rating || 5), 0) / props.testimonials.length).toFixed(1)
+        : null;
+
+    return {
+        '@context': 'https://schema.org',
+        '@graph': [
+            // Software product
+            {
+                '@type': 'SoftwareApplication',
+                '@id': `https://doctorato.com/${props.market.country_code.toLowerCase()}#software`,
+                name: 'Doctorato',
+                applicationCategory: 'BusinessApplication',
+                operatingSystem: 'Web',
+                areaServed: { '@type': 'Country', name: props.market.name_en, identifier: props.market.country_code },
+                offers: props.plans.map(p => ({
+                    '@type': 'Offer',
+                    name: locale.value === 'ar' ? p.name_ar : p.name_en,
+                    price: String(p.monthly_price),
+                    priceCurrency: p.currency,
+                })),
+                ...(avgRating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: avgRating, reviewCount: props.testimonials.length } } : {}),
+            },
+            // Local business — primary signal for Google Maps + local pack
+            {
+                '@type': 'LocalBusiness',
+                '@id': `https://doctorato.com/${props.market.country_code.toLowerCase()}#business`,
+                name: `Doctorato — ${props.market.name_en}`,
+                description: locale.value === 'ar' ? props.market.hero_subtitle_ar : props.market.hero_subtitle_en,
+                url: `https://doctorato.com/${props.market.country_code.toLowerCase()}`,
+                telephone: props.market.phone,
+                priceRange: '$$',
+                areaServed: { '@type': 'Country', name: props.market.name_en, identifier: props.market.country_code },
+                address: {
+                    '@type': 'PostalAddress',
+                    addressCountry: props.market.country_code,
+                },
+                openingHours: 'Mo-Sa 09:00-20:00',
+                ...(avgRating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: avgRating, reviewCount: props.testimonials.length } } : {}),
+            },
+            // Breadcrumb so the country page reads as a section, not a stub
+            {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                    { '@type': 'ListItem', position: 1, name: 'Doctorato', item: 'https://doctorato.com' },
+                    { '@type': 'ListItem', position: 2, name: props.market.name_en, item: `https://doctorato.com/${props.market.country_code.toLowerCase()}` },
+                ],
+            },
+        ],
+    };
+});
 </script>
 
 <template>

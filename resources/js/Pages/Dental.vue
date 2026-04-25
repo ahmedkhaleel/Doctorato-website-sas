@@ -108,8 +108,8 @@ const notificationFeatures = computed(() => [
 
 <template>
     <SeoHead
-        :title="t('dental_page.page_title')"
-        :description="t('dental_page.hero_subtitle') || 'وحدة طب الأسنان المتكاملة: مخطط أسنان تفاعلي، علاجات، تركيبات، تقويم'"
+        :title="t('dental_page.page_title') || 'نظام إدارة عيادات الأسنان | برنامج عيادة أسنان احترافي — دكتوراتو'"
+        :description="t('dental_page.hero_subtitle') || 'أفضل نظام إدارة عيادات الأسنان في السعودية ومصر والإمارات: مخطط أسنان تفاعلي FDI، خطط علاج، أشعة، مختبرات، تقويم، تركيبات، فوترة وتأمين. جرّب Doctorato مجاناً 14 يوم.'"
     />
     <MainLayout>
         <!-- ============================================================ -->

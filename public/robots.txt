@@ -1,3 +1,6 @@
+# robots.txt for Doctorato — clinic management SaaS
+# Allow all major search bots, restrict admin + checkout + webhook noise.
+
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -5,8 +8,27 @@ Disallow: /admin/*
 Disallow: /checkout
 Disallow: /checkout/*
 Disallow: /webhooks/*
+Disallow: /deploy.php
+Disallow: /lang/*
+Disallow: /currency/*
+Disallow: /country/*
+Disallow: /start-trial/check
+
+# Block URL noise that creates duplicate-content pages
+Disallow: /*?utm_*
+Disallow: /*?ref=*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
 
 # Crawl delay to protect shared hosting
 Crawl-delay: 1
 
+# Specific bot tuning — give Googlebot full speed since it respects load
+User-agent: Googlebot
+Crawl-delay: 0
+
+User-agent: Bingbot
+Crawl-delay: 0
+
+# Sitemap with all indexable URLs (static + blog + case studies)
 Sitemap: https://doctorato.com/sitemap.xml
