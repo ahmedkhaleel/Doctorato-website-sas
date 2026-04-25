@@ -30,13 +30,29 @@ class BlogController extends Controller
 
         $post->increment('views_count');
 
-        $relatedPosts = BlogPost::where('is_published', true)
+        // Same-category first; fill any remaining slots with the most
+        // recent posts overall so the section never renders blank.
+        $sameCategory = BlogPost::with('category')
+            ->where('status', 'published')
             ->where('id', '!=', $post->id)
             ->where('category_id', $post->category_id)
             ->where('published_at', '<=', now())
             ->orderBy('published_at', 'desc')
             ->limit(3)
             ->get();
+
+        $relatedPosts = $sameCategory;
+        if ($relatedPosts->count() < 3) {
+            $excludeIds = $relatedPosts->pluck('id')->push($post->id);
+            $fallback = BlogPost::with('category')
+                ->where('status', 'published')
+                ->whereNotIn('id', $excludeIds)
+                ->where('published_at', '<=', now())
+                ->orderBy('published_at', 'desc')
+                ->limit(3 - $relatedPosts->count())
+                ->get();
+            $relatedPosts = $relatedPosts->concat($fallback);
+        }
 
         return Inertia::render('Blog/Show', [
             'post' => $post,

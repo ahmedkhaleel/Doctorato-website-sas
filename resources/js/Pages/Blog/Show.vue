@@ -26,7 +26,7 @@ function formatDate(dateString) {
 }
 
 const pageTitle = computed(() => localizedField(props.post, 'title'));
-const content = computed(() => localizedField(props.post, 'body') || '');
+const content = computed(() => localizedField(props.post, 'content') || localizedField(props.post, 'body') || '');
 const excerpt = computed(() => localizedField(props.post, 'excerpt') || '');
 
 const shareUrl = computed(() => {
@@ -62,38 +62,71 @@ const shareLinks = computed(() => [
 function getExcerpt(post) {
     const ex = localizedField(post, 'excerpt');
     if (ex) return ex;
-    const body = localizedField(post, 'body') || '';
-    return body.substring(0, 120) + '...';
+    const body = localizedField(post, 'content') || localizedField(post, 'body') || '';
+    // Strip HTML tags for clean preview text
+    return body.replace(/<[^>]*>/g, '').substring(0, 120) + '...';
 }
+
+// Strip HTML and count words for the schema's wordCount (Google uses
+// this as a quality signal — long-form content ranks better).
+const wordCount = computed(() => {
+    const plain = (content.value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    return plain ? plain.split(' ').length : 0;
+});
+
+// Resolve absolute URLs at SSR-safe time. window only exists in the
+// browser; on the server we fall back to the canonical app URL via
+// the inertia page props (set by app.blade.php as a meta tag).
+const origin = typeof window !== 'undefined' ? window.location.origin : 'https://doctorato.com';
+const pageUrl = typeof window !== 'undefined' ? window.location.href : `${origin}/blog/${props.post.slug}`;
 
 const articleJsonLd = computed(() => ({
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: pageTitle.value,
-    description: excerpt.value,
-    image: props.post.featured_image
-        ? (props.post.featured_image.startsWith('http')
-            ? props.post.featured_image
-            : (typeof window !== 'undefined' ? window.location.origin : '') + props.post.featured_image)
-        : undefined,
-    datePublished: props.post.published_at || props.post.created_at,
-    dateModified: props.post.updated_at || props.post.published_at,
-    author: {
-        '@type': 'Organization',
-        name: 'Doctorato',
-    },
-    publisher: {
-        '@type': 'Organization',
-        name: 'Doctorato',
-        logo: {
-            '@type': 'ImageObject',
-            url: (typeof window !== 'undefined' ? window.location.origin : '') + '/images/doctorato-logo.png',
+    '@graph': [
+        {
+            '@type': 'BlogPosting',
+            '@id': `${pageUrl}#article`,
+            headline: pageTitle.value,
+            description: excerpt.value,
+            image: props.post.featured_image
+                ? (props.post.featured_image.startsWith('http')
+                    ? props.post.featured_image
+                    : origin + props.post.featured_image)
+                : `${origin}/images/og-cover.jpg`,
+            datePublished: props.post.published_at || props.post.created_at,
+            dateModified: props.post.updated_at || props.post.published_at,
+            wordCount: wordCount.value,
+            inLanguage: isRtl.value ? 'ar' : 'en',
+            articleSection: props.post.category ? localizedField(props.post.category, 'name') : 'Healthcare',
+            author: {
+                '@type': 'Organization',
+                '@id': `${origin}#organization`,
+                name: 'Doctorato',
+                url: origin,
+            },
+            publisher: {
+                '@type': 'Organization',
+                '@id': `${origin}#organization`,
+                name: 'Doctorato',
+                logo: {
+                    '@type': 'ImageObject',
+                    url: `${origin}/images/doctorato-logo.png`,
+                },
+            },
+            mainEntityOfPage: {
+                '@type': 'WebPage',
+                '@id': pageUrl,
+            },
         },
-    },
-    mainEntityOfPage: {
-        '@type': 'WebPage',
-        '@id': typeof window !== 'undefined' ? window.location.href : '',
-    },
+        {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: t('blog.breadcrumb_home'), item: origin + '/' },
+                { '@type': 'ListItem', position: 2, name: t('blog.breadcrumb_blog'), item: origin + '/blog' },
+                { '@type': 'ListItem', position: 3, name: pageTitle.value, item: pageUrl },
+            ],
+        },
+    ],
 }));
 </script>
 
