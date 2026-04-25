@@ -100,6 +100,109 @@ class SitemapController extends Controller
         ]);
     }
 
+    /**
+     * Sitemap index — points Google at the page sitemap + image sitemap.
+     * Lets us split crawls without losing anything.
+     */
+    public function indexFile(): Response
+    {
+        $base = rtrim(config('app.url'), '/');
+        $now = now()->toAtomString();
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach (['sitemap.xml', 'sitemap-images.xml'] as $name) {
+            $xml .= "  <sitemap>\n";
+            $xml .= '    <loc>' . $base . '/' . $name . "</loc>\n";
+            $xml .= "    <lastmod>{$now}</lastmod>\n";
+            $xml .= "  </sitemap>\n";
+        }
+        $xml .= '</sitemapindex>' . "\n";
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=utf-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
+    }
+
+    /**
+     * Image sitemap — separate file for image search indexing.
+     * Pulls featured images from blog posts + case studies plus the
+     * static brand assets (logo, OG cover) so Google Images can rank
+     * them under our keywords.
+     */
+    public function images(): Response
+    {
+        $base = rtrim(config('app.url'), '/');
+        $now = now()->toAtomString();
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ' .
+                'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+
+        // Brand assets — show up under the home URL
+        $xml .= "  <url>\n";
+        $xml .= '    <loc>' . $base . "/</loc>\n";
+        foreach (['/images/doctorato-logo.png', '/images/og-cover.jpg', '/favicon.ico'] as $img) {
+            $xml .= "    <image:image>\n";
+            $xml .= '      <image:loc>' . $base . $img . "</image:loc>\n";
+            $xml .= "      <image:title>Doctorato — نظام إدارة العيادات</image:title>\n";
+            $xml .= "    </image:image>\n";
+        }
+        $xml .= "  </url>\n";
+
+        // Blog post featured images
+        BlogPost::query()
+            ->published()
+            ->whereNotNull('featured_image')
+            ->orderByDesc('updated_at')
+            ->chunk(200, function ($posts) use (&$xml, $base) {
+                foreach ($posts as $post) {
+                    $imgUrl = str_starts_with($post->featured_image, 'http')
+                        ? $post->featured_image
+                        : $base . $post->featured_image;
+                    $xml .= "  <url>\n";
+                    $xml .= '    <loc>' . $base . '/blog/' . $post->slug . "</loc>\n";
+                    $xml .= "    <image:image>\n";
+                    $xml .= '      <image:loc>' . htmlspecialchars($imgUrl, ENT_XML1) . "</image:loc>\n";
+                    $xml .= '      <image:title>' . htmlspecialchars($post->title_ar ?: $post->title_en, ENT_XML1) . "</image:title>\n";
+                    if ($post->excerpt_ar || $post->excerpt_en) {
+                        $xml .= '      <image:caption>' . htmlspecialchars($post->excerpt_ar ?: $post->excerpt_en, ENT_XML1) . "</image:caption>\n";
+                    }
+                    $xml .= "    </image:image>\n";
+                    $xml .= "  </url>\n";
+                }
+            });
+
+        // Case study hero + logo images
+        CaseStudy::query()
+            ->published()
+            ->orderByDesc('updated_at')
+            ->chunk(200, function ($cases) use (&$xml, $base) {
+                foreach ($cases as $case) {
+                    $images = array_filter([$case->hero_image ?? null, $case->logo ?? null]);
+                    if (empty($images)) continue;
+                    $xml .= "  <url>\n";
+                    $xml .= '    <loc>' . $base . '/case-studies/' . $case->slug . "</loc>\n";
+                    foreach ($images as $img) {
+                        $imgUrl = str_starts_with($img, 'http') ? $img : $base . $img;
+                        $xml .= "    <image:image>\n";
+                        $xml .= '      <image:loc>' . htmlspecialchars($imgUrl, ENT_XML1) . "</image:loc>\n";
+                        $xml .= '      <image:title>' . htmlspecialchars($case->title_ar ?: $case->title_en, ENT_XML1) . "</image:title>\n";
+                        $xml .= "    </image:image>\n";
+                    }
+                    $xml .= "  </url>\n";
+                }
+            });
+
+        $xml .= '</urlset>' . "\n";
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=utf-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
+    }
+
     protected function urlBlock(string $loc, string $lastmod, string $freq, string $priority, array $locales, string $path): string
     {
         $base = rtrim(config('app.url'), '/');

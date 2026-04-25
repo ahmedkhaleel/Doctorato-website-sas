@@ -30,6 +30,8 @@ Route::get('/country/{code}', function ($code, \Illuminate\Http\Request $request
 
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap-index.xml', [SitemapController::class, 'indexFile'])->name('sitemap.index');
+Route::get('/sitemap-images.xml', [SitemapController::class, 'images'])->name('sitemap.images');
 
 // Main pages
 Route::get('/', [HomeController::class, 'index'])->name('home');

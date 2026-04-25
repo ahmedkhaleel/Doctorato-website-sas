@@ -1,0 +1,40 @@
+{
+    "name": "Doctorato — Clinic Management System",
+    "short_name": "Doctorato",
+    "description": "Bilingual clinic management SaaS for the Middle East. EMR, dental, dermatology, pediatrics, telemedicine — all in one platform.",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#0A1628",
+    "theme_color": "#1B4F72",
+    "lang": "ar",
+    "dir": "rtl",
+    "scope": "/",
+    "categories": ["business", "medical", "productivity"],
+    "icons": [
+        {
+            "src": "/images/doctorato-logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/doctorato-logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Pricing",
+            "url": "/pricing",
+            "description": "View pricing plans"
+        },
+        {
+            "name": "Book a demo",
+            "url": "/demo",
+            "description": "Schedule a free demo"
+        }
+    ]
+}

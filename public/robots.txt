@@ -30,5 +30,7 @@ Crawl-delay: 0
 User-agent: Bingbot
 Crawl-delay: 0
 
-# Sitemap with all indexable URLs (static + blog + case studies)
+# Sitemap index → page sitemap + image sitemap
+Sitemap: https://doctorato.com/sitemap-index.xml
 Sitemap: https://doctorato.com/sitemap.xml
+Sitemap: https://doctorato.com/sitemap-images.xml
