@@ -184,18 +184,24 @@ const stats = computed(() => [
     { target: 80, suffix: '+', label: t('features_page.stat_permissions'), icon: 'permissions' },
 ]);
 
-/* ───────── Competitive Advantages ───────── */
+/* ───────── Competitive Advantages ─────────
+ * Re-ordered so the 3 specialty modules (dermatology, pediatrics,
+ * telemedicine) sit near the top of the grid — they're the
+ * differentiators most prospects compare us on. */
 const advantages = computed(() => [
-    { title: t('features_page.advantage_bilingual_title'), description: t('features_page.advantage_bilingual_desc'), icon: 'globe' },
+    { title: t('features_page.advantage_bilingual_title'),    description: t('features_page.advantage_bilingual_desc'),    icon: 'globe' },
     { title: t('features_page.advantage_multispecialty_title'), description: t('features_page.advantage_multispecialty_desc'), icon: 'building' },
-    { title: t('features_page.advantage_portals_title'), description: t('features_page.advantage_portals_desc'), icon: 'grid' },
-    { title: t('features_page.advantage_crm_title'), description: t('features_page.advantage_crm_desc'), icon: 'users' },
-    { title: t('features_page.advantage_financials_title'), description: t('features_page.advantage_financials_desc'), icon: 'money' },
-    { title: t('features_page.advantage_hr_title'), description: t('features_page.advantage_hr_desc'), icon: 'calendar' },
-    { title: t('features_page.advantage_dental_title'), description: t('features_page.advantage_dental_desc'), icon: 'heart' },
-    { title: t('features_page.advantage_insurance_title'), description: t('features_page.advantage_insurance_desc'), icon: 'document' },
-    { title: t('features_page.advantage_inventory_title'), description: t('features_page.advantage_inventory_desc'), icon: 'box' },
-    { title: t('features_page.advantage_security_title'), description: t('features_page.advantage_security_desc'), icon: 'shield' },
+    { title: t('features_page.advantage_dermatology_title'),  description: t('features_page.advantage_dermatology_desc'),  icon: 'sparkles' },
+    { title: t('features_page.advantage_pediatrics_title'),   description: t('features_page.advantage_pediatrics_desc'),   icon: 'pediatrics' },
+    { title: t('features_page.advantage_telemedicine_title'), description: t('features_page.advantage_telemedicine_desc'), icon: 'video' },
+    { title: t('features_page.advantage_dental_title'),       description: t('features_page.advantage_dental_desc'),       icon: 'heart' },
+    { title: t('features_page.advantage_portals_title'),      description: t('features_page.advantage_portals_desc'),      icon: 'grid' },
+    { title: t('features_page.advantage_crm_title'),          description: t('features_page.advantage_crm_desc'),          icon: 'users' },
+    { title: t('features_page.advantage_financials_title'),   description: t('features_page.advantage_financials_desc'),   icon: 'money' },
+    { title: t('features_page.advantage_hr_title'),           description: t('features_page.advantage_hr_desc'),           icon: 'calendar' },
+    { title: t('features_page.advantage_insurance_title'),    description: t('features_page.advantage_insurance_desc'),    icon: 'document' },
+    { title: t('features_page.advantage_inventory_title'),    description: t('features_page.advantage_inventory_desc'),    icon: 'box' },
+    { title: t('features_page.advantage_security_title'),     description: t('features_page.advantage_security_desc'),     icon: 'shield' },
 ]);
 
 const activeAdvantage = ref(0);
@@ -479,6 +485,9 @@ const activeAdvantage = ref(0);
                                 <path v-if="adv.icon === 'document'" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 <path v-if="adv.icon === 'box'" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 <path v-if="adv.icon === 'shield'" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                <path v-if="adv.icon === 'sparkles'" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                <path v-if="adv.icon === 'pediatrics'" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                                <path v-if="adv.icon === 'video'" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                             </svg>
                         </div>
 
