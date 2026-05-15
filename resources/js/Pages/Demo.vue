@@ -20,13 +20,14 @@ const { t, locale } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
 useScrollAnimation();
 
-// What the demo will actually cover — kept tight (4 items) so the
-// section reads in one phone screen.
+// Demo agenda — Khaleeji-tuned Arabic. The Gulf is our highest-LTV
+// market, so the language defaults to a Gulf register (وش راح / عبّي /
+// لا) instead of Egyptian (إيه / املأ / مش).
 const agenda = computed(() => isAr.value ? [
-    { icon: '🩺', title: 'تعرّف على عيادتك', body: 'نسأل عن تخصصك وحجم العيادة، ونرتّب العرض حول احتياجاتك تحديداً.' },
-    { icon: '🖥️', title: 'جولة حية في النظام', body: 'نشاركك الشاشة ونمشي على المسارات اليومية: الحجز، السجلات، الفواتير.' },
-    { icon: '💡', title: 'أسئلة وأجوبة', body: 'مساحة مفتوحة لكل استفساراتك التقنية والتجارية — بدون عجلة.' },
-    { icon: '💰', title: 'خطة سعرية واضحة', body: 'نحسبلك الباقة المناسبة بسعر بلدك مع الإعداد والتدريب المحاسب.' },
+    { icon: '🩺', title: 'نتعرّف على عيادتك', body: 'نسألك عن تخصصك وحجم العيادة، ونرتّب العرض حسب احتياجاتك بالضبط.' },
+    { icon: '🖥️', title: 'جولة مباشرة في النظام', body: 'نشاركك الشاشة ونوريك المسارات اليومية: الحجز، السجلات، والفواتير.' },
+    { icon: '💡', title: 'أسئلة وأجوبة', body: 'وقت مفتوح لكل استفساراتك التقنية والتجارية — على راحتك بدون استعجال.' },
+    { icon: '💰', title: 'خطة أسعار واضحة', body: 'نحدّد لك الباقة المناسبة بعملة بلدك مع الإعداد والتدريب الكامل.' },
 ] : [
     { icon: '🩺', title: 'Get to know your clinic', body: 'We ask about your specialty and clinic size, then tailor the demo around your real needs.' },
     { icon: '🖥️', title: 'Live system walkthrough', body: 'We share our screen and run through the daily flows: booking, records, billing.' },
@@ -38,7 +39,7 @@ const benefits = computed(() => isAr.value ? [
     'تجربة مجانية 14 يوم',
     'بدون بطاقة ائتمان',
     'إعداد كامل لفريقك',
-    'دعم باللغة العربية',
+    'دعم بالعربي',
 ] : [
     '14-day free trial',
     'No credit card required',
@@ -47,18 +48,18 @@ const benefits = computed(() => isAr.value ? [
 ]);
 
 const stats = computed(() => [
-    { value: '+200', label: isAr.value ? 'عيادة نشطة' : 'Active clinics' },
+    { value: '+200', label: isAr.value ? 'عيادة فعّالة' : 'Active clinics' },
     { value: '12', label: isAr.value ? 'دولة' : 'Countries' },
     { value: '99.9%', label: isAr.value ? 'استقرار' : 'Uptime' },
     { value: '24/7', label: isAr.value ? 'دعم فني' : 'Support' },
 ]);
 
 const faqs = computed(() => isAr.value ? [
-    { q: 'كم يستغرق العرض التجريبي؟', a: 'عادةً 30-45 دقيقة، حسب حجم عيادتك وعدد الأسئلة. نمشي بإيقاعك مش بإيقاعنا.' },
-    { q: 'هل يوجد التزام مالي للحجز؟', a: 'لا. العرض مجاني تماماً ولا يلزمك بأي اشتراك. حتى التجربة المجانية بعده 14 يوم بدون بطاقة ائتمان.' },
-    { q: 'في أي وقت ممكن نحدّد الموعد؟', a: 'مرونة كاملة — نحجز معاك في أي يوم من السبت للخميس بين 9 صباحاً و8 مساءً (بتوقيت عيادتك).' },
+    { q: 'كم يأخذ العرض التجريبي؟', a: 'عادة 30-45 دقيقة، حسب حجم عيادتك وعدد أسئلتك. نمشي على راحتك بدون استعجال.' },
+    { q: 'هل في التزام مالي للحجز؟', a: 'لا، العرض مجاني تمامًا وما يلزمك بأي اشتراك. وحتى التجربة المجانية بعده 14 يوم بدون بطاقة ائتمان.' },
+    { q: 'وش الأوقات المتاحة للموعد؟', a: 'مرونة كاملة — نحجز معاك أي يوم من السبت إلى الخميس بين 9 صباحًا و8 مساءً (بتوقيتك المحلي).' },
     { q: 'هل يدعم النظام تخصصي؟', a: 'نخدم عيادات الأسنان، الجلدية والتجميل، طب الأطفال، النساء، العظام، القلب، أنف وأذن وحنجرة، العيون، والمتعدد التخصصات.' },
-    { q: 'كم عدد الأطباء اللي يستوعبهم النظام؟', a: 'من طبيب واحد لأكثر من 100 طبيب. الباقات مرنة وتتوسع مع نمو عيادتك.' },
+    { q: 'كم عدد الأطباء اللي يدعمهم النظام؟', a: 'من طبيب واحد إلى أكثر من 100 طبيب. الباقات مرنة وتتوسع مع نمو عيادتك.' },
 ] : [
     { q: 'How long does the demo take?', a: 'Typically 30-45 minutes, depending on your clinic size and questions. We move at your pace, not ours.' },
     { q: 'Is there any commitment to book?', a: 'None. The demo is completely free with no obligation. Even the trial after it is 14 days, no credit card required.' },
@@ -124,44 +125,56 @@ const demoJsonLd = computed(() => [
         ]"
     />
     <MainLayout>
-        <!-- ─── Hero ─────────────────────────────────────────────── -->
-        <section class="relative pt-28 pb-16 sm:pt-32 sm:pb-20 md:pt-40 md:pb-24 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
-            <!-- backdrop -->
+        <!-- ─── Hero — shorter (was pt-28 pb-16), with layered animations ─── -->
+        <section class="demo-hero relative pt-20 pb-8 sm:pt-24 sm:pb-10 md:pt-28 md:pb-12 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
+            <!-- Dot grid backdrop -->
             <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 40px 40px;"></div>
-            <div class="absolute -top-20 -start-20 w-72 h-72 sm:w-96 sm:h-96 bg-[#C4A265]/15 rounded-full blur-[120px]"></div>
-            <div class="absolute -bottom-20 -end-20 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-[#2471A3]/20 rounded-full blur-[120px]"></div>
+
+            <!-- Aurora orbs — animated to feel "alive" without being noisy -->
+            <div class="absolute -top-20 -start-20 w-72 h-72 sm:w-96 sm:h-96 bg-[#C4A265]/15 rounded-full blur-[120px] demo-orb-a"></div>
+            <div class="absolute -bottom-20 -end-20 w-80 h-80 sm:w-[28rem] sm:h-[28rem] bg-[#2471A3]/20 rounded-full blur-[120px] demo-orb-b"></div>
+            <div class="absolute top-1/3 start-1/2 w-64 h-64 -translate-x-1/2 bg-[#C4A265]/10 rounded-full blur-[100px] demo-orb-c"></div>
+
+            <!-- Floating particles — pure CSS, GPU-only -->
+            <div class="absolute inset-0 pointer-events-none">
+                <span v-for="i in 8" :key="i" class="demo-particle" :style="`--i:${i};`"></span>
+            </div>
 
             <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <!-- Live pill -->
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 backdrop-blur-sm ring-1 ring-emerald-400/30 mb-5 sm:mb-6 animate-fade-up">
+                <!-- Live pill — stagger delay 0 -->
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 backdrop-blur-sm ring-1 ring-emerald-400/30 mb-4 sm:mb-5 demo-rise" style="--rise-delay: 0ms;">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                     </span>
                     <span class="text-xs sm:text-sm text-emerald-200 font-semibold">
-                        {{ isAr ? 'متاحون اليوم — نرد خلال ساعة عمل' : 'Available today · we reply within 1 business hour' }}
+                        {{ isAr ? 'موجودين اليوم — نرد عليك خلال ساعة' : 'Available today · we reply within 1 business hour' }}
                     </span>
                 </div>
 
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-5 animate-fade-up leading-tight">
+                <!-- Headline — stagger delay 80ms. Removed "جنيه" (Egyptian
+                     currency) — replaced with a neutral Khaleeji phrasing
+                     that works across all Gulf markets. -->
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-4 demo-rise leading-tight" style="--rise-delay: 80ms;">
                     {{ isAr ? 'شوف دكتوراتو في عيادتك،' : 'See Doctorato in your clinic,' }}
-                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#C4A265] to-[#D4B876]">
-                        {{ isAr ? 'قبل ما تدفع جنيه' : 'before you pay a dollar' }}
+                    <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#C4A265] to-[#D4B876] demo-shimmer">
+                        {{ isAr ? 'قبل لا تدفع أي شي' : 'before you pay anything' }}
                     </span>
                 </h1>
 
-                <p class="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 animate-fade-up">
+                <p class="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed mb-5 sm:mb-7 demo-rise" style="--rise-delay: 160ms;">
                     {{ isAr
-                        ? 'عرض حي مع فريقنا — نمشي على النظام بكامل تفاصيله، نجاوب على كل أسئلتك، ونرتّب لك تجربة مجانية 14 يوم بعدها مباشرة.'
+                        ? 'عرض مباشر معاك من فريقنا — نوريك النظام كاملًا، نرد على كل استفساراتك، ونرتّب لك تجربة مجانية 14 يوم بعدها مباشرة.'
                         : 'A live walkthrough with our team — we run through every detail, answer your questions, and set up a 14-day free trial right after.' }}
                 </p>
 
-                <!-- Inline benefits chip row -->
-                <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-7 sm:mb-9 animate-fade-up">
+                <!-- Benefits chip row — stagger inside the row too -->
+                <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 demo-rise" style="--rise-delay: 240ms;">
                     <span
                         v-for="(b, idx) in benefits"
                         :key="idx"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-sm border border-white/[0.1] text-xs sm:text-sm text-white/85"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] backdrop-blur-sm border border-white/[0.1] text-xs sm:text-sm text-white/85 demo-chip"
+                        :style="`--chip-delay: ${280 + idx * 60}ms;`"
                     >
                         <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -170,28 +183,36 @@ const demoJsonLd = computed(() => [
                     </span>
                 </div>
 
-                <!-- CTA -->
+                <!-- CTA — magnetic hover -->
                 <a
                     href="#demo"
-                    class="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold text-sm sm:text-base shadow-xl shadow-[#C4A265]/25 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 animate-fade-up"
+                    class="group relative inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white font-bold text-sm sm:text-base shadow-xl shadow-[#C4A265]/25 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 demo-rise overflow-hidden"
+                    style="--rise-delay: 320ms;"
                 >
-                    {{ isAr ? 'املأ الفورم في 60 ثانية' : 'Fill the form in 60 seconds' }}
-                    <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <!-- Sheen sweep on hover -->
+                    <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent"></span>
+                    <span class="relative">{{ isAr ? 'عبّي النموذج في 60 ثانية' : 'Fill the form in 60 seconds' }}</span>
+                    <svg class="relative w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                 </a>
 
-                <!-- Stats row -->
-                <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl mx-auto mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-white/10 animate-fade-up">
-                    <div v-for="s in stats" :key="s.label" class="text-center">
+                <!-- Stats row — compact, animated counter-up feel via stagger -->
+                <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-2xl mx-auto mt-7 sm:mt-9 pt-5 sm:pt-6 border-t border-white/10">
+                    <div
+                        v-for="(s, idx) in stats"
+                        :key="s.label"
+                        class="text-center demo-rise"
+                        :style="`--rise-delay: ${400 + idx * 80}ms;`"
+                    >
                         <div class="text-lg sm:text-2xl md:text-3xl font-extrabold text-[#C4A265] tabular-nums">{{ s.value }}</div>
                         <div class="text-[9px] sm:text-[11px] md:text-xs text-white/55 uppercase tracking-wider mt-0.5">{{ s.label }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Soft fade into next section -->
-            <div class="absolute bottom-0 inset-x-0 h-16 sm:h-24 bg-gradient-to-t from-light-blue to-transparent"></div>
+            <!-- Soft fade into next section — kept but narrower since hero shrank -->
+            <div class="absolute bottom-0 inset-x-0 h-12 sm:h-16 bg-gradient-to-t from-light-blue to-transparent"></div>
         </section>
 
         <!-- ─── Demo request form ─────────────────────────────────── -->
@@ -205,7 +226,7 @@ const demoJsonLd = computed(() => [
                         {{ isAr ? 'أجندة العرض' : 'Demo agenda' }}
                     </p>
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833]">
-                        {{ isAr ? 'إيه اللي بتشوفه في الـ 30 دقيقة؟' : 'What you\'ll see in 30 minutes' }}
+                        {{ isAr ? 'وش راح تشوف في الـ 30 دقيقة؟' : 'What you\'ll see in 30 minutes' }}
                     </h2>
                 </div>
 
@@ -213,16 +234,20 @@ const demoJsonLd = computed(() => [
                     <article
                         v-for="(item, idx) in agenda"
                         :key="idx"
-                        class="group relative bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-up"
+                        class="agenda-card group relative bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#C4A265]/40 transition-all duration-300 animate-fade-up overflow-hidden"
+                        :style="`animation-delay: ${idx * 100}ms;`"
                     >
+                        <!-- Hover-only gold glow -->
+                        <div class="absolute inset-0 -z-10 bg-gradient-to-br from-[#C4A265]/0 to-[#C4A265]/0 group-hover:from-[#C4A265]/5 group-hover:to-[#C4A265]/0 transition-all duration-500"></div>
+
                         <div class="flex items-start gap-3 sm:gap-4">
-                            <span class="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-light-blue/60 to-light-gold/40 ring-1 ring-[#C4A265]/20 flex items-center justify-center text-xl sm:text-2xl">
+                            <span class="agenda-icon shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-light-blue/60 to-light-gold/40 ring-1 ring-[#C4A265]/20 flex items-center justify-center text-xl sm:text-2xl group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
                                 {{ item.icon }}
                             </span>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-baseline gap-2 mb-1">
                                     <span class="text-[11px] font-mono text-[#C4A265] font-bold">{{ String(idx + 1).padStart(2, '0') }}</span>
-                                    <h3 class="text-base sm:text-lg font-bold text-[#1C2833]">{{ item.title }}</h3>
+                                    <h3 class="text-base sm:text-lg font-bold text-[#1C2833] group-hover:text-[#1B4F72] transition-colors">{{ item.title }}</h3>
                                 </div>
                                 <p class="text-sm text-gray-600 leading-relaxed">{{ item.body }}</p>
                             </div>
@@ -240,7 +265,7 @@ const demoJsonLd = computed(() => [
                         {{ isAr ? 'أسئلة شائعة' : 'Common questions' }}
                     </p>
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833]">
-                        {{ isAr ? 'قبل ما تحجز' : 'Before you book' }}
+                        {{ isAr ? 'قبل لا تحجز' : 'Before you book' }}
                     </h2>
                 </div>
 
@@ -354,3 +379,89 @@ const demoJsonLd = computed(() => [
         </section>
     </MainLayout>
 </template>
+
+<style scoped>
+/* ─── Hero entry — slow fade + rise, controlled per-element via --rise-delay ─── */
+.demo-rise {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: demo-rise-anim 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: var(--rise-delay, 0ms);
+}
+@keyframes demo-rise-anim {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Chip pop — scale + fade, individually delayed via --chip-delay */
+.demo-chip {
+    opacity: 0;
+    transform: scale(0.9);
+    animation: demo-chip-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: var(--chip-delay, 0ms);
+}
+@keyframes demo-chip-pop {
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Headline gold accent — slow shimmer sweep, very subtle */
+.demo-shimmer {
+    background-size: 200% auto;
+    animation: demo-shimmer-anim 6s ease-in-out infinite;
+}
+@keyframes demo-shimmer-anim {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+
+/* Aurora orbs — slow drift to add depth without distraction.
+   prefers-reduced-motion respected at the bottom. */
+.demo-orb-a { animation: demo-orb-drift 18s ease-in-out infinite alternate; }
+.demo-orb-b { animation: demo-orb-drift 22s ease-in-out infinite alternate-reverse; }
+.demo-orb-c { animation: demo-orb-pulse 8s ease-in-out infinite; }
+@keyframes demo-orb-drift {
+    0%   { transform: translate(0, 0)   scale(1);   opacity: 0.85; }
+    100% { transform: translate(40px, -30px) scale(1.1); opacity: 1; }
+}
+@keyframes demo-orb-pulse {
+    0%, 100% { transform: translate(-50%, 0) scale(1);   opacity: 0.6; }
+    50%      { transform: translate(-50%, 0) scale(1.2); opacity: 1; }
+}
+
+/* Floating particles — gold dots that drift slowly upward */
+.demo-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 9999px;
+    background: rgba(196, 162, 101, 0.55);
+    box-shadow: 0 0 6px rgba(196, 162, 101, 0.4);
+    /* Distribute around the hero based on --i (1..8) */
+    left: calc((var(--i) * 13% - 5%));
+    bottom: -10px;
+    opacity: 0;
+    animation: demo-particle-float calc(12s + (var(--i) * 1.4s)) linear infinite;
+    animation-delay: calc(var(--i) * -1.8s);
+}
+@keyframes demo-particle-float {
+    0%   { transform: translateY(0)    translateX(0);     opacity: 0; }
+    10%  { opacity: 0.8; }
+    50%  { transform: translateY(-180px) translateX(20px); opacity: 1; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(-360px) translateX(-10px); opacity: 0; }
+}
+
+/* Honor system-level reduced motion — keep the page accessible. */
+@media (prefers-reduced-motion: reduce) {
+    .demo-rise,
+    .demo-chip,
+    .demo-shimmer,
+    .demo-orb-a,
+    .demo-orb-b,
+    .demo-orb-c,
+    .demo-particle {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+</style>

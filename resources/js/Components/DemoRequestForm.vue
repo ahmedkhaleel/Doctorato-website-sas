@@ -186,7 +186,7 @@ function toggleModule(moduleValue) {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-8 sm:mb-12 animate-fade-up">
                 <p class="text-xs sm:text-sm font-bold uppercase tracking-widest text-[#C4A265] mb-2">
-                    {{ locale === 'ar' ? 'املأ الفورم' : 'Fill the form' }}
+                    {{ locale === 'ar' ? 'عبّي النموذج' : 'Fill the form' }}
                 </p>
                 <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833] mb-3 leading-tight">
                     {{ $t('demo.title') }}
