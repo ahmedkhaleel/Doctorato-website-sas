@@ -50,5 +50,27 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Render a custom Inertia 404 so visitors who hit a stale or
+        // mistyped URL see the brand-styled page (with internal links
+        // back into the main funnels) instead of Laravel's default
+        // boilerplate. Returns null for non-public requests (API, etc.)
+        // so JSON 404s still get JSON.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->is('api/*') || $request->is('admin/*')) {
+                return null;
+            }
+
+            // Pull a few recent posts so the 404 page can suggest
+            // something useful rather than just dead-ending.
+            $suggestedPosts = \App\Models\BlogPost::where('status', 'published')
+                ->where('published_at', '<=', now())
+                ->orderByDesc('published_at')
+                ->limit(3)
+                ->get(['slug', 'title_ar', 'title_en']);
+
+            return \Inertia\Inertia::render('Errors/NotFound', [
+                'suggestedPosts' => $suggestedPosts,
+                'requestedPath' => $request->getRequestUri(),
+            ])->toResponse($request)->setStatusCode(404);
+        });
     })->create();

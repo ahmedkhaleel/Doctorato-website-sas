@@ -6,6 +6,12 @@
     $canonical = $appUrl . '/' . ltrim(request()->getRequestUri(), '/');
     // Strip query for canonical (keep path only) — avoids duplicate indexing
     $canonical = strtok($canonical, '?');
+    // Hreflang URLs — distinct per locale so Google can route AR vs EN
+    // visitors correctly. The ?lang= param flips the session locale via
+    // SetLocale middleware.
+    $sep = str_contains($canonical, '?') ? '&' : '?';
+    $hreflangAr = $canonical . $sep . 'lang=ar';
+    $hreflangEn = $canonical . $sep . 'lang=en';
     $ogImage = $appUrl . '/images/og-cover.jpg';
     $siteName = 'Doctorato';
     $defaultTitle = $isAr
@@ -86,8 +92,11 @@
 
     {{-- Canonical + hreflang --}}
     <link rel="canonical" href="{{ $canonical }}" head-key="canonical">
-    <link rel="alternate" hreflang="ar" href="{{ $canonical }}">
-    <link rel="alternate" hreflang="en" href="{{ $canonical }}">
+    <link rel="alternate" hreflang="ar" href="{{ $hreflangAr }}">
+    <link rel="alternate" hreflang="ar-SA" href="{{ $hreflangAr }}">
+    <link rel="alternate" hreflang="ar-AE" href="{{ $hreflangAr }}">
+    <link rel="alternate" hreflang="ar-EG" href="{{ $hreflangAr }}">
+    <link rel="alternate" hreflang="en" href="{{ $hreflangEn }}">
     <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
     {{-- RSS autodiscovery — feed readers and Google/Bing will find this --}}
     <link rel="alternate" type="application/rss+xml" title="Doctorato Blog RSS" href="{{ url('/blog/rss.xml') }}">
