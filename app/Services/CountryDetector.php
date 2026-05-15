@@ -39,6 +39,13 @@ class CountryDetector
     protected const SOURCE_KEY = 'active_country_source';
     protected const CACHE_TTL = 60 * 60 * 24; // 24 hours per-IP cache
 
+    /**
+     * True after resolve() if no server-side signal worked and we
+     * fell back to the default 'EG'. The frontend reads this via
+     * Inertia and runs a browser-side detection.
+     */
+    protected bool $serverDetectionFailed = false;
+
     public function resolve(Request $request): string
     {
         $session = $request->session();
@@ -51,19 +58,25 @@ class CountryDetector
             return $this->ensureSupported(strtoupper($stored));
         }
 
+        // Browser detection from a previous request in this session.
+        // Already trusted, no need to re-run anything.
+        if ($stored && $source === 'browser') {
+            return $this->ensureSupported(strtoupper($stored));
+        }
+
         // Auto-detect from the current request. Cascade through the
         // cheapest signals first (zero-latency headers + native PHP
-        // extensions) before falling back to HTTPS lookups, so the
-        // system still works even when outbound HTTP is blocked or
-        // the cURL extension isn't enabled.
-        // We INTENTIONALLY don't fall back to $stored here — pinning
-        // a traveler to the old session value is exactly the bug we
-        // were trying to fix.
-        $detected = $this->fromCloudflare($request)
-            ?? $this->fromServerHeaders($request)
-            ?? $this->fromGeoipExtension($request)
-            ?? $this->fromIpLookup($request)
-            ?? 'EG';
+        // extensions) before falling back to HTTPS lookups.
+        $cf = $this->fromCloudflare($request);
+        $headers = $cf ?? $this->fromServerHeaders($request);
+        $ext = $headers ?? $this->fromGeoipExtension($request);
+        $detected = $ext ?? $this->fromIpLookup($request);
+
+        // None of the server signals worked → flag for the frontend
+        // to run browser-side detection (calls a free HTTPS geo API
+        // from JavaScript, bypassing all server PHP-config issues).
+        $this->serverDetectionFailed = $detected === null;
+        $detected = $detected ?? 'EG';
 
         $detected = strtoupper($detected);
 
@@ -131,6 +144,24 @@ class CountryDetector
     {
         $request->session()->put(self::SESSION_KEY, strtoupper($code));
         $request->session()->put(self::SOURCE_KEY, 'explicit');
+    }
+
+    /**
+     * Store a country code that came from the browser-side detector
+     * (the JS fallback for hosts where server-side lookups fail).
+     * Marked 'browser' so resolve() skips re-detection on the next
+     * request but explicit user switches still take priority.
+     */
+    public function setFromBrowser(Request $request, string $code): void
+    {
+        $request->session()->put(self::SESSION_KEY, strtoupper($code));
+        $request->session()->put(self::SOURCE_KEY, 'browser');
+    }
+
+    /** True if the most recent resolve() call had to fall back to 'EG'. */
+    public function didServerDetectionFail(): bool
+    {
+        return $this->serverDetectionFailed;
     }
 
     /**

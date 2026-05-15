@@ -21,6 +21,18 @@ Route::get('/currency/{code}', function ($code) {
     return back();
 })->name('currency.switch');
 
+// Browser-side detection fallback. The frontend calls a free HTTPS
+// geo API from JavaScript (works on any host since the browser
+// handles the HTTPS request, not PHP) and POSTs the result here.
+// Marked 'browser' in the session so it doesn't get re-detected.
+Route::post('/_set-detected-country', function (\Illuminate\Http\Request $request) {
+    $code = strtoupper((string) $request->input('country', ''));
+    if (preg_match('/^[A-Z]{2}$/', $code)) {
+        app(\App\Services\CountryDetector::class)->setFromBrowser($request, $code);
+    }
+    return response()->noContent();
+})->name('country.detect_client');
+
 // Reset the explicit lock so the next request re-detects from IP.
 // MUST be declared BEFORE /country/{code} or that catch-all would
 // match /country/reset with $code="reset" and persist "RESET" as

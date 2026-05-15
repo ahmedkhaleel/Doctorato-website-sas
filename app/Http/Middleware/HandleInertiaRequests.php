@@ -27,6 +27,10 @@ class HandleInertiaRequests extends Middleware
     {
         $detector = app(CountryDetector::class);
         $activeCountry = $detector->resolve($request);
+        // True when no server-side signal worked and the system fell
+        // back to the default 'EG'. The frontend reads this flag and
+        // runs a browser-side detection (bypasses PHP config issues).
+        $geoNeedsClient = $detector->didServerDetectionFail();
 
         return [
             ...parent::share($request),
@@ -35,6 +39,7 @@ class HandleInertiaRequests extends Middleware
             // Active country + list of supported markets — consumed by the
             // Navbar country switcher and the Pricing page to pick prices.
             'activeCountry' => $activeCountry,
+            'geoNeedsClient' => $geoNeedsClient,
             'supportedCountries' => fn () => $detector->supportedCountries(),
             // Live scarcity counter for the launch offer. Lazy closure so
             // the DB hit is only paid on pages that actually read it.
