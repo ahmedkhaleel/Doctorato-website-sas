@@ -28,6 +28,32 @@ Route::get('/country/{code}', function ($code, \Illuminate\Http\Request $request
     return back();
 })->name('country.switch');
 
+// Reset the explicit lock so the next request re-detects from IP.
+// Useful for visitors who manually picked the wrong country or
+// traveled to a new region and want auto-detection back on.
+Route::get('/country/reset', function (\Illuminate\Http\Request $request) {
+    app(\App\Services\CountryDetector::class)->clearExplicit($request);
+    $request->session()->forget('active_country');
+    return back();
+})->name('country.reset');
+
+// Debug endpoint for country detection — open in local, and on
+// production it requires ?key=<random> matching APP_KEY's prefix
+// so it isn't a public information leak. Useful for diagnosing
+// "wrong currency" reports from travelers.
+Route::get('/_debug/country', function (\Illuminate\Http\Request $request) {
+    if (!app()->environment('local')) {
+        $expected = substr(str_replace('base64:', '', (string) config('app.key')), 0, 12);
+        if ($request->query('key') !== $expected) abort(404);
+    }
+    return response()->json(
+        app(\App\Services\CountryDetector::class)->diagnose($request),
+        200,
+        [],
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
+});
+
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-index.xml', [SitemapController::class, 'indexFile'])->name('sitemap.index');

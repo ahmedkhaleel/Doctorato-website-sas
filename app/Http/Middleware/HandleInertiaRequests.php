@@ -8,6 +8,7 @@ use App\Models\DemoRequest;
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Cache;
 use App\Services\CountryDetector;
+use App\Services\CountryMarkets;
 use App\Services\LaunchOfferService;
 use App\Services\RecaptchaService;
 use Illuminate\Http\Request;
@@ -63,13 +64,22 @@ class HandleInertiaRequests extends Middleware
                 'enabled' => SiteSetting::get('tracking_enabled', app()->environment('production') ? '1' : '0') === '1',
             ],
             'site' => fn () => [
-                'contact' => [
-                    'email' => SiteSetting::get('company_email'),
-                    'phone' => SiteSetting::get('company_phone'),
-                    'whatsapp' => SiteSetting::get('company_whatsapp'),
-                    'address_ar' => SiteSetting::get('company_address_ar'),
-                    'address_en' => SiteSetting::get('company_address_en'),
-                ],
+                'contact' => (function () use ($activeCountry) {
+                    // Per-country override: when the visitor is detected
+                    // in one of our supported markets, swap the phone +
+                    // WhatsApp for the local pair. Email + address stay
+                    // global because we operate from one HQ.
+                    $market = CountryMarkets::find($activeCountry);
+                    return [
+                        'email' => SiteSetting::get('company_email'),
+                        'phone' => $market['phone'] ?? SiteSetting::get('company_phone'),
+                        'whatsapp' => $market['whatsapp'] ?? SiteSetting::get('company_whatsapp'),
+                        'country_code' => $activeCountry,
+                        'country_flag' => $market['flag'] ?? null,
+                        'address_ar' => SiteSetting::get('company_address_ar'),
+                        'address_en' => SiteSetting::get('company_address_en'),
+                    ];
+                })(),
                 'social' => [
                     'twitter' => SiteSetting::get('social_twitter'),
                     'facebook' => SiteSetting::get('social_facebook'),

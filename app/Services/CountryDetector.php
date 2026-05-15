@@ -50,24 +50,48 @@ class CountryDetector
             return $this->ensureSupported(strtoupper($stored));
         }
 
-        // Auto-detected previously, or never set. Re-detect every request
-        // so travelers and shared-network users get the right currency.
+        // Auto-detect from the current request. Cloudflare first
+        // (zero-latency); ip-api second (cached 24h per IP).
+        // We INTENTIONALLY don't fall back to $stored here — if the
+        // visitor was previously detected as EG and now their IP says
+        // nothing, we'd rather show 'EG' (the home market default)
+        // than the stale session value, which is what kept travelers
+        // pinned to the old currency.
         $detected = $this->fromCloudflare($request)
             ?? $this->fromIpLookup($request)
-            ?? $stored
             ?? 'EG';
 
         $detected = strtoupper($detected);
 
         // Persist the freshly-detected code with the 'detected' source
-        // so future requests can compare and update. Skip the write if
-        // nothing changed — saves a session touch on every request.
+        // so future requests can compare. Skip the write when nothing
+        // changed to avoid touching the session on every request.
         if ($stored !== $detected || $source !== 'detected') {
             $session->put(self::SESSION_KEY, $detected);
             $session->put(self::SOURCE_KEY, 'detected');
         }
 
         return $this->ensureSupported($detected);
+    }
+
+    /**
+     * Diagnostic snapshot used by a debug route to figure out why the
+     * wrong country is being detected. Returns the raw signals (with
+     * the live IP) plus the final resolution.
+     */
+    public function diagnose(Request $request): array
+    {
+        return [
+            'request_ip' => $request->ip(),
+            'cf_ipcountry' => $request->header('CF-IPCountry'),
+            'session_country' => $request->session()->get(self::SESSION_KEY),
+            'session_source' => $request->session()->get(self::SOURCE_KEY),
+            'from_cloudflare' => $this->fromCloudflare($request),
+            'from_ip_lookup' => $this->fromIpLookup($request),
+            'resolved' => $this->resolve($request),
+            'supported_codes' => collect($this->supportedCountries())->pluck('country_code')->values(),
+            'trusted_proxies' => 'see TrustProxies middleware — accepts X-Forwarded-* from any proxy',
+        ];
     }
 
     /**
