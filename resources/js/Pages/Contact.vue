@@ -1,8 +1,9 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
-import { Head, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { ref, computed, onMounted } from 'vue';
 import { useTracking } from '@/composables/useTracking';
 
@@ -148,10 +149,49 @@ const particles = Array.from({ length: 20 }, (_, i) => ({
     duration: Math.random() * 10 + 10,
     delay: Math.random() * 5,
 }));
+
+// ContactPage schema with the Organization as mainEntity carrying the
+// contactPoint (phone + email) so the Knowledge Panel can surface
+// "Call" / "Email" actions directly in SERP.
+const contactJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: t('contact.page_title'),
+    inLanguage: ['ar', 'en'],
+    mainEntity: {
+        '@type': 'Organization',
+        '@id': 'https://doctorato.com#organization',
+        name: 'Doctorato',
+        url: 'https://doctorato.com',
+        contactPoint: [
+            {
+                '@type': 'ContactPoint',
+                contactType: 'sales',
+                availableLanguage: ['Arabic', 'English'],
+                areaServed: ['SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM'],
+            },
+            {
+                '@type': 'ContactPoint',
+                contactType: 'customer support',
+                availableLanguage: ['Arabic', 'English'],
+                hoursAvailable: '24/7',
+            },
+        ],
+    },
+}));
 </script>
 
 <template>
-    <Head :title="t('contact.page_title')" />
+    <SeoHead
+        :title="t('contact.page_title')"
+        :description="t('contact.subtitle')
+            || 'تواصل مع فريق Doctorato — دعم عربي 24/7، إجابة في أقل من ساعة عمل.'"
+        :json-ld="contactJsonLd"
+        :breadcrumbs="[
+            { name: t('blog.breadcrumb_home'), url: '/' },
+            { name: t('contact.page_title'), url: '/contact' },
+        ]"
+    />
     <MainLayout>
         <!-- ===== HERO SECTION ===== -->
         <section class="relative min-h-[70vh] flex items-center overflow-hidden bg-[#0D2B45]">

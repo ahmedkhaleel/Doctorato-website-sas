@@ -1,9 +1,10 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
 import AnimatedCounter from '@/Components/AnimatedCounter.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { computed, defineAsyncComponent } from 'vue';
 
 // Lazy-load the carousel — same reasoning as Home.vue: large chunk
@@ -62,10 +63,41 @@ const timeline = computed(() => [
     { year: '2023', title: t('about.timeline_2023_title'), description: t('about.timeline_2023_desc') },
     { year: '2024', title: t('about.timeline_2024_title'), description: t('about.timeline_2024_desc') },
 ]);
+
+// AboutPage schema — surfaces the company's history, footprint, and
+// values to Google so the About page can rank for brand queries and
+// for "who built doctorato" / "company behind doctorato" searches.
+const aboutJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: t('about.page_title'),
+    inLanguage: ['ar', 'en'],
+    mainEntity: {
+        '@type': 'Organization',
+        '@id': 'https://doctorato.com#organization',
+        name: 'Doctorato',
+        alternateName: 'دكتوراتو',
+        url: 'https://doctorato.com',
+        foundingDate: '2020',
+        numberOfEmployees: '11-50',
+        areaServed: ['SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM'],
+        description: t('about.hero_subtitle')
+            || 'منصة إدارة العيادات الأولى في الشرق الأوسط — تخدم 500+ عيادة في 15+ دولة.',
+    },
+}));
 </script>
 
 <template>
-    <Head :title="t('about.page_title')" />
+    <SeoHead
+        :title="t('about.page_title')"
+        :description="t('about.hero_subtitle')
+            || 'منصة إدارة العيادات الأولى في الشرق الأوسط — قصتنا، رسالتنا، وفريقنا.'"
+        :json-ld="aboutJsonLd"
+        :breadcrumbs="[
+            { name: t('blog.breadcrumb_home'), url: '/' },
+            { name: t('about.page_title'), url: '/about' },
+        ]"
+    />
     <MainLayout>
         <!-- ═══════ HERO ═══════ -->
         <section class="relative pt-32 pb-24 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">
