@@ -215,6 +215,10 @@ const ldJson = computed(() => ({
         :title="tr('قاموس مصطلحات أنظمة العيادات الطبية | EMR EHR CRM HIPAA — Doctorato', 'Clinic Tech Glossary | EMR, EHR, CRM, HIPAA — Doctorato')"
         :description="tr('قاموس شامل لكل مصطلحات أنظمة إدارة العيادات: EMR، EHR، CRM طبي، HIPAA، GDPR، NPHIES، Riayati، RBAC، No-Show، Telemedicine، وأكثر من 30 مصطلح آخر — بالعربي والإنجليزي.', 'Comprehensive glossary of clinic-tech terms: EMR, EHR, medical CRM, HIPAA, GDPR, NPHIES, Riayati, RBAC, no-show, telemedicine — 30+ terms in Arabic and English.')"
         :json-ld="ldJson"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('قاموس المصطلحات', 'Glossary'), url: '/glossary' },
+        ]"
     />
     <MainLayout>
         <!-- Hero -->

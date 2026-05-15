@@ -34,6 +34,10 @@ const faqJsonLd = computed(() => ({
         :title="t('faq.title')"
         :description="t('faq.subtitle') || 'الإجابة على أكثر الأسئلة شيوعاً حول دكتوراتو'"
         :json-ld="faqJsonLd"
+        :breadcrumbs="[
+            { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: '/' },
+            { name: locale === 'ar' ? 'الأسئلة الشائعة' : 'FAQ', url: '/faq' },
+        ]"
     />
     <MainLayout>
         <!-- Hero Section -->

@@ -30,6 +30,10 @@ function metricLabel(metric) {
     <SeoHead
         :title="t('case_studies.page_title') || 'دراسات الحالة'"
         :description="t('case_studies.page_description') || 'قصص نجاح حقيقية لعيادات ومراكز طبية تستخدم دكتوراتو'"
+        :breadcrumbs="[
+            { name: t('blog.breadcrumb_home'), url: '/' },
+            { name: t('case_studies.page_title') || 'Case studies', url: '/case-studies' },
+        ]"
     />
 
     <MainLayout>

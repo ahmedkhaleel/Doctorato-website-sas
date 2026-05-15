@@ -120,6 +120,10 @@ const useCases = computed(() => [
     <SeoHead
         :title="tr('استشارات طبية اون لاين | منصة Telemedicine للعيادات — دكتوراتو', 'Telemedicine Platform for Clinics | Online Consultations — Doctorato')"
         :description="tr('منصة الاستشارات الطبية عن بُعد الأولى في الشرق الأوسط: مكالمات فيديو HD آمنة، وصفات إلكترونية موقّعة رقمياً، دفع فوري بالبطاقة قبل الجلسة، تكامل كامل مع السجل الطبي، تذكيرات ذكية. جرّب 14 يوم مجاناً.', 'The leading telemedicine platform for Middle East clinics: secure HD video, digitally signed e-prescriptions, instant card payment before sessions, full EMR integration, smart reminders. 14-day free trial.')"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('التليطب', 'Telemedicine'), url: '/telemedicine' },
+        ]"
     />
 
     <MainLayout>

@@ -135,6 +135,10 @@ const ldJson = computed(() => ({
         :title="tr('نظام EMR عربي | برنامج السجلات الطبية الإلكترونية للعيادات — Doctorato', 'Arabic EMR Software | EHR System for Middle East Clinics — Doctorato')"
         :description="tr('أفضل نظام EMR / EHR عربي للعيادات الطبية في الشرق الأوسط: سجلات طبية إلكترونية، وصفات رقمية، تكامل مختبر وأشعة، قوالب لكل تخصص، وأمان طبي معتمد. جرّب 14 يوم مجاناً.', 'The leading Arabic-first EMR / EHR for Middle East clinics: electronic medical records, e-prescriptions, lab + imaging integration, per-specialty templates, healthcare-grade security. 14-day free trial.')"
         :json-ld="ldJson"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('نظام EMR', 'EMR Software'), url: '/emr' },
+        ]"
     />
     <MainLayout>
         <!-- ─── Hero ─────────────────────────────────────────────── -->

@@ -211,6 +211,10 @@ const activeAdvantage = ref(0);
     <SeoHead
         :title="t('features.page_title')"
         :description="t('features.hero_subtitle') || 'أكثر من 800 خاصية في نظام واحد لإدارة كل جانب من جوانب عيادتك'"
+        :breadcrumbs="[
+            { name: t('blog.breadcrumb_home'), url: '/' },
+            { name: t('nav.features'), url: '/features' },
+        ]"
     />
     <MainLayout>
         <!-- ═══════ 1. HERO SECTION ═══════ -->

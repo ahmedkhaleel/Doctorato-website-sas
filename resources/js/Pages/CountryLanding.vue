@@ -112,6 +112,10 @@ const ldJson = computed(() => {
         :title="`${heroTitle} — Doctorato ${market.flag}`"
         :description="heroSubtitle"
         :json-ld="ldJson"
+        :breadcrumbs="[
+            { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: '/' },
+            { name: name, url: `/${market.country_code.toLowerCase()}` },
+        ]"
     />
     <MainLayout>
         <!-- Hero -->

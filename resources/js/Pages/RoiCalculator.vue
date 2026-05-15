@@ -78,6 +78,10 @@ const currencyLabel = computed(() => tr('ج.م', 'EGP'));
     <SeoHead
         :title="tr('حاسبة العائد على الاستثمار', 'ROI Calculator')"
         :description="tr('احسب كم ستوفّر عيادتك وكم ستربح إضافياً عند استخدام دكتوراتو — في أقل من دقيقة', 'Calculate your clinic savings and extra revenue with Doctorato — in under a minute')"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('حاسبة العائد', 'ROI Calculator'), url: '/roi-calculator' },
+        ]"
     />
 
     <MainLayout>

@@ -94,6 +94,10 @@ const stats = computed(() => [
     <SeoHead
         :title="tr('برنامج عيادات الأطفال | نظام عيادة طب أطفال — دكتوراتو', 'Pediatric Clinic Software | Best EMR for Pediatrics — Doctorato')"
         :description="tr('أفضل نظام عيادات أطفال في الخليج: منحنيات نمو WHO تلقائية، جداول تطعيمات ذكية مع تنبيهات، حسابات أدوية بالوزن، ملفات عائلية، بوابة أولياء الأمور. جرّب مجاناً 14 يوم.', 'The leading pediatric clinic software in the Middle East: automatic WHO growth charts, smart vaccination schedules with reminders, weight-based medication calculators, family profiles, parent portal. Free 14-day trial.')"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('طب الأطفال', 'Pediatrics'), url: '/pediatrics' },
+        ]"
     />
 
     <MainLayout>

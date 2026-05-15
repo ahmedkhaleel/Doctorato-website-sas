@@ -135,6 +135,10 @@ const ldJson = computed(() => ({
         :title="tr('Doctorato vs أنظمة إدارة العيادات الأخرى | مقارنة شاملة 2026', 'Doctorato vs Other Clinic Management Software | 2026 Comparison')"
         :description="tr('مقارنة موضوعية بين Doctorato و Drchrono و Practo و Vezeeta و Excel — 30 ميزة عبر 7 فئات (السجل الطبي، التخصصات، التأمين، الأمان، السعر). اختار النظام المناسب لعيادتك في 5 دقائق.', 'Honest comparison of Doctorato vs Drchrono, Practo, Vezeeta, and Excel — 30 features across 7 categories (EMR, specialties, insurance, security, price). Pick the right clinic system in 5 minutes.')"
         :json-ld="ldJson"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('قارن الأنظمة', 'Compare systems'), url: '/compare' },
+        ]"
     />
     <MainLayout>
         <!-- Hero -->

@@ -111,6 +111,10 @@ const stats = computed(() => [
     <SeoHead
         :title="tr('نظام إدارة عيادات الجلدية والتجميل | برنامج عيادة تجميل وليزر — دكتوراتو', 'Dermatology & Cosmetic Clinic Software | Best Aesthetic CRM — Doctorato')"
         :description="tr('أفضل نظام إدارة لعيادات الجلدية والتجميل والليزر: خرائط جلد تفاعلية، أرشيف صور قبل/بعد، بروتوكولات بوتكس وفيلر معتمدة، باقات جلسات، موافقات رقمية، مخزون منتجات، وتحليلات بالإجراء. جرّب 14 يوم مجاناً.', 'The leading dermatology + cosmetic clinic software: interactive skin maps, before/after photo archive, approved Botox/filler/laser protocols, session packages, digital consents, product inventory, per-procedure analytics. 14-day free trial.')"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('عيادات الجلدية', 'Dermatology'), url: '/dermatology' },
+        ]"
     />
 
     <MainLayout>

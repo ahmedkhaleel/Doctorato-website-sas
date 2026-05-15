@@ -220,6 +220,10 @@ const pricingJsonLd = computed(() => ({
         :title="t('pricing.page_title') || t('pricing.title')"
         :description="t('pricing.subtitle') || 'خطط مرنة بالجنيه المصري — ابدأ من 799 ج.م شهرياً'"
         :json-ld="pricingJsonLd"
+        :breadcrumbs="[
+            { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: '/' },
+            { name: locale === 'ar' ? 'الأسعار' : 'Pricing', url: '/pricing' },
+        ]"
     />
     <MainLayout>
         <!-- Hero Section -->

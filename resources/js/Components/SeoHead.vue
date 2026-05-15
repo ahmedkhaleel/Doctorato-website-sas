@@ -21,6 +21,10 @@ const props = defineProps({
     image: { type: String, default: null },        // absolute or path under /images
     noindex: { type: Boolean, default: false },
     jsonLd: { type: [Object, Array], default: null },
+    // Pass a breadcrumb trail and we'll emit BreadcrumbList JSON-LD
+    // alongside the page-specific schema. Example:
+    //   :breadcrumbs="[{name:'Home', url:'/'}, {name:'EMR', url:'/emr'}]"
+    breadcrumbs: { type: Array, default: () => [] },
 });
 
 const page = usePage();
@@ -48,9 +52,35 @@ const ogImage = computed(() => {
 // so we pass the raw title here.
 const fullTitleForMeta = computed(() => `${props.title} — Doctorato`);
 
-const jsonLdString = computed(() =>
-    props.jsonLd ? JSON.stringify(props.jsonLd) : null
-);
+// Auto-build a BreadcrumbList block when the page passed a trail.
+// Each item gets its absolute URL resolved against the current origin.
+const breadcrumbJsonLd = computed(() => {
+    if (!props.breadcrumbs?.length) return null;
+    const base = origin.value || 'https://doctorato.com';
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: props.breadcrumbs.map((crumb, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: crumb.name,
+            item: crumb.url?.startsWith('http') ? crumb.url : `${base}${crumb.url}`,
+        })),
+    };
+});
+
+const jsonLdString = computed(() => {
+    const blocks = [];
+    if (props.jsonLd) {
+        Array.isArray(props.jsonLd) ? blocks.push(...props.jsonLd) : blocks.push(props.jsonLd);
+    }
+    if (breadcrumbJsonLd.value) blocks.push(breadcrumbJsonLd.value);
+    if (!blocks.length) return null;
+    // If we have multiple blocks, emit them as a single @graph rather
+    // than multiple <script> tags — Google parses both, but @graph keeps
+    // related entities linked via @id references.
+    return JSON.stringify(blocks.length === 1 ? blocks[0] : blocks);
+});
 
 // Inject per-page JSON-LD via a teleport to <head>. Inertia's <Head> component
 // strips child content of <script> tags (its virtual head only tracks attrs),

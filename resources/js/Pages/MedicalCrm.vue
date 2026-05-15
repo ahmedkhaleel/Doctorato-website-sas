@@ -105,6 +105,10 @@ const ldJson = computed(() => ({
         :title="tr('CRM للعيادات الطبية | نظام إدارة علاقات المرضى — Doctorato', 'Medical CRM for Clinics | Patient Relationship Management — Doctorato')"
         :description="tr('أفضل CRM طبي للعيادات في الشرق الأوسط: تتبع العملاء المحتملين، حملات SMS/WhatsApp، متابعات تلقائية، Lead Scoring، تكامل مع السجل الطبي. زوّد تحويلاتك 3.2x.', 'The leading medical CRM for Middle East clinics: lead tracking, SMS/WhatsApp campaigns, automated follow-ups, lead scoring, EMR integration. 3.2x lift in conversion.')"
         :json-ld="ldJson"
+        :breadcrumbs="[
+            { name: tr('الرئيسية', 'Home'), url: '/' },
+            { name: tr('CRM طبي', 'Medical CRM'), url: '/medical-crm' },
+        ]"
     />
     <MainLayout>
         <!-- Hero -->

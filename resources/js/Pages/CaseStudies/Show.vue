@@ -10,7 +10,7 @@ const props = defineProps({
     related: { type: Array, default: () => [] },
 });
 
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 
 function localized(field) {
     const c = props.study;
@@ -42,6 +42,11 @@ const jsonLd = computed(() => ({
         :description="study.seo_description || localized('summary')"
         :image="study.hero_image"
         :json-ld="jsonLd"
+        :breadcrumbs="[
+            { name: t('blog.breadcrumb_home'), url: '/' },
+            { name: t('case_studies.page_title') || 'Case studies', url: '/case-studies' },
+            { name: localized('title'), url: `/case-studies/${study.slug}` },
+        ]"
     />
 
     <MainLayout>
