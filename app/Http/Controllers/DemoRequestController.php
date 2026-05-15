@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DemoAdminNotification;
+use App\Mail\DemoCustomerConfirmation;
 use App\Models\DemoRequest;
 use App\Services\RecaptchaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class DemoRequestController extends Controller
@@ -35,9 +38,9 @@ class DemoRequestController extends Controller
         ]);
 
         try {
-            DemoRequest::create($validated);
+            $demo = DemoRequest::create($validated);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Demo request save failed', [
+            Log::error('Demo request save failed', [
                 'error' => $e->getMessage(),
                 'email' => $validated['email'] ?? null,
             ]);
@@ -46,6 +49,32 @@ class DemoRequestController extends Controller
                 ->withErrors(['clinic_name' => 'حدث خطأ أثناء حفظ الطلب. حاول مرة أخرى.']);
         }
 
+        $this->sendEmails($demo);
+
         return back()->with('success', true);
+    }
+
+    /**
+     * Customer confirmation + admin notification, each wrapped so a
+     * single send failure doesn't block the other or the form.
+     */
+    protected function sendEmails(DemoRequest $demo): void
+    {
+        try {
+            Mail::to($demo->email)->send(new DemoCustomerConfirmation($demo));
+        } catch (\Throwable $e) {
+            Log::warning('Demo: customer confirmation email failed', [
+                'error' => $e->getMessage(),
+                'to' => $demo->email,
+            ]);
+        }
+
+        try {
+            Mail::to('info@doctorato.com')->send(new DemoAdminNotification($demo));
+        } catch (\Throwable $e) {
+            Log::warning('Demo: admin notification email failed', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
