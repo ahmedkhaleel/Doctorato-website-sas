@@ -16,16 +16,33 @@ const props = defineProps({
     posts: Object, // paginated { data, links, meta }
     categories: { type: Array, default: () => [] },
     currentCategory: { type: String, default: null },
+    searchQuery: { type: String, default: '' },
 });
 
 const selectedCategory = ref(props.currentCategory);
+const searchInput = ref(props.searchQuery);
 
 watch(selectedCategory, (val) => {
-    router.get(route('blog.index'), { category: val || undefined }, {
+    router.get(route('blog.index'), { category: val || undefined, q: searchInput.value || undefined }, {
         preserveState: true,
         preserveScroll: true,
     });
 });
+
+function submitSearch() {
+    router.get(route('blog.index'), {
+        q: searchInput.value || undefined,
+        category: selectedCategory.value || undefined,
+    }, {
+        preserveState: true,
+        preserveScroll: false,
+    });
+}
+
+function clearSearch() {
+    searchInput.value = '';
+    submitSearch();
+}
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -39,8 +56,10 @@ function formatDate(dateString) {
 function getExcerpt(post) {
     const excerpt = localizedField(post, 'excerpt');
     if (excerpt) return excerpt;
-    const body = localizedField(post, 'body') || '';
-    return body.substring(0, 160) + '...';
+    // Field is `content` on the model; older code referenced `body`,
+    // keep the fallback for safety.
+    const body = localizedField(post, 'content') || localizedField(post, 'body') || '';
+    return body.replace(/<[^>]*>/g, '').substring(0, 160) + '...';
 }
 </script>
 
@@ -61,8 +80,47 @@ function getExcerpt(post) {
                 <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 animate-fade-up">
                     {{ t('blog.hero_title') }}
                 </h1>
-                <p class="text-xl text-white/80 max-w-3xl mx-auto animate-fade-up">
+                <p class="text-xl text-white/80 max-w-3xl mx-auto animate-fade-up mb-8">
                     {{ t('blog.hero_subtitle') }}
+                </p>
+
+                <!-- Search box — wired to ?q= so Google's SearchAction schema
+                     lands here on a real, working search results page. -->
+                <form
+                    @submit.prevent="submitSearch"
+                    class="max-w-2xl mx-auto animate-fade-up"
+                    role="search"
+                >
+                    <div class="relative">
+                        <input
+                            v-model="searchInput"
+                            type="search"
+                            name="q"
+                            :placeholder="isRtl ? 'ابحث في المقالات…' : 'Search articles…'"
+                            :aria-label="isRtl ? 'بحث' : 'Search'"
+                            class="w-full ps-12 pe-12 py-3.5 rounded-full bg-white/95 text-dark placeholder-gray text-base shadow-lg focus:outline-none focus:ring-4 focus:ring-secondary/30"
+                        />
+                        <svg class="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <button
+                            v-if="searchInput"
+                            type="button"
+                            @click="clearSearch"
+                            class="absolute end-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray/20 hover:bg-gray/40 text-gray flex items-center justify-center transition-colors"
+                            :aria-label="isRtl ? 'مسح البحث' : 'Clear search'"
+                        >
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <p v-if="searchQuery" class="mt-4 text-white/70 text-sm animate-fade-up">
+                    {{ isRtl
+                        ? `نتائج البحث عن "${searchQuery}" — ${posts?.total ?? 0} مقال`
+                        : `Search results for "${searchQuery}" — ${posts?.total ?? 0} articles` }}
                 </p>
             </div>
         </section>

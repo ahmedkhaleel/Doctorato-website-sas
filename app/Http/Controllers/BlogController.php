@@ -11,14 +11,32 @@ class BlogController extends Controller
 {
     public function index(Request $request)
     {
+        $query = trim((string) $request->query('q', ''));
+
         $posts = BlogPost::with('category')
             ->where('status', 'published')
             ->where('published_at', '<=', now())
+            ->when($query !== '', function ($q) use ($query) {
+                // Search across both Arabic and English title + excerpt +
+                // body. LIKE is fine at our scale (sub-1000 posts);
+                // swap to fulltext / Scout if the table grows past that.
+                $like = '%' . $query . '%';
+                $q->where(function ($inner) use ($like) {
+                    $inner->where('title_ar', 'like', $like)
+                        ->orWhere('title_en', 'like', $like)
+                        ->orWhere('excerpt_ar', 'like', $like)
+                        ->orWhere('excerpt_en', 'like', $like)
+                        ->orWhere('content_ar', 'like', $like)
+                        ->orWhere('content_en', 'like', $like);
+                });
+            })
             ->orderBy('published_at', 'desc')
-            ->paginate(9);
+            ->paginate(9)
+            ->withQueryString();
 
         return Inertia::render('Blog/Index', [
             'posts' => $posts,
+            'searchQuery' => $query,
         ]);
     }
 

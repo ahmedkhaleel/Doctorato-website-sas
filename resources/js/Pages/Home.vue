@@ -8,7 +8,7 @@ import NewsletterSignup from '@/Components/NewsletterSignup.vue';
 import SectionTitle from '@/Components/SectionTitle.vue';
 import AnimatedCounter from '@/Components/AnimatedCounter.vue';
 import { useI18n } from 'vue-i18n';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import SeoHead from '@/Components/SeoHead.vue';
 import { computed } from 'vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
@@ -201,27 +201,91 @@ const howItWorksSteps = computed(() => [
     },
 ]);
 
+// Pull social profile URLs from the site config shared by Inertia so
+// the Organization schema's `sameAs` reflects the live admin settings
+// rather than a hardcoded list. Empty strings are filtered out — Google
+// rejects a sameAs entry that isn't a full URL.
+const inertiaPage = usePage();
+const social = computed(() => inertiaPage.props.site?.social || {});
+
+const sameAs = computed(() => Object.values(social.value).filter(
+    (u) => typeof u === 'string' && /^https?:\/\//.test(u)
+));
+
+const origin = typeof window !== 'undefined' ? window.location.origin : 'https://doctorato.com';
+
+// @graph bundles three related entities into one JSON-LD block:
+//   1. Organization — establishes the brand for the Knowledge Panel,
+//      links social profiles, and is the publisher of every blog post.
+//   2. WebSite — enables Google's Sitelinks Search Box (a search input
+//      that appears under the homepage result in SERP).
+//   3. SoftwareApplication — the product itself with pricing + ratings,
+//      which keeps the existing product rich result.
 const homeJsonLd = computed(() => ({
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'Doctorato',
-    alternateName: 'دكتوراتو',
-    description: t('home.title'),
-    applicationCategory: 'HealthApplication',
-    operatingSystem: 'Web, iOS, Android',
-    offers: {
-        '@type': 'AggregateOffer',
-        priceCurrency: 'EGP',
-        lowPrice: '799',
-        highPrice: '2999',
-        offerCount: 3,
-    },
-    aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        reviewCount: '127',
-        bestRating: '5',
-    },
+    '@graph': [
+        {
+            '@type': 'Organization',
+            '@id': `${origin}#organization`,
+            name: 'Doctorato',
+            alternateName: 'دكتوراتو',
+            url: origin,
+            logo: {
+                '@type': 'ImageObject',
+                url: `${origin}/images/doctorato-logo.png`,
+                width: 512,
+                height: 512,
+            },
+            sameAs: sameAs.value,
+            contactPoint: {
+                '@type': 'ContactPoint',
+                contactType: 'customer support',
+                availableLanguage: ['Arabic', 'English'],
+                areaServed: ['SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM'],
+            },
+        },
+        {
+            '@type': 'WebSite',
+            '@id': `${origin}#website`,
+            url: origin,
+            name: 'Doctorato',
+            alternateName: 'دكتوراتو',
+            inLanguage: ['ar', 'en'],
+            publisher: { '@id': `${origin}#organization` },
+            potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: `${origin}/blog?q={search_term_string}`,
+                },
+                'query-input': 'required name=search_term_string',
+            },
+        },
+        {
+            '@type': 'SoftwareApplication',
+            '@id': `${origin}#product`,
+            name: 'Doctorato',
+            alternateName: 'دكتوراتو',
+            description: t('home.title'),
+            applicationCategory: 'HealthApplication',
+            operatingSystem: 'Web, iOS, Android',
+            url: origin,
+            publisher: { '@id': `${origin}#organization` },
+            offers: {
+                '@type': 'AggregateOffer',
+                priceCurrency: 'EGP',
+                lowPrice: '799',
+                highPrice: '2999',
+                offerCount: 3,
+            },
+            aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.9',
+                reviewCount: '127',
+                bestRating: '5',
+            },
+        },
+    ],
 }));
 </script>
 
