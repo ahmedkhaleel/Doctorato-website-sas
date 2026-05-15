@@ -6,6 +6,7 @@ use App\Models\PlanPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Resolves the "active country" for a visitor.
@@ -144,17 +145,64 @@ class CountryDetector
             return null;
         }
 
-        return Cache::remember("geoip:{$ip}", self::CACHE_TTL, function () use ($ip) {
+        // Only cache successful lookups, and only for 24h. Caching
+        // null would mean a one-time provider hiccup pins the visitor
+        // to 'EG' for the rest of the day.
+        $cached = Cache::get("geoip:{$ip}");
+        if ($cached) return $cached;
+
+        // Provider fallback chain, all HTTPS so shared-hosting
+        // firewalls that block raw outbound HTTP (e.g. ea-php on
+        // cPanel) still get a result. Returns the first provider
+        // that succeeds; logs each failure so the chain stays
+        // observable.
+        foreach ($this->ipProviders() as $label => $resolver) {
             try {
-                $res = Http::timeout(2)->get("http://ip-api.com/json/{$ip}", ['fields' => 'status,countryCode']);
-                if ($res->ok() && $res->json('status') === 'success') {
-                    return $res->json('countryCode');
+                $code = $resolver($ip);
+                if ($code && strlen($code) === 2 && ctype_alpha($code)) {
+                    $code = strtoupper($code);
+                    Cache::put("geoip:{$ip}", $code, self::CACHE_TTL);
+                    return $code;
                 }
             } catch (\Throwable $e) {
-                // Silent — we'll fall through to the default.
+                Log::warning("geoip provider failed: {$label}", [
+                    'ip' => $ip,
+                    'error' => $e->getMessage(),
+                ]);
             }
-            return null;
-        });
+        }
+        return null;
+    }
+
+    /**
+     * Provider chain — keyed by label so log messages are readable.
+     * Each closure takes the IP and returns a 2-letter ISO code or
+     * throws on failure. Order is fastest/most-reliable first.
+     */
+    protected function ipProviders(): array
+    {
+        return [
+            // Plain JSON, no key needed, generous free tier. Fast.
+            'country.is' => fn (string $ip) => Http::timeout(3)
+                ->acceptJson()
+                ->get("https://api.country.is/{$ip}")
+                ->throw()
+                ->json('country'),
+
+            // Backup #1 — returns plain text country code on a path.
+            'ipapi.co' => fn (string $ip) => trim(Http::timeout(3)
+                ->withHeaders(['User-Agent' => 'Doctorato/1.0'])
+                ->get("https://ipapi.co/{$ip}/country/")
+                ->throw()
+                ->body()),
+
+            // Backup #2 — last resort. Returns JSON with countryCode.
+            'freeipapi.com' => fn (string $ip) => Http::timeout(3)
+                ->acceptJson()
+                ->get("https://freeipapi.com/api/json/{$ip}")
+                ->throw()
+                ->json('countryCode'),
+        ];
     }
 
     /** If a detected country has no price rows yet, fall back to EG. */
