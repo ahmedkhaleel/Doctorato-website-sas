@@ -6,8 +6,14 @@ import TrustBar from '@/Components/TrustBar.vue';
 // the fold. Splitting it out shaves ~30KB from the initial Home
 // bundle and improves LCP on slower connections.
 const TestimonialsCarousel = defineAsyncComponent(() => import('@/Components/TestimonialsCarousel.vue'));
-import PartnersMarquee from '@/Components/PartnersMarquee.vue';
-import NewsletterSignup from '@/Components/NewsletterSignup.vue';
+// Both of these live far below the fold (partners marquee comes after
+// testimonials, newsletter is just above the footer), so lazy-load
+// keeps them out of the initial bundle the same way we did for
+// TestimonialsCarousel. AnimatedCounter stays eagerly imported — it
+// fires on the visible-above-the-fold overview section and would
+// flash empty if lazy-loaded.
+const PartnersMarquee = defineAsyncComponent(() => import('@/Components/PartnersMarquee.vue'));
+const NewsletterSignup = defineAsyncComponent(() => import('@/Components/NewsletterSignup.vue'));
 import SectionTitle from '@/Components/SectionTitle.vue';
 import AnimatedCounter from '@/Components/AnimatedCounter.vue';
 import { useI18n } from 'vue-i18n';

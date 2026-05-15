@@ -176,10 +176,13 @@ onUnmounted(() => {
                             </Transition>
                         </div>
 
-                        <!-- Regular link -->
+                        <!-- Regular link. prefetch="hover" warms /pricing
+                             and /blog (top-level top-funnel routes) so the
+                             click registers as instant. -->
                         <Link
                             v-else
                             :href="link.href"
+                            prefetch="hover"
                             class="px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 text-dark hover:text-primary hover:bg-light-blue"
                         >
                             {{ link.label }}
@@ -197,8 +200,12 @@ onUnmounted(() => {
                          self-serve trial path was removed because the
                          clinic system is provisioned manually on a
                          separate hosting account, not auto-spun. -->
+                    <!-- prefetch on hover — the demo CTA is the highest-
+                         intent destination from the navbar, so warming
+                         the route on hover makes the click feel instant. -->
                     <Link
                         href="/demo"
+                        prefetch="hover"
                         class="px-6 py-2.5 bg-secondary hover:bg-secondary-dark text-white text-sm font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-secondary/25 hover:-translate-y-0.5"
                     >
                         {{ $t('nav.cta') }}
