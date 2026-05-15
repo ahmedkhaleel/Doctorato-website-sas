@@ -2,9 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\BlogPost;
 use App\Models\Currency;
 use App\Models\DemoRequest;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Cache;
 use App\Services\CountryDetector;
 use App\Services\LaunchOfferService;
 use App\Services\RecaptchaService;
@@ -89,6 +91,16 @@ class HandleInertiaRequests extends Middleware
                     'tagline_en' => SiteSetting::get('footer_tagline_en'),
                 ],
             ],
+            // Latest 4 blog posts for the footer "Latest from the blog"
+            // column. Cached 10 minutes so the footer doesn't pay for a
+            // DB hit on every request — invalidates on next cache flush.
+            'footerLatestPosts' => fn () => Cache::remember('footer.latest_posts', 600, function () {
+                return BlogPost::where('status', 'published')
+                    ->where('published_at', '<=', now())
+                    ->orderByDesc('published_at')
+                    ->limit(4)
+                    ->get(['id', 'slug', 'title_ar', 'title_en', 'published_at']);
+            }),
         ];
     }
 }

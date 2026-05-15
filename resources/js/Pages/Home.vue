@@ -12,6 +12,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import SeoHead from '@/Components/SeoHead.vue';
 import { computed } from 'vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
+import { useLocale } from '@/composables/useLocale';
 
 useScrollAnimation();
 
@@ -23,7 +24,25 @@ const props = defineProps({
     faqs: Array,
     currencies: Array,
     currentCurrency: String,
+    featuredPosts: { type: Array, default: () => [] },
 });
+
+// Pull these helpers in so the featured-posts strip can render
+// locale-aware titles/excerpts and format the publish date.
+const { localizedField: localizeBlog, isRtl: blogIsRtl } = useLocale();
+function blogPostExcerpt(post) {
+    return localizeBlog(post, 'excerpt') || '';
+}
+function blogPostTitle(post) {
+    return localizeBlog(post, 'title') || '';
+}
+function blogPostDate(dateString) {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    return d.toLocaleDateString(blogIsRtl.value ? 'ar-SA' : 'en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+    });
+}
 
 const overviewItems = computed(() => [
     {
@@ -1305,6 +1324,90 @@ const homeJsonLd = computed(() => ({
                             <div class="w-2 h-2 rounded-full bg-[#1B4F72]"></div>
                             95+ Modules
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7.5 Featured Articles — surfaces the long-form SEO content so
+                visitors discover the blog without digging into the nav -->
+        <section v-if="featuredPosts.length" class="py-20 lg:py-28 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                        <div>
+                            <p class="text-secondary text-sm font-bold uppercase tracking-wider mb-2">
+                                {{ blogIsRtl ? 'مقالات ودلائل' : 'Guides & insights' }}
+                            </p>
+                            <h2 class="text-3xl md:text-4xl font-bold text-dark">
+                                {{ blogIsRtl ? 'أحدث المقالات من مدوّنة Doctorato' : 'Latest from the Doctorato blog' }}
+                            </h2>
+                            <p class="text-gray mt-3 max-w-2xl">
+                                {{ blogIsRtl
+                                    ? 'أدلة عملية، مقارنات، وحسابات ROI لمساعدتك تختار وتدير نظام إدارة العيادات الأنسب.'
+                                    : 'Practical guides, comparisons, and ROI math to help you pick and run the right clinic management system.' }}
+                            </p>
+                        </div>
+                        <Link
+                            href="/blog"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 text-primary font-bold rounded-full border-2 border-primary hover:bg-primary hover:text-white transition-colors shrink-0"
+                        >
+                            {{ blogIsRtl ? 'كل المقالات' : 'All articles' }}
+                            <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </Link>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <article
+                            v-for="post in featuredPosts"
+                            :key="post.id"
+                            class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300"
+                        >
+                            <Link :href="`/blog/${post.slug}`" class="block overflow-hidden aspect-[16/9] bg-gradient-to-br from-primary/10 to-secondary/10 relative">
+                                <img
+                                    v-if="post.featured_image"
+                                    :src="post.featured_image"
+                                    :alt="blogPostTitle(post)"
+                                    loading="lazy"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div v-else class="w-full h-full flex items-center justify-center">
+                                    <svg class="w-16 h-16 text-primary/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                            </Link>
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-3 text-xs">
+                                    <span
+                                        v-if="post.category"
+                                        class="px-2.5 py-0.5 bg-primary/10 text-primary font-medium rounded-full"
+                                    >
+                                        {{ localizeBlog(post.category, 'name') }}
+                                    </span>
+                                    <span class="text-gray">{{ blogPostDate(post.published_at) }}</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-dark mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                                    <Link :href="`/blog/${post.slug}`">
+                                        {{ blogPostTitle(post) }}
+                                    </Link>
+                                </h3>
+                                <p class="text-gray text-sm leading-relaxed line-clamp-3">
+                                    {{ blogPostExcerpt(post) }}
+                                </p>
+                                <Link
+                                    :href="`/blog/${post.slug}`"
+                                    class="inline-flex items-center gap-2 mt-4 text-secondary font-semibold text-sm hover:text-primary transition-colors"
+                                >
+                                    {{ blogIsRtl ? 'اقرأ المقال' : 'Read article' }}
+                                    <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </Link>
+                            </div>
+                        </article>
                     </div>
                 </div>
             </div>

@@ -44,13 +44,17 @@ const navLinks = computed(() => [
         ],
     },
     { label: t('nav.pricing'), href: '/pricing' },
+    // Blog promoted to top-level — the long-form SEO articles are a
+    // primary content asset and were buried under Resources.
+    { label: t('nav.blog'), href: '/blog' },
     {
         label: locale.value === 'ar' ? 'الموارد' : 'Resources',
         dropdown: 'resources',
         children: [
             { label: locale.value === 'ar' ? 'دراسات الحالة' : 'Case studies', href: '/case-studies', desc: locale.value === 'ar' ? 'قصص نجاح عملاء حقيقيين' : 'Real customer success stories', icon: 'case' },
             { label: locale.value === 'ar' ? 'حاسبة العائد' : 'ROI calculator', href: '/roi-calculator', desc: locale.value === 'ar' ? 'احسب توفيرك خلال دقيقة' : 'Calculate your savings in a minute', icon: 'roi' },
-            { label: t('nav.blog'), href: '/blog', desc: locale.value === 'ar' ? 'مقالات ونصائح لإدارة العيادات' : 'Articles & tips for clinics', icon: 'blog' },
+            { label: locale.value === 'ar' ? 'مسرد المصطلحات' : 'Glossary', href: '/glossary', desc: locale.value === 'ar' ? 'تعريفات مصطلحات إدارة العيادات' : 'Clinic management terminology', icon: 'blog' },
+            { label: locale.value === 'ar' ? 'قارن الأنظمة' : 'Compare systems', href: '/compare', desc: locale.value === 'ar' ? 'Doctorato مقابل Drchrono و Vezeeta و Practo' : 'Doctorato vs Drchrono, Vezeeta, Practo', icon: 'reports' },
             { label: t('nav.faq'), href: '/faq', desc: locale.value === 'ar' ? 'إجابات الأسئلة المتكررة' : 'Answers to common questions', icon: 'faq' },
         ],
     },

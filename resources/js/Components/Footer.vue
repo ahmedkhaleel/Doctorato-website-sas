@@ -1,10 +1,18 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Link, useForm } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 
 const { t, locale, te } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
+
+// Latest blog posts come from the Inertia shared `footerLatestPosts`
+// prop, which is cached at the middleware layer.
+const page = usePage();
+const latestPosts = computed(() => page.props.footerLatestPosts || []);
+function postTitle(post) {
+    return isAr.value ? (post.title_ar || post.title_en) : (post.title_en || post.title_ar);
+}
 
 // Render a footer link label. When a translation key exists we use it;
 // otherwise fall back to the inline ar/en pair defined on the link —
@@ -137,7 +145,7 @@ const trustBadges = computed(() => [
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
                 <div class="grid grid-cols-2 md:grid-cols-12 gap-8 sm:gap-10 lg:gap-12">
                     <!-- Brand + about + social — full width on mobile, centered. -->
-                    <div class="col-span-2 md:col-span-12 lg:col-span-4 footer-fade text-center md:text-start" style="--delay: 0ms">
+                    <div class="col-span-2 md:col-span-12 lg:col-span-3 footer-fade text-center md:text-start" style="--delay: 0ms">
                         <Link href="/" class="inline-block mb-4 sm:mb-5 group">
                             <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 sm:w-40 h-auto logo-white group-hover:scale-105 transition-transform duration-300" />
                         </Link>
@@ -203,8 +211,39 @@ const trustBadges = computed(() => [
                         </ul>
                     </div>
 
-                    <!-- Newsletter — full width on mobile, 1/3 on md, 1/3 on lg -->
-                    <div class="col-span-2 md:col-span-4 lg:col-span-4 footer-fade" style="--delay: 300ms">
+                    <!-- Latest blog posts — surfaces the long-form SEO content
+                         on every page. Pulled from the Inertia-shared
+                         footerLatestPosts prop (cached 10 min). -->
+                    <div v-if="latestPosts.length" class="col-span-2 md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 250ms">
+                        <h4 class="relative inline-flex items-center gap-2 mb-5 text-base font-bold text-white">
+                            <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
+                            {{ isAr ? 'من المدوّنة' : 'From the blog' }}
+                        </h4>
+                        <ul class="space-y-2.5">
+                            <li v-for="post in latestPosts" :key="post.id">
+                                <Link
+                                    :href="`/blog/${post.slug}`"
+                                    class="group inline-flex items-start gap-1.5 text-sm text-white/55 hover:text-white transition-colors leading-snug"
+                                    :title="postTitle(post)"
+                                >
+                                    <span class="w-0 group-hover:w-2 h-px bg-[#C4A265] transition-all duration-300 mt-2 shrink-0"></span>
+                                    <span class="line-clamp-2">{{ postTitle(post) }}</span>
+                                </Link>
+                            </li>
+                        </ul>
+                        <Link
+                            href="/blog"
+                            class="inline-flex items-center gap-1.5 mt-4 text-xs text-[#C4A265] hover:text-[#D4B876] font-bold transition-colors"
+                        >
+                            {{ isAr ? 'كل المقالات' : 'All articles' }}
+                            <svg class="w-3 h-3 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </Link>
+                    </div>
+
+                    <!-- Newsletter — full width on mobile, 1/3 on md, 1/4 on lg -->
+                    <div class="col-span-2 md:col-span-4 lg:col-span-3 footer-fade" style="--delay: 300ms">
                         <div class="relative rounded-2xl p-5 sm:p-6 bg-white/[0.03] border border-white/[0.08] overflow-hidden footer-newsletter-card">
                             <!-- Soft glow behind card -->
                             <div class="absolute -top-10 -end-10 w-32 h-32 rounded-full bg-[#C4A265]/15 blur-3xl pointer-events-none"></div>
