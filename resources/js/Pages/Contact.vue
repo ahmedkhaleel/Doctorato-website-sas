@@ -3,7 +3,7 @@ import MainLayout from '@/Layouts/MainLayout.vue';
 import SeoHead from '@/Components/SeoHead.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted } from 'vue';
 import { useTracking } from '@/composables/useTracking';
 
@@ -99,25 +99,32 @@ const subjects = computed(() => [
     { value: 'other', label: t('contact.subject_other') },
 ]);
 
-// Contact channels
-const phones = [
-    {
-        country: 'مصر',
-        countryEn: 'Egypt',
-        flag: '🇪🇬',
-        number: '+20 101 296 7285',
-        raw: '+201012967285',
-        whatsapp: 'https://wa.me/201012967285',
-    },
-    {
-        country: 'الإمارات',
-        countryEn: 'UAE',
-        flag: '🇦🇪',
-        number: '+971 55 796 1688',
-        raw: '+971557961688',
-        whatsapp: 'https://wa.me/971557961688',
-    },
-];
+// Contact channels — geo-aware. The rule per product:
+//   visitors detected in Egypt see the Egyptian line; everyone else
+//   (UAE, Saudi, traveler, unknown) gets the UAE regional line.
+// We render ONE phone card based on the active country instead of
+// piling both on top of each other.
+const page = usePage();
+const activeCountry = computed(() => page.props.activeCountry || 'EG');
+
+const PHONE_EGYPT = {
+    country: 'مصر',
+    countryEn: 'Egypt',
+    flag: '🇪🇬',
+    number: '+20 101 296 7285',
+    raw: '+201012967285',
+    whatsapp: 'https://wa.me/201012967285',
+};
+const PHONE_REGIONAL = {
+    country: 'الإمارات',
+    countryEn: 'UAE',
+    flag: '🇦🇪',
+    number: '+971 55 796 1688',
+    raw: '+971557961688',
+    whatsapp: 'https://wa.me/971557961688',
+};
+
+const phone = computed(() => activeCountry.value === 'EG' ? PHONE_EGYPT : PHONE_REGIONAL);
 
 const email = 'info@doctorato.com';
 
@@ -270,7 +277,7 @@ const contactJsonLd = computed(() => ({
                             </span>
                             <div class="absolute inset-0 bg-gradient-to-r from-[#D4B87A] to-[#C4A265] translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                         </a>
-                        <a :href="phones[0].whatsapp" target="_blank" class="group px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold text-sm transition-all hover:bg-white/20 hover:scale-105 flex items-center gap-2">
+                        <a :href="phone.whatsapp" target="_blank" class="group px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-semibold text-sm transition-all hover:bg-white/20 hover:scale-105 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" /></svg>
                             واتساب فوري
                         </a>
@@ -280,116 +287,66 @@ const contactJsonLd = computed(() => ({
 
         </section>
 
-        <!-- ===== QUICK CONTACT CARDS ===== -->
+        <!-- ===== QUICK CONTACT CARDS — geo-aware single phone + email ===== -->
         <section class="relative -mt-12 z-20 pb-20">
             <div class="container mx-auto px-4">
-                <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Phone Egypt -->
+                <!-- Narrower max-width (was max-w-6xl with 3 cols), p-6 instead
+                     of p-8, and 2 cards instead of 3 — keeps the visual weight
+                     proportionate now that one phone replaces the EG/UAE pair. -->
+                <div class="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <!-- Phone — single card. EG visitors see Egypt; everyone
+                         else (UAE/Saudi/traveler/unknown) gets the UAE line. -->
                     <a
-                        :href="`tel:${phones[0].raw}`"
-                        class="contact-card reveal group relative rounded-[28px] p-8 overflow-hidden"
+                        :href="`tel:${phone.raw}`"
+                        class="contact-card reveal group relative rounded-2xl p-6 overflow-hidden"
                     >
-                        <!-- Layered background -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-white to-[#F8FAFC]"></div>
-                        <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#1B4F72] via-[#2E86C1] to-[#1B4F72]"></div>
-
-                        <!-- Corner flag -->
-                        <div class="absolute top-5 end-5 text-2xl opacity-90 group-hover:scale-110 transition-transform duration-500">{{ phones[0].flag }}</div>
-
-                        <!-- Decorative ring -->
-                        <div class="absolute -bottom-16 -end-16 w-48 h-48 rounded-full border border-[#1B4F72]/10 group-hover:scale-110 transition-transform duration-700"></div>
-                        <div class="absolute -bottom-8 -end-8 w-32 h-32 rounded-full border border-[#1B4F72]/10 group-hover:scale-110 transition-transform duration-700 delay-75"></div>
-
-                        <div class="relative">
-                            <!-- Icon -->
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] flex items-center justify-center shadow-lg shadow-[#1B4F72]/25 mb-5 group-hover:scale-105 transition-transform duration-500">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                            </div>
-
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#1B4F72] mb-1.5 font-bold">{{ phones[0].country }} — Egypt</p>
-                            <p class="text-xl font-bold text-[#1C2833] mb-5 tracking-tight" dir="ltr">{{ phones[0].number }}</p>
-
-                            <div class="flex items-center justify-between pt-5 border-t border-gray-100">
-                                <span class="text-xs text-gray-500 font-medium">اتصل مباشرة</span>
-                                <div class="w-9 h-9 rounded-full bg-[#1B4F72]/5 flex items-center justify-center group-hover:bg-[#1B4F72] transition-all duration-500">
-                                    <svg class="w-4 h-4 text-[#1B4F72] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Phone UAE (Featured - Gold) -->
-                    <a
-                        :href="`tel:${phones[1].raw}`"
-                        class="contact-card reveal group relative rounded-[28px] p-8 overflow-hidden md:-mt-4 md:mb-4"
-                        style="animation-delay: 100ms"
-                    >
-                        <!-- Layered background - Dark premium -->
+                        <!-- Dark premium background — pulls the eye since this
+                             is the primary CTA on the page. -->
                         <div class="absolute inset-0 bg-gradient-to-br from-[#0D2B45] via-[#1B4F72] to-[#0D2B45]"></div>
                         <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#C4A265] via-[#D4B87A] to-[#C4A265]"></div>
-
-                        <!-- Subtle pattern -->
                         <div class="absolute inset-0 opacity-[0.06]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 20px 20px;"></div>
+                        <div class="absolute -top-16 -start-16 w-48 h-48 bg-[#C4A265]/20 rounded-full blur-3xl group-hover:bg-[#C4A265]/30 transition-all duration-700"></div>
 
-                        <!-- Corner flag -->
-                        <div class="absolute top-5 end-5 text-2xl opacity-90 group-hover:scale-110 transition-transform duration-500">{{ phones[1].flag }}</div>
+                        <!-- Corner flag — auto-swaps when activeCountry flips -->
+                        <div class="absolute top-4 end-4 text-2xl opacity-90 group-hover:scale-110 transition-transform duration-500">{{ phone.flag }}</div>
 
-                        <!-- Glow -->
-                        <div class="absolute -top-20 -start-20 w-64 h-64 bg-[#C4A265]/20 rounded-full blur-3xl group-hover:bg-[#C4A265]/30 transition-all duration-700"></div>
-
-                        <!-- "Preferred" badge -->
-                        <div class="absolute top-5 start-5 px-2.5 py-1 rounded-full bg-[#C4A265]/20 border border-[#C4A265]/30">
-                            <span class="text-[9px] uppercase tracking-wider text-[#D4B87A] font-bold">⭐ الأفضل</span>
-                        </div>
-
-                        <div class="relative mt-10">
-                            <!-- Icon -->
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center shadow-lg shadow-[#C4A265]/30 mb-5 group-hover:scale-105 transition-transform duration-500">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                        <div class="relative">
+                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center shadow-lg shadow-[#C4A265]/30 mb-4 group-hover:scale-105 transition-transform duration-500">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                             </div>
-
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1.5 font-bold">{{ phones[1].country }} — UAE</p>
-                            <p class="text-xl font-bold text-white mb-5 tracking-tight" dir="ltr">{{ phones[1].number }}</p>
-
-                            <div class="flex items-center justify-between pt-5 border-t border-white/10">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1 font-bold">{{ phone.country }} — {{ phone.countryEn }}</p>
+                            <p class="text-lg font-bold text-white mb-4 tracking-tight" dir="ltr">{{ phone.number }}</p>
+                            <div class="flex items-center justify-between pt-4 border-t border-white/10">
                                 <span class="text-xs text-white/60 font-medium">اتصل مباشرة</span>
-                                <div class="w-9 h-9 rounded-full bg-[#C4A265]/20 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
-                                    <svg class="w-4 h-4 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                                <div class="w-8 h-8 rounded-full bg-[#C4A265]/20 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
+                                    <svg class="w-3.5 h-3.5 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                 </div>
                             </div>
                         </div>
                     </a>
 
-                    <!-- Email -->
+                    <!-- Email — companion card, light theme for contrast -->
                     <a
                         :href="`mailto:${email}`"
-                        class="contact-card reveal group relative rounded-[28px] p-8 overflow-hidden"
-                        style="animation-delay: 200ms"
+                        class="contact-card reveal group relative rounded-2xl p-6 overflow-hidden"
+                        style="animation-delay: 100ms"
                     >
-                        <!-- Layered background -->
                         <div class="absolute inset-0 bg-gradient-to-br from-white to-[#F8FAFC]"></div>
                         <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#C4A265] via-[#1B4F72] to-[#C4A265]"></div>
 
-                        <!-- Corner icon -->
-                        <div class="absolute top-5 end-5 text-xl opacity-60 group-hover:scale-110 transition-transform duration-500">@</div>
-
-                        <!-- Decorative ring -->
-                        <div class="absolute -bottom-16 -end-16 w-48 h-48 rounded-full border border-[#C4A265]/10 group-hover:scale-110 transition-transform duration-700"></div>
-                        <div class="absolute -bottom-8 -end-8 w-32 h-32 rounded-full border border-[#C4A265]/10 group-hover:scale-110 transition-transform duration-700 delay-75"></div>
+                        <div class="absolute top-4 end-4 text-xl opacity-60 group-hover:scale-110 transition-transform duration-500">@</div>
+                        <div class="absolute -bottom-12 -end-12 w-36 h-36 rounded-full border border-[#C4A265]/10 group-hover:scale-110 transition-transform duration-700"></div>
 
                         <div class="relative">
-                            <!-- Icon -->
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1B4F72] to-[#2E86C1] flex items-center justify-center shadow-lg shadow-[#1B4F72]/25 mb-5 group-hover:scale-105 transition-transform duration-500">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1B4F72] to-[#2E86C1] flex items-center justify-center shadow-lg shadow-[#1B4F72]/25 mb-4 group-hover:scale-105 transition-transform duration-500">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             </div>
-
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1.5 font-bold">البريد الإلكتروني</p>
-                            <p class="text-base font-bold text-[#1C2833] mb-5 tracking-tight break-all" dir="ltr">{{ email }}</p>
-
-                            <div class="flex items-center justify-between pt-5 border-t border-gray-100">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1 font-bold">البريد الإلكتروني</p>
+                            <p class="text-base font-bold text-[#1C2833] mb-4 tracking-tight break-all" dir="ltr">{{ email }}</p>
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                 <span class="text-xs text-gray-500 font-medium">راسلنا الآن</span>
-                                <div class="w-9 h-9 rounded-full bg-[#C4A265]/10 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
-                                    <svg class="w-4 h-4 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                                <div class="w-8 h-8 rounded-full bg-[#C4A265]/10 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
+                                    <svg class="w-3.5 h-3.5 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                 </div>
                             </div>
                         </div>
