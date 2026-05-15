@@ -17,11 +17,14 @@ class DemoRequestController extends Controller
             return back()->withInput()->withErrors(['clinic_name' => 'تعذر التحقق من الطلب، حاول مرة أخرى.']);
         }
 
+        // Phone limit was max:20 which rejects realistic international
+        // formats like "+1 (963) 646-4167". Bumped to 50 to accept
+        // brackets/dashes/spaces in any reasonable input.
         $validated = $request->validate([
             'clinic_name' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|string|max:50',
             'country_code' => 'required|string|max:10',
             'country' => 'nullable|string|max:100',
             'doctors_count' => 'nullable|string',
@@ -31,7 +34,17 @@ class DemoRequestController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        DemoRequest::create($validated);
+        try {
+            DemoRequest::create($validated);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Demo request save failed', [
+                'error' => $e->getMessage(),
+                'email' => $validated['email'] ?? null,
+            ]);
+            return back()
+                ->withInput()
+                ->withErrors(['clinic_name' => 'حدث خطأ أثناء حفظ الطلب. حاول مرة أخرى.']);
+        }
 
         return back()->with('success', true);
     }
