@@ -24,7 +24,7 @@ const isAr = computed(() => locale.value === 'ar');
 
 const COMPANY = 'Markeza Group';
 const PRODUCT = 'Doctorato';
-const CONTACT = 'info@markeza-group.com';
+const CONTACT = 'info@doctorato.com';
 const LAST_UPDATED = '2026-04-25';
 const GOVERNING_LAW_AR = 'القوانين المعمول بها في جمهورية مصر العربية';
 const GOVERNING_LAW_EN = 'the laws of the Arab Republic of Egypt';
