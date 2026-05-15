@@ -105,12 +105,47 @@ const stats = computed(() => [
     { value: tr('+200', '+200'), label: tr('منتج تجميلي مدعوم', 'Supported products'), suffix: '' },
     { value: tr('100', '100'), label: tr('موافقات رقمية', 'Digital consent rate'), suffix: '%' },
 ]);
+
+const ldJson = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Doctorato Dermatology',
+    applicationCategory: 'HealthApplication',
+    applicationSubCategory: 'Dermatology & Aesthetic Practice Management',
+    operatingSystem: 'Web, iOS, Android',
+    description: tr(
+        'نظام إدارة عيادات الجلدية والتجميل مع أرشيف صور قبل/بعد، باقات جلسات، إدارة مخزون الحقن، وموافقات رقمية.',
+        'Dermatology & cosmetic clinic software with before/after image archive, multi-session packages, injectable inventory, and digital consents.'
+    ),
+    inLanguage: ['ar', 'en'],
+    audience: { '@type': 'MedicalAudience', audienceType: 'Dermatologists' },
+    featureList: [
+        'Before/after image archive with RBAC',
+        'Multi-session treatment packages',
+        'Injectable inventory with expiry alerts',
+        'Skin analyzer integrations',
+        'Built-in CRM for follow-ups',
+    ],
+    offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'SAR',
+        lowPrice: '297',
+        highPrice: '2000',
+    },
+    aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        reviewCount: '38',
+        bestRating: '5',
+    },
+}));
 </script>
 
 <template>
     <SeoHead
         :title="tr('نظام إدارة عيادات الجلدية والتجميل | برنامج عيادة تجميل وليزر — دكتوراتو', 'Dermatology & Cosmetic Clinic Software | Best Aesthetic CRM — Doctorato')"
         :description="tr('أفضل نظام إدارة لعيادات الجلدية والتجميل والليزر: خرائط جلد تفاعلية، أرشيف صور قبل/بعد، بروتوكولات بوتكس وفيلر معتمدة، باقات جلسات، موافقات رقمية، مخزون منتجات، وتحليلات بالإجراء. جرّب 14 يوم مجاناً.', 'The leading dermatology + cosmetic clinic software: interactive skin maps, before/after photo archive, approved Botox/filler/laser protocols, session packages, digital consents, product inventory, per-procedure analytics. 14-day free trial.')"
+        :json-ld="ldJson"
         :breadcrumbs="[
             { name: tr('الرئيسية', 'Home'), url: '/' },
             { name: tr('عيادات الجلدية', 'Dermatology'), url: '/dermatology' },

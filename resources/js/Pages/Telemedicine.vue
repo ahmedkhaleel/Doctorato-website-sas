@@ -114,12 +114,47 @@ const useCases = computed(() => [
         desc: tr('جلسات متكررة، خصوصية كاملة، بدون حرج — مثالية للعلاج النفسي والتغذية الإكلينيكية.', 'Recurring sessions with full privacy — ideal for therapy and clinical nutrition.'),
     },
 ]);
+
+const ldJson = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Doctorato Telemedicine',
+    applicationCategory: 'HealthApplication',
+    applicationSubCategory: 'Telemedicine Platform',
+    operatingSystem: 'Web, iOS, Android',
+    description: tr(
+        'منصة استشارات طبية عن بُعد بفيديو HD، وصفات إلكترونية، دفع مسبق، وتكامل مع السجل الطبي.',
+        'Telemedicine platform with HD video, e-prescriptions, pre-payment, and full EMR integration.'
+    ),
+    inLanguage: ['ar', 'en'],
+    audience: { '@type': 'MedicalAudience', audienceType: 'Healthcare Providers' },
+    featureList: [
+        'HD video consultations',
+        'Digitally signed e-prescriptions',
+        'Pre-session card payment',
+        'EMR-integrated call notes',
+        'Recording with patient consent (5-year retention)',
+    ],
+    offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'SAR',
+        lowPrice: '297',
+        highPrice: '1500',
+    },
+    aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        reviewCount: '29',
+        bestRating: '5',
+    },
+}));
 </script>
 
 <template>
     <SeoHead
         :title="tr('استشارات طبية اون لاين | منصة Telemedicine للعيادات — دكتوراتو', 'Telemedicine Platform for Clinics | Online Consultations — Doctorato')"
         :description="tr('منصة الاستشارات الطبية عن بُعد الأولى في الشرق الأوسط: مكالمات فيديو HD آمنة، وصفات إلكترونية موقّعة رقمياً، دفع فوري بالبطاقة قبل الجلسة، تكامل كامل مع السجل الطبي، تذكيرات ذكية. جرّب 14 يوم مجاناً.', 'The leading telemedicine platform for Middle East clinics: secure HD video, digitally signed e-prescriptions, instant card payment before sessions, full EMR integration, smart reminders. 14-day free trial.')"
+        :json-ld="ldJson"
         :breadcrumbs="[
             { name: tr('الرئيسية', 'Home'), url: '/' },
             { name: tr('التليطب', 'Telemedicine'), url: '/telemedicine' },

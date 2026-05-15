@@ -61,13 +61,52 @@ function getExcerpt(post) {
     const body = localizedField(post, 'content') || localizedField(post, 'body') || '';
     return body.replace(/<[^>]*>/g, '').substring(0, 160) + '...';
 }
+
+// prev/next pagination URLs — pulled from Laravel's paginator so Google
+// understands the series and consolidates the link-equity onto page 1.
+const prevPageUrl = computed(() => props.posts?.prev_page_url || null);
+const nextPageUrl = computed(() => props.posts?.next_page_url || null);
+
+// CollectionPage schema for the blog index. Lists the current page's
+// posts as itemListElement so Google sees the index as a structured
+// collection rather than a leaf article.
+const blogIndexJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Doctorato Blog',
+    description: isRtl.value
+        ? 'مقالات وأدلة لإدارة العيادات الطبية في الشرق الأوسط'
+        : 'Articles and guides for clinic management in the Middle East',
+    inLanguage: isRtl.value ? 'ar' : 'en',
+    mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: (props.posts?.data || []).map((post, i) => ({
+            '@type': 'ListItem',
+            position: (props.posts?.from || 1) + i,
+            url: (typeof window !== 'undefined' ? window.location.origin : 'https://doctorato.com')
+                + '/blog/' + post.slug,
+            name: localizedField(post, 'title'),
+        })),
+    },
+}));
 </script>
 
 <template>
     <SeoHead
         :title="t('blog.page_title')"
         :description="t('blog.subtitle') || 'مقالات ونصائح لإدارة العيادات الطبية بذكاء'"
+        :json-ld="blogIndexJsonLd"
+        :breadcrumbs="[
+            { name: t('blog.breadcrumb_home'), url: '/' },
+            { name: t('blog.breadcrumb_blog'), url: '/blog' },
+        ]"
     />
+    <!-- prev/next pagination link tags — consolidates link-equity on
+         page 1 for Google and helps the SERP understand the series. -->
+    <Head>
+        <link v-if="prevPageUrl" rel="prev" :href="prevPageUrl" />
+        <link v-if="nextPageUrl" rel="next" :href="nextPageUrl" />
+    </Head>
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">

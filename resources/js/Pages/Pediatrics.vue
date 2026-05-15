@@ -88,12 +88,47 @@ const stats = computed(() => [
     { value: tr('100', '100'), label: tr('تطعيم مدعوم', 'Supported vaccines'), suffix: '%' },
     { value: tr('24/7', '24/7'), label: tr('بوابة أولياء الأمور', 'Parent portal access'), suffix: '' },
 ]);
+
+const ldJson = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Doctorato Pediatrics',
+    applicationCategory: 'HealthApplication',
+    applicationSubCategory: 'Pediatric Practice Management',
+    operatingSystem: 'Web, iOS, Android',
+    description: tr(
+        'نظام عيادات الأطفال مع منحنيات نمو WHO، جداول تطعيمات حسب البلد، ملف عائلة، وحاسبة جرعات.',
+        'Pediatric clinic software with WHO growth charts, country-specific vaccination schedules, family profiles, and dose calculators.'
+    ),
+    inLanguage: ['ar', 'en'],
+    audience: { '@type': 'MedicalAudience', audienceType: 'Pediatricians' },
+    featureList: [
+        'WHO growth charts (weight, height, head circumference)',
+        'Country-specific vaccination schedule',
+        'Family profile with multi-child support',
+        'Weight-based dose calculator',
+        'WhatsApp + SMS parent reminders',
+    ],
+    offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'SAR',
+        lowPrice: '297',
+        highPrice: '1200',
+    },
+    aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '34',
+        bestRating: '5',
+    },
+}));
 </script>
 
 <template>
     <SeoHead
         :title="tr('برنامج عيادات الأطفال | نظام عيادة طب أطفال — دكتوراتو', 'Pediatric Clinic Software | Best EMR for Pediatrics — Doctorato')"
         :description="tr('أفضل نظام عيادات أطفال في الخليج: منحنيات نمو WHO تلقائية، جداول تطعيمات ذكية مع تنبيهات، حسابات أدوية بالوزن، ملفات عائلية، بوابة أولياء الأمور. جرّب مجاناً 14 يوم.', 'The leading pediatric clinic software in the Middle East: automatic WHO growth charts, smart vaccination schedules with reminders, weight-based medication calculators, family profiles, parent portal. Free 14-day trial.')"
+        :json-ld="ldJson"
         :breadcrumbs="[
             { name: tr('الرئيسية', 'Home'), url: '/' },
             { name: tr('طب الأطفال', 'Pediatrics'), url: '/pediatrics' },
