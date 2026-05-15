@@ -72,12 +72,36 @@ function fmtMoney(v) {
 }
 
 const currencyLabel = computed(() => tr('ج.م', 'EGP'));
+
+// WebApplication schema — surfaces the calculator as an interactive
+// tool in SERP, distinct from a static informational page.
+const roiJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: tr('حاسبة العائد على الاستثمار من Doctorato', 'Doctorato ROI Calculator'),
+    description: tr(
+        'حاسبة تفاعلية تحسب توفير العيادة الشهري + العائد السنوي من تطبيق Doctorato بناءً على أرقام عيادتك الفعلية.',
+        'An interactive calculator that estimates your clinic\'s monthly savings and annual return from Doctorato, based on your actual numbers.'
+    ),
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires JavaScript',
+    inLanguage: ['ar', 'en'],
+    offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+    },
+    isAccessibleForFree: true,
+}));
 </script>
 
 <template>
     <SeoHead
         :title="tr('حاسبة العائد على الاستثمار', 'ROI Calculator')"
         :description="tr('احسب كم ستوفّر عيادتك وكم ستربح إضافياً عند استخدام دكتوراتو — في أقل من دقيقة', 'Calculate your clinic savings and extra revenue with Doctorato — in under a minute')"
+        :json-ld="roiJsonLd"
         :breadcrumbs="[
             { name: tr('الرئيسية', 'Home'), url: '/' },
             { name: tr('حاسبة العائد', 'ROI Calculator'), url: '/roi-calculator' },

@@ -11,9 +11,9 @@
  */
 import MainLayout from '@/Layouts/MainLayout.vue';
 import DemoRequestForm from '@/Components/DemoRequestForm.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
-import { Head } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
 const { t, locale } = useI18n();
@@ -72,10 +72,57 @@ const openFaq = ref(null);
 function toggleFaq(idx) {
     openFaq.value = openFaq.value === idx ? null : idx;
 }
+
+// Service schema — tells Google the page offers a tangible service
+// (a free demo) so the SERP card can carry the FAQ snippets as well
+// as the offer detail. Includes the FAQs above as a FAQPage entity.
+const demoJsonLd = computed(() => [
+    {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: isAr.value ? 'عرض توضيحي مجاني لـ Doctorato' : 'Doctorato free demo',
+        provider: {
+            '@type': 'Organization',
+            name: 'Doctorato',
+            url: 'https://doctorato.com',
+        },
+        description: isAr.value
+            ? 'عرض توضيحي مجاني (30-45 دقيقة) مع فريق Doctorato — يغطي احتياجات عيادتك والباقة المناسبة والإعداد.'
+            : 'A free 30-45 minute demo with the Doctorato team — covers your clinic needs, the right plan, and onboarding.',
+        serviceType: 'Product Demo',
+        offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            url: 'https://doctorato.com/demo',
+        },
+        areaServed: ['SA', 'AE', 'EG', 'KW', 'QA', 'BH', 'OM'],
+    },
+    {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.value.map(f => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+    },
+]);
 </script>
 
 <template>
-    <Head :title="t('demo.page_title') || (isAr ? 'احجز عرضاً تجريبياً' : 'Book a demo')" />
+    <SeoHead
+        :title="t('demo.page_title') || (isAr ? 'احجز عرضاً تجريبياً' : 'Book a demo')"
+        :description="isAr
+            ? 'احجز عرضاً توضيحياً مجانياً 30-45 دقيقة مع فريق Doctorato — تجربة مجانية 14 يوم بعده، بدون بطاقة ائتمان.'
+            : 'Book a free 30-45 minute demo with the Doctorato team — followed by a 14-day free trial, no credit card required.'"
+        :json-ld="demoJsonLd"
+        :breadcrumbs="[
+            { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
+            { name: isAr ? 'احجز عرضاً تجريبياً' : 'Book a demo', url: '/demo' },
+        ]"
+    />
     <MainLayout>
         <!-- ─── Hero ─────────────────────────────────────────────── -->
         <section class="relative pt-28 pb-16 sm:pt-32 sm:pb-20 md:pt-40 md:pb-24 bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] overflow-hidden">

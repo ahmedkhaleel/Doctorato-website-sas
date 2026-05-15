@@ -1,11 +1,14 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
 import AnimatedCounter from '@/Components/AnimatedCounter.vue';
-import TestimonialsCarousel from '@/Components/TestimonialsCarousel.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
+
+// Lazy-load the carousel — same reasoning as Home.vue: large chunk
+// below the fold, so split it out of the initial About bundle.
+const TestimonialsCarousel = defineAsyncComponent(() => import('@/Components/TestimonialsCarousel.vue'));
 
 const { t } = useI18n();
 useScrollAnimation();
