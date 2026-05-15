@@ -51,14 +51,17 @@ class CountryDetector
             return $this->ensureSupported(strtoupper($stored));
         }
 
-        // Auto-detect from the current request. Cloudflare first
-        // (zero-latency); ip-api second (cached 24h per IP).
-        // We INTENTIONALLY don't fall back to $stored here — if the
-        // visitor was previously detected as EG and now their IP says
-        // nothing, we'd rather show 'EG' (the home market default)
-        // than the stale session value, which is what kept travelers
-        // pinned to the old currency.
+        // Auto-detect from the current request. Cascade through the
+        // cheapest signals first (zero-latency headers + native PHP
+        // extensions) before falling back to HTTPS lookups, so the
+        // system still works even when outbound HTTP is blocked or
+        // the cURL extension isn't enabled.
+        // We INTENTIONALLY don't fall back to $stored here — pinning
+        // a traveler to the old session value is exactly the bug we
+        // were trying to fix.
         $detected = $this->fromCloudflare($request)
+            ?? $this->fromServerHeaders($request)
+            ?? $this->fromGeoipExtension($request)
             ?? $this->fromIpLookup($request)
             ?? 'EG';
 
@@ -87,11 +90,16 @@ class CountryDetector
             'cf_ipcountry' => $request->header('CF-IPCountry'),
             'session_country' => $request->session()->get(self::SESSION_KEY),
             'session_source' => $request->session()->get(self::SOURCE_KEY),
+            'php_curl_loaded' => extension_loaded('curl'),
+            'php_geoip_loaded' => extension_loaded('geoip'),
+            'php_allow_url_fopen' => (bool) ini_get('allow_url_fopen'),
+            'apache_geoip_header' => $_SERVER['GEOIP_COUNTRY_CODE'] ?? null,
             'from_cloudflare' => $this->fromCloudflare($request),
+            'from_server_headers' => $this->fromServerHeaders($request),
+            'from_geoip_extension' => $this->fromGeoipExtension($request),
             'from_ip_lookup' => $this->fromIpLookup($request),
             'resolved' => $this->resolve($request),
             'supported_codes' => collect($this->supportedCountries())->pluck('country_code')->values(),
-            'trusted_proxies' => 'see TrustProxies middleware — accepts X-Forwarded-* from any proxy',
         ];
     }
 
@@ -126,6 +134,40 @@ class CountryDetector
                 ->values()
                 ->toArray();
         });
+    }
+
+    /**
+     * Look for GeoIP country headers set by Apache mod_geoip2 or
+     * nginx GeoIP modules. Many cPanel/WHM hosts ship one of these
+     * by default — zero outbound traffic, zero latency.
+     */
+    protected function fromServerHeaders(Request $request): ?string
+    {
+        foreach (['GEOIP_COUNTRY_CODE', 'HTTP_X_GEO_COUNTRY', 'HTTP_X_COUNTRY_CODE'] as $key) {
+            $value = $_SERVER[$key] ?? $request->header($key);
+            if ($value && strlen($value) === 2 && ctype_alpha($value)) {
+                return strtoupper($value);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Use the PHP geoip extension if it's loaded. Requires the
+     * GeoIP.dat database on the server (`/usr/share/GeoIP/GeoIP.dat`
+     * on most cPanel boxes). Costs ~1ms, no network.
+     */
+    protected function fromGeoipExtension(Request $request): ?string
+    {
+        if (!function_exists('geoip_country_code_by_name')) return null;
+        $ip = $request->ip();
+        if (!$ip) return null;
+        try {
+            $code = @geoip_country_code_by_name($ip);
+            return ($code && strlen($code) === 2) ? strtoupper($code) : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     protected function fromCloudflare(Request $request): ?string
