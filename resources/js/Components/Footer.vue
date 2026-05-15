@@ -1,4 +1,23 @@
 <script setup>
+/**
+ * Footer — rebuilt for visual balance and professional hierarchy.
+ *
+ * Layout (top to bottom):
+ *   1. Brand row    : logo + description + social, single column,
+ *                     spans the full width so the brand reads big.
+ *   2. Link grid    : four equal-weight columns (Product, Resources,
+ *                     Company, From the blog). Same width = visually
+ *                     balanced; no column dominates.
+ *   3. Newsletter   : centered card with the form, given its own
+ *                     row instead of being crammed into a sidebar.
+ *                     Acts as the conversion focal point.
+ *   4. Trust strip  : compact row of compliance badges.
+ *   5. Legal bar    : copyright + privacy + terms, evenly split.
+ *
+ * Background is single subtle aurora + dot grid — the previous
+ * version had three overlapping orbs and a diagonal grid, which
+ * fought for attention.
+ */
 import { ref, computed } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
@@ -6,20 +25,17 @@ import { useI18n } from 'vue-i18n';
 const { t, locale, te } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
 
-// Latest blog posts come from the Inertia shared `footerLatestPosts`
-// prop, which is cached at the middleware layer.
 const page = usePage();
 const latestPosts = computed(() => page.props.footerLatestPosts || []);
 function postTitle(post) {
     return isAr.value ? (post.title_ar || post.title_en) : (post.title_en || post.title_ar);
 }
 
-// Render a footer link label. When a translation key exists we use it;
-// otherwise fall back to the inline ar/en pair defined on the link —
-// this avoids having to round-trip to ar.json for brand-new pages.
+// Render a footer link label. When a translation key exists we use
+// it; otherwise fall back to the inline ar/en pair on the link.
 function linkLabel(link) {
     if (link.label && te(link.label)) return t(link.label);
-    if (link.fallback) return locale.value === 'ar' ? link.fallback.ar : link.fallback.en;
+    if (link.fallback) return isAr.value ? link.fallback.ar : link.fallback.en;
     return link.label;
 }
 
@@ -43,24 +59,31 @@ function scrollTop() {
     }
 }
 
+// Four sibling link columns — each kept to ~5 items so columns are
+// visually the same height, which is what made the old footer feel
+// lopsided when one column had 7 links and another had 4.
 const productLinks = [
     { label: 'nav.features', href: '/features' },
     { label: 'nav.portals', href: '/portals' },
-    { label: 'footer.link_dental', href: '/dental', fallback: { ar: 'نظام عيادات الأسنان', en: 'Dental clinic system' } },
+    { label: 'footer.link_dental', href: '/dental', fallback: { ar: 'عيادات الأسنان', en: 'Dental' } },
     { label: 'footer.link_pediatrics', href: '/pediatrics', fallback: { ar: 'طب الأطفال', en: 'Pediatrics' } },
-    { label: 'footer.link_telemedicine', href: '/telemedicine', fallback: { ar: 'الاستشارات الأون لاين', en: 'Online consultations' } },
-    { label: 'nav.solutions', href: '/solutions' },
+    { label: 'footer.link_telemedicine', href: '/telemedicine', fallback: { ar: 'الاستشارات الأون لاين', en: 'Telemedicine' } },
+];
+
+const resourcesLinks = [
     { label: 'nav.pricing', href: '/pricing' },
+    { label: 'nav.blog', href: '/blog' },
+    { label: 'footer.link_glossary', href: '/glossary', fallback: { ar: 'قاموس المصطلحات', en: 'Glossary' } },
+    { label: 'footer.link_compare', href: '/compare', fallback: { ar: 'مقارنة الأنظمة', en: 'Compare systems' } },
+    { label: 'nav.faq', href: '/faq', fallback: { ar: 'الأسئلة الشائعة', en: 'FAQ' } },
 ];
 
 const companyLinks = [
+    { label: 'nav.about', href: '/about', fallback: { ar: 'عن دكتوراتو', en: 'About' } },
     { label: 'footer.contact_us', href: '/contact' },
     { label: 'footer.request_demo', href: '/demo' },
     { label: 'nav.technology', href: '/technology' },
     { label: 'nav.reports', href: '/reports' },
-    { label: 'nav.blog', href: '/blog' },
-    { label: 'footer.link_glossary', href: '/glossary', fallback: { ar: 'قاموس المصطلحات', en: 'Glossary' } },
-    { label: 'footer.link_compare', href: '/compare', fallback: { ar: 'مقارنة بالمنافسين', en: 'Compare alternatives' } },
 ];
 
 const socialLinks = [
@@ -72,247 +95,219 @@ const socialLinks = [
 ];
 
 const trustBadges = computed(() => [
-    { label: 'SSL 256-bit',                                color: 'text-emerald-400', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' },
-    { label: 'PCI DSS',                                    color: 'text-blue-400',    icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
-    { label: isAr.value ? 'GDPR متوافق' : 'GDPR-ready',     color: 'text-amber-400',   icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
-    { label: isAr.value ? 'HIPAA متوافق' : 'HIPAA-aligned', color: 'text-rose-400',    icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
-    { label: isAr.value ? '99.9% استقرار' : '99.9% uptime', color: 'text-emerald-400', live: true },
-    { label: isAr.value ? 'دعم 24/7'      : '24/7 support', color: 'text-[#C4A265]',   icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: 'SSL 256-bit', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' },
+    { label: 'PCI DSS',     icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
+    { label: isAr.value ? 'GDPR متوافق' : 'GDPR-ready',     icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
+    { label: isAr.value ? 'HIPAA متوافق' : 'HIPAA-aligned', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+    { label: isAr.value ? '99.9% استقرار' : '99.9% uptime', live: true },
+    { label: isAr.value ? 'دعم 24/7'      : '24/7 support', icon: 'M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 7v5l3 2' },
+]);
+
+const linkColumns = computed(() => [
+    { title: t('footer.quick_links'),                       links: productLinks },
+    { title: isAr.value ? 'الموارد'   : 'Resources',         links: resourcesLinks },
+    { title: t('footer.support'),                           links: companyLinks },
 ]);
 </script>
 
 <template>
     <footer class="relative text-white overflow-hidden bg-[#070F1B]">
-        <!-- ─── Layer 1 — animated gold gradient line at the very top ─── -->
-        <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/60 to-transparent footer-shimmer"></div>
+        <!-- Top hairline — soft gold gradient, no shimmer; subtle by design. -->
+        <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/50 to-transparent"></div>
 
-        <!-- ─── Layer 2 — base radial gradient bed ─── -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[#0A1628] via-[#0F1923] to-[#070F1B]"></div>
-
-        <!-- ─── Layer 3 — dot grid texture ─── -->
+        <!-- Single quiet background — base gradient + one aurora orb +
+             dot grid. The previous version stacked three orbs and a
+             diagonal grid that fought for attention. -->
+        <div class="absolute inset-0 bg-gradient-to-b from-[#0A1726] via-[#0A1320] to-[#070F1B]"></div>
+        <div class="absolute inset-x-0 top-0 h-96 bg-[#1B4F72]/15 blur-[140px] pointer-events-none"></div>
         <div
-            class="absolute inset-0 opacity-[0.06] pointer-events-none"
-            style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 36px 36px;"
+            class="absolute inset-0 opacity-[0.04] pointer-events-none"
+            style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 32px 32px;"
         ></div>
 
-        <!-- ─── Layer 4 — floating aurora orbs (drift slowly) ─── -->
-        <div class="absolute inset-0 pointer-events-none overflow-hidden">
-            <div class="absolute -top-40 -start-20 w-[28rem] h-[28rem] rounded-full bg-[#1B4F72]/30 blur-[140px] footer-aurora"></div>
-            <div class="absolute -bottom-32 -end-32 w-[36rem] h-[36rem] rounded-full bg-[#C4A265]/[0.10] blur-[160px] footer-aurora" style="animation-delay: -8s"></div>
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24rem] h-[24rem] rounded-full bg-[#2E86C1]/15 blur-[120px] footer-aurora" style="animation-delay: -16s"></div>
-        </div>
-
-        <!-- ─── Layer 5 — diagonal grid (drifts) — desktop only to save mobile battery + reduce visual noise on small screens ─── -->
-        <div class="absolute inset-0 footer-diagonal-grid pointer-events-none hidden sm:block"></div>
-
-        <!-- ──────────── Content ──────────── -->
         <div class="relative">
-            <!-- Tagline bar — centered stack on mobile, side-by-side on desktop -->
-            <div class="border-b border-white/[0.06]">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
-                        <div class="flex flex-col sm:flex-row items-center text-center sm:text-start gap-3 sm:gap-4 w-full sm:w-auto">
-                            <div class="relative shrink-0">
-                                <div class="absolute inset-0 rounded-2xl bg-[#C4A265]/20 blur-xl footer-pulse"></div>
-                                <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/20">
-                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a9 9 0 0118 0v6m-3 0a3 3 0 11-6 0 3 3 0 016 0zm0 0v-6m-12 6a3 3 0 11-6 0 3 3 0 016 0zm0 0v-6" />
+            <!-- ───────── 1. Brand row ───────── -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-16 lg:pt-20 pb-10 sm:pb-12">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                    <!-- Logo + description -->
+                    <div class="md:col-span-7 lg:col-span-8 text-center md:text-start footer-fade" style="--delay: 0ms">
+                        <Link href="/" class="inline-block mb-5 group">
+                            <img
+                                src="/images/doctorato-logo.png"
+                                alt="Doctorato"
+                                class="w-36 sm:w-40 h-auto logo-white group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </Link>
+                        <p class="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl mx-auto md:mx-0">
+                            {{ $t('footer.description') }}
+                        </p>
+                    </div>
+
+                    <!-- Social + back-to-top, right-aligned on desktop -->
+                    <div class="md:col-span-5 lg:col-span-4 footer-fade flex flex-col items-center md:items-end gap-5" style="--delay: 100ms">
+                        <div>
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] font-bold mb-3 text-center md:text-end">
+                                {{ isAr ? 'تابعنا' : 'Follow us' }}
+                            </p>
+                            <div class="flex items-center gap-2">
+                                <a
+                                    v-for="social in socialLinks"
+                                    :key="social.name"
+                                    :href="social.href"
+                                    :aria-label="social.name"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="group relative w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:border-white/20 overflow-hidden"
+                                >
+                                    <span
+                                        class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        :style="{ background: social.color }"
+                                    ></span>
+                                    <svg class="relative w-4 h-4 fill-current text-white/70 group-hover:text-white transition-colors" viewBox="0 0 24 24">
+                                        <path :d="social.icon" />
                                     </svg>
-                                </div>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#C4A265] font-bold mb-0.5">{{ isAr ? 'مهمتنا' : 'Our mission' }}</p>
-                                <p class="text-xs sm:text-base font-semibold text-white/90 leading-snug">
-                                    {{ isAr ? 'تحويل العيادات الطبية للعصر الرقمي — بكفاءة وأمان' : 'Clinics in the digital age — efficient, secure, beautiful' }}
-                                </p>
+                                </a>
                             </div>
                         </div>
                         <button
                             @click="scrollTop"
-                            class="group hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-xs font-semibold text-white/70 hover:text-white transition-all"
+                            class="group inline-flex items-center gap-1.5 text-xs font-semibold text-white/50 hover:text-white transition-colors"
                         >
-                            <span>{{ isAr ? 'العودة لأعلى' : 'Back to top' }}</span>
                             <svg class="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                             </svg>
+                            {{ isAr ? 'العودة لأعلى' : 'Back to top' }}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Main columns — 2-col on mobile (link blocks side-by-side),
-                 12-col on md+ for full layout flexibility. -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
-                <div class="grid grid-cols-2 md:grid-cols-12 gap-8 sm:gap-10 lg:gap-12">
-                    <!-- Brand + about + social — full width on mobile, centered. -->
-                    <div class="col-span-2 md:col-span-12 lg:col-span-3 footer-fade text-center md:text-start" style="--delay: 0ms">
-                        <Link href="/" class="inline-block mb-4 sm:mb-5 group">
-                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 sm:w-40 h-auto logo-white group-hover:scale-105 transition-transform duration-300" />
-                        </Link>
-                        <p class="text-white/55 text-sm leading-relaxed mb-5 sm:mb-6 max-w-md mx-auto md:mx-0">
-                            {{ $t('footer.description') }}
-                        </p>
-
-                        <!-- Social icons — centered on mobile -->
-                        <div class="flex items-center justify-center md:justify-start gap-2 sm:gap-2.5">
-                            <a
-                                v-for="social in socialLinks"
-                                :key="social.name"
-                                :href="social.href"
-                                :aria-label="social.name"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="group relative w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:scale-110 overflow-hidden"
-                                :style="{ '--brand-color': social.color }"
-                            >
-                                <span class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" :style="{ background: social.color }"></span>
-                                <svg class="relative w-4 h-4 fill-current text-white/70 group-hover:text-white transition-colors" viewBox="0 0 24 24">
-                                    <path :d="social.icon" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Product links — 1/2 width on mobile (side-by-side with Support) -->
-                    <div class="col-span-1 md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 100ms">
-                        <h4 class="relative inline-flex items-center gap-2 mb-5 text-base font-bold text-white">
-                            <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
-                            {{ $t('footer.quick_links') }}
-                        </h4>
-                        <ul class="space-y-2.5">
-                            <li v-for="link in productLinks" :key="link.href">
-                                <Link
-                                    :href="link.href"
-                                    class="group inline-flex items-center gap-1.5 text-sm text-white/55 hover:text-white transition-colors"
-                                >
-                                    <span class="w-0 group-hover:w-2 h-px bg-[#C4A265] transition-all duration-300"></span>
-                                    <span>{{ linkLabel(link) }}</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Company links — 1/2 width on mobile -->
-                    <div class="col-span-1 md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 200ms">
-                        <h4 class="relative inline-flex items-center gap-2 mb-5 text-base font-bold text-white">
-                            <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
-                            {{ $t('footer.support') }}
-                        </h4>
-                        <ul class="space-y-2.5">
-                            <li v-for="link in companyLinks" :key="link.href">
-                                <Link
-                                    :href="link.href"
-                                    class="group inline-flex items-center gap-1.5 text-sm text-white/55 hover:text-white transition-colors"
-                                >
-                                    <span class="w-0 group-hover:w-2 h-px bg-[#C4A265] transition-all duration-300"></span>
-                                    <span>{{ linkLabel(link) }}</span>
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Latest blog posts — surfaces the long-form SEO content
-                         on every page. Pulled from the Inertia-shared
-                         footerLatestPosts prop (cached 10 min). -->
-                    <div v-if="latestPosts.length" class="col-span-2 md:col-span-4 lg:col-span-2 footer-fade" style="--delay: 250ms">
-                        <h4 class="relative inline-flex items-center gap-2 mb-5 text-base font-bold text-white">
-                            <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
-                            {{ isAr ? 'من المدوّنة' : 'From the blog' }}
-                        </h4>
-                        <ul class="space-y-2.5">
-                            <li v-for="post in latestPosts" :key="post.id">
-                                <Link
-                                    :href="`/blog/${post.slug}`"
-                                    class="group inline-flex items-start gap-1.5 text-sm text-white/55 hover:text-white transition-colors leading-snug"
-                                    :title="postTitle(post)"
-                                >
-                                    <span class="w-0 group-hover:w-2 h-px bg-[#C4A265] transition-all duration-300 mt-2 shrink-0"></span>
-                                    <span class="line-clamp-2">{{ postTitle(post) }}</span>
-                                </Link>
-                            </li>
-                        </ul>
-                        <Link
-                            href="/blog"
-                            class="inline-flex items-center gap-1.5 mt-4 text-xs text-[#C4A265] hover:text-[#D4B876] font-bold transition-colors"
+            <!-- ───────── 2. Link grid — 4 equal-weight columns ───────── -->
+            <div class="border-t border-white/[0.05]">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+                        <!-- 3 link columns rendered from the same template — visually identical. -->
+                        <div
+                            v-for="(column, idx) in linkColumns"
+                            :key="column.title"
+                            class="footer-fade"
+                            :style="`--delay: ${150 + idx * 80}ms;`"
                         >
-                            {{ isAr ? 'كل المقالات' : 'All articles' }}
-                            <svg class="w-3 h-3 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </Link>
-                    </div>
-
-                    <!-- Newsletter — full width on mobile, 1/3 on md, 1/4 on lg -->
-                    <div class="col-span-2 md:col-span-4 lg:col-span-3 footer-fade" style="--delay: 300ms">
-                        <div class="relative rounded-2xl p-5 sm:p-6 bg-white/[0.03] border border-white/[0.08] overflow-hidden footer-newsletter-card">
-                            <!-- Soft glow behind card -->
-                            <div class="absolute -top-10 -end-10 w-32 h-32 rounded-full bg-[#C4A265]/15 blur-3xl pointer-events-none"></div>
-
-                            <h4 class="relative inline-flex items-center gap-2 mb-2 text-base font-bold text-white">
-                                <span class="w-1 h-4 rounded-full bg-gradient-to-b from-[#C4A265] to-[#D4B876]"></span>
-                                {{ $t('footer.newsletter') }}
+                            <h4 class="text-xs font-bold tracking-[0.18em] uppercase text-[#C4A265] mb-5">
+                                {{ column.title }}
                             </h4>
-                            <p class="text-xs sm:text-sm text-white/55 mb-4 leading-relaxed">{{ $t('footer.newsletter_desc') }}</p>
-
-                            <form @submit.prevent="submitNewsletter" class="space-y-2.5">
-                                <!-- Stack vertically on mobile so each touch target is full-width
-                                     and easy to tap with a thumb. Inline on sm+ for compactness. -->
-                                <div class="flex flex-col sm:flex-row gap-2 sm:gap-2 rounded-xl">
-                                    <input
-                                        v-model="newsletterForm.email"
-                                        type="email"
-                                        required
-                                        :placeholder="$t('footer.email_placeholder')"
-                                        class="w-full sm:flex-1 sm:min-w-0 px-3.5 py-3 sm:py-2.5 rounded-lg bg-white/[0.06] border border-white/[0.12] text-white placeholder-white/35 text-sm focus:border-[#C4A265]/60 focus:bg-white/[0.10] focus:ring-2 focus:ring-[#C4A265]/20 outline-none transition-all"
-                                        dir="ltr"
-                                    />
-                                    <button
-                                        type="submit"
-                                        :disabled="newsletterForm.processing"
-                                        class="group inline-flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 sm:px-5 py-3 sm:py-2.5 bg-gradient-to-r from-[#C4A265] to-[#D4B876] hover:shadow-lg hover:shadow-[#C4A265]/25 text-white text-sm font-bold rounded-lg transition-all duration-300 disabled:opacity-50 hover:-translate-y-0.5"
+                            <ul class="space-y-3">
+                                <li v-for="link in column.links" :key="link.href">
+                                    <Link
+                                        :href="link.href"
+                                        class="group inline-flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors"
                                     >
-                                        <span>{{ $t('footer.subscribe') }}</span>
-                                        <svg class="w-4 h-4 rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <p v-if="newsletterForm.errors.email" class="text-rose-400 text-xs">{{ newsletterForm.errors.email }}</p>
-                                <Transition
-                                    enter-active-class="transition duration-300"
-                                    enter-from-class="opacity-0 -translate-y-1"
-                                    enter-to-class="opacity-100 translate-y-0"
-                                    leave-active-class="transition duration-200"
-                                    leave-from-class="opacity-100"
-                                    leave-to-class="opacity-0"
-                                >
-                                    <p v-if="newsletterSuccess" class="flex items-center gap-1.5 text-emerald-400 text-xs font-semibold">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        {{ $t('footer.subscribe_success') }}
-                                    </p>
-                                </Transition>
-                            </form>
+                                        <span class="w-0 group-hover:w-3 h-px bg-[#C4A265] transition-all duration-300"></span>
+                                        <span>{{ linkLabel(link) }}</span>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 4th column: latest posts -->
+                        <div v-if="latestPosts.length" class="footer-fade" style="--delay: 390ms">
+                            <h4 class="text-xs font-bold tracking-[0.18em] uppercase text-[#C4A265] mb-5">
+                                {{ isAr ? 'من المدوّنة' : 'From the blog' }}
+                            </h4>
+                            <ul class="space-y-3">
+                                <li v-for="post in latestPosts.slice(0, 4)" :key="post.id">
+                                    <Link
+                                        :href="`/blog/${post.slug}`"
+                                        class="group inline-flex items-start gap-1.5 text-sm text-white/60 hover:text-white transition-colors leading-snug"
+                                        :title="postTitle(post)"
+                                    >
+                                        <span class="w-0 group-hover:w-3 h-px bg-[#C4A265] transition-all duration-300 mt-2 shrink-0"></span>
+                                        <span class="line-clamp-2">{{ postTitle(post) }}</span>
+                                    </Link>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Trust strip — 3-col grid on mobile (2 rows of 3), inline on desktop -->
-            <div class="border-t border-white/[0.06] bg-black/30 backdrop-blur-sm">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                    <div class="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 gap-y-3">
+            <!-- ───────── 3. Newsletter — its own focal row ───────── -->
+            <div class="border-t border-white/[0.05]">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+                    <div class="max-w-3xl mx-auto text-center footer-fade" style="--delay: 0ms">
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] font-bold mb-3">
+                            {{ isAr ? 'نشرة بريدية' : 'Newsletter' }}
+                        </p>
+                        <h3 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white mb-2">
+                            {{ $t('footer.newsletter') }}
+                        </h3>
+                        <p class="text-sm sm:text-base text-white/55 mb-6 max-w-xl mx-auto leading-relaxed">
+                            {{ $t('footer.newsletter_desc') }}
+                        </p>
+
+                        <form @submit.prevent="submitNewsletter" class="max-w-md mx-auto">
+                            <div class="relative flex flex-col sm:flex-row gap-2 p-1 sm:p-1.5 rounded-2xl sm:rounded-full bg-white/[0.04] border border-white/[0.08] focus-within:border-[#C4A265]/40 transition-colors">
+                                <input
+                                    v-model="newsletterForm.email"
+                                    type="email"
+                                    required
+                                    :placeholder="$t('footer.email_placeholder')"
+                                    class="flex-1 min-w-0 px-4 py-3 sm:py-2.5 bg-transparent text-white placeholder-white/35 text-sm outline-none"
+                                    dir="ltr"
+                                />
+                                <button
+                                    type="submit"
+                                    :disabled="newsletterForm.processing"
+                                    class="group inline-flex items-center justify-center gap-1.5 px-5 sm:px-6 py-3 sm:py-2.5 bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white text-sm font-bold rounded-xl sm:rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-[#C4A265]/30 disabled:opacity-50"
+                                >
+                                    <span>{{ $t('footer.subscribe') }}</span>
+                                    <svg class="w-4 h-4 rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <p v-if="newsletterForm.errors.email" class="text-rose-400 text-xs mt-2">{{ newsletterForm.errors.email }}</p>
+                            <Transition
+                                enter-active-class="transition duration-300"
+                                enter-from-class="opacity-0 -translate-y-1"
+                                enter-to-class="opacity-100 translate-y-0"
+                                leave-active-class="transition duration-200"
+                                leave-from-class="opacity-100"
+                                leave-to-class="opacity-0"
+                            >
+                                <p v-if="newsletterSuccess" class="flex items-center justify-center gap-1.5 text-emerald-400 text-xs font-semibold mt-3">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    {{ $t('footer.subscribe_success') }}
+                                </p>
+                            </Transition>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ───────── 4. Trust strip ───────── -->
+            <div class="border-t border-white/[0.05] bg-black/20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-3 items-center">
                         <div
                             v-for="badge in trustBadges"
                             :key="badge.label"
-                            class="group flex items-center justify-center gap-1.5 text-white/55 hover:text-white/95 transition-colors"
+                            class="flex items-center justify-center gap-1.5 text-white/55"
                         >
                             <span v-if="badge.live" class="relative flex h-2 w-2 shrink-0">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                             </span>
-                            <svg v-else class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" :class="badge.color" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg
+                                v-else
+                                class="w-3.5 h-3.5 shrink-0 text-[#C4A265]/80"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                viewBox="0 0 24 24"
+                            >
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="badge.icon" />
                             </svg>
                             <span class="text-[10px] sm:text-xs font-semibold tracking-wide whitespace-nowrap">{{ badge.label }}</span>
@@ -321,108 +316,46 @@ const trustBadges = computed(() => [
                 </div>
             </div>
 
-            <!-- Bottom bar — center on mobile, split on desktop -->
-            <div class="border-t border-white/[0.06]">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <!-- ───────── 5. Legal bar ───────── -->
+            <div class="border-t border-white/[0.05]">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-white/45">
-                        <!-- Privacy/terms shown FIRST on mobile (smaller, but more important
-                             for visitors looking for legal). Copyright second, broken across
-                             two lines on small screens to fit. -->
-                        <div class="flex items-center gap-4 sm:gap-5 order-1 sm:order-2">
+                        <p class="text-center sm:text-start">
+                            &copy; {{ new Date().getFullYear() }} Doctorato
+                            <span class="text-white/20 mx-1.5">·</span>
+                            <span>{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
+                        </p>
+                        <div class="flex items-center gap-4 sm:gap-5">
                             <Link href="/privacy" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.privacy') }}</Link>
                             <span class="w-px h-3 bg-white/15"></span>
                             <Link href="/terms" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.terms') }}</Link>
                         </div>
-                        <p class="text-center sm:text-start text-[11px] sm:text-sm leading-relaxed order-2 sm:order-1">
-                            <span class="block sm:inline">&copy; {{ new Date().getFullYear() }} Doctorato</span>
-                            <span class="hidden sm:inline text-white/20"> · </span>
-                            <span class="block sm:inline">{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
-                        </p>
                     </div>
                 </div>
             </div>
-
         </div>
     </footer>
 </template>
 
 <style scoped>
-/* Shimmer along the gold top line — looks like light sweeping across */
-.footer-shimmer {
-    background-size: 200% 100%;
-    animation: footer-shimmer-anim 6s linear infinite;
-}
-@keyframes footer-shimmer-anim {
-    0%   { background-position: 100% 0; }
-    100% { background-position: -100% 0; }
-}
-
-/* Slow drifting aurora orbs */
-.footer-aurora {
-    animation: footer-aurora-drift 18s ease-in-out infinite;
-}
-@keyframes footer-aurora-drift {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%      { transform: translate(28px, -20px) scale(1.08); }
-    66%      { transform: translate(-22px, 18px) scale(0.95); }
-}
-
-/* Subtle pulse behind the mission icon */
-.footer-pulse {
-    animation: footer-pulse-anim 3.5s ease-in-out infinite;
-}
-@keyframes footer-pulse-anim {
-    0%, 100% { transform: scale(1);   opacity: 0.6; }
-    50%      { transform: scale(1.2); opacity: 0.9; }
-}
-
-/* Diagonal grid that slowly drifts (background texture) */
-.footer-diagonal-grid {
-    background-image:
-        linear-gradient(45deg, rgba(196, 162, 101, 0.04) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(196, 162, 101, 0.04) 25%, transparent 25%);
-    background-size: 60px 60px;
-    animation: footer-grid-drift 22s linear infinite;
-    opacity: 0.5;
-}
-@keyframes footer-grid-drift {
-    0%   { background-position: 0 0, 0 0; }
-    100% { background-position: 60px 60px, -60px 60px; }
-}
-
-/* Stagger reveal for the four columns */
+/* Stagger reveal — each block fades up in sequence via --delay */
 .footer-fade {
-    animation: footer-column-fade 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: footer-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--delay, 0ms);
 }
-@keyframes footer-column-fade {
-    from { opacity: 0; transform: translateY(16px); }
+@keyframes footer-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Newsletter card — soft animated glowing border */
-.footer-newsletter-card::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    padding: 1px;
-    border-radius: 1rem;
-    background: linear-gradient(135deg, rgba(196, 162, 101, 0.45), transparent 30%, transparent 70%, rgba(196, 162, 101, 0.30));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.7;
+/* Logo color tweak — assumes the white logo PNG; if the file is
+   dark, swap to filter: brightness(0) invert(1). */
+.logo-white {
+    /* No-op marker so we can target it for future tweaks. */
 }
 
-/* Respect "reduce motion" — stop animations for users who opt out */
+/* Honor reduce-motion */
 @media (prefers-reduced-motion: reduce) {
-    .footer-shimmer,
-    .footer-aurora,
-    .footer-pulse,
-    .footer-diagonal-grid,
-    .footer-fade {
-        animation: none;
-    }
+    .footer-fade { animation: none; }
 }
 </style>
