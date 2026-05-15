@@ -8,35 +8,85 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Resolves the "active country" for a visitor in this order:
- *   1. Explicit user choice persisted in session.
- *   2. Cloudflare header (CF-IPCountry) — free and zero latency.
- *   3. ipapi.co / ip-api.com fallback lookup (cached by IP).
- *   4. 'EG' as the hard fallback (our home market).
+ * Resolves the "active country" for a visitor.
  *
- * Return value is always a 2-letter ISO country code that has at least
- * one active PlanPrice row — otherwise we fall back to EG so the pricing
- * page never renders empty.
+ * The session stores two keys instead of one so traveling visitors
+ * don't get stuck on stale prices:
+ *
+ *   - country_source = 'explicit' → user clicked the country switcher
+ *     or visited /ae, /sa, etc. directly. We persist this and DON'T
+ *     re-detect, because the user made a deliberate choice.
+ *
+ *   - country_source = 'detected' (or unset) → we auto-detected from
+ *     Cloudflare / ip-api on a previous request. On every subsequent
+ *     request we re-run detection: if the visitor's IP now resolves
+ *     to a different country (e.g. they traveled from Egypt to the
+ *     UAE), the session is updated and they see local prices.
+ *
+ * Fallback chain when nothing's cached:
+ *   1. Cloudflare's CF-IPCountry header (free, zero-latency)
+ *   2. ip-api.com lookup (cached 24h per IP)
+ *   3. 'EG' as the home-market default
+ *
+ * The returned code is always a supported country (one we have at
+ * least one active PlanPrice row for) so the pricing page never
+ * renders empty.
  */
 class CountryDetector
 {
     protected const SESSION_KEY = 'active_country';
+    protected const SOURCE_KEY = 'active_country_source';
     protected const CACHE_TTL = 60 * 60 * 24; // 24 hours per-IP cache
 
     public function resolve(Request $request): string
     {
-        $code = $this->fromSession($request)
-            ?? $this->fromCloudflare($request)
+        $session = $request->session();
+        $stored = $session->get(self::SESSION_KEY);
+        $source = $session->get(self::SOURCE_KEY);
+
+        // Explicit choice — user clicked the switcher or landed on
+        // /ae, /sa, etc. Respect it without re-detection.
+        if ($stored && $source === 'explicit') {
+            return $this->ensureSupported(strtoupper($stored));
+        }
+
+        // Auto-detected previously, or never set. Re-detect every request
+        // so travelers and shared-network users get the right currency.
+        $detected = $this->fromCloudflare($request)
             ?? $this->fromIpLookup($request)
+            ?? $stored
             ?? 'EG';
 
-        return $this->ensureSupported(strtoupper($code));
+        $detected = strtoupper($detected);
+
+        // Persist the freshly-detected code with the 'detected' source
+        // so future requests can compare and update. Skip the write if
+        // nothing changed — saves a session touch on every request.
+        if ($stored !== $detected || $source !== 'detected') {
+            $session->put(self::SESSION_KEY, $detected);
+            $session->put(self::SOURCE_KEY, 'detected');
+        }
+
+        return $this->ensureSupported($detected);
     }
 
-    /** Persist the user's choice for future requests. */
+    /**
+     * Persist an explicit country choice — locks the session to this
+     * country until the user opts out (or clears their cookies).
+     */
     public function setCountry(Request $request, string $code): void
     {
         $request->session()->put(self::SESSION_KEY, strtoupper($code));
+        $request->session()->put(self::SOURCE_KEY, 'explicit');
+    }
+
+    /**
+     * Drop the explicit lock so the next request re-detects from IP.
+     * Useful if we ever want a "reset location" button.
+     */
+    public function clearExplicit(Request $request): void
+    {
+        $request->session()->forget(self::SOURCE_KEY);
     }
 
     /** List of country codes we have at least one active PlanPrice for. */
@@ -51,11 +101,6 @@ class CountryDetector
                 ->values()
                 ->toArray();
         });
-    }
-
-    protected function fromSession(Request $request): ?string
-    {
-        return $request->session()->get(self::SESSION_KEY);
     }
 
     protected function fromCloudflare(Request $request): ?string
