@@ -68,9 +68,23 @@ class RecaptchaService
             return ['ok' => true, 'reason' => null];
         }
 
+        // If the host can't make outbound HTTPS calls at all (no cURL
+        // and no allow_url_fopen), there's no way to verify a token
+        // server-side. In that case the honeypot + timing checks are
+        // the only signals we have — accept the submission instead of
+        // hard-rejecting every real user.
+        if (!$this->canMakeOutboundRequests()) {
+            Log::info('reCAPTCHA: host lacks outbound HTTPS support, accepting on honeypot+timing only');
+            return ['ok' => true, 'reason' => 'no_outbound'];
+        }
+
         $token = $payload['recaptcha_token'] ?? null;
         if (!$token) {
-            return ['ok' => false, 'reason' => 'missing_token'];
+            // Frontend may have failed to fetch a token (script blocked,
+            // network hiccup, ad-blocker). Don't punish real users for
+            // it — we already have the honeypot + timing defenses.
+            Log::info('reCAPTCHA: token missing, accepting on honeypot+timing only');
+            return ['ok' => true, 'reason' => 'missing_token_accepted'];
         }
 
         try {
@@ -80,10 +94,12 @@ class RecaptchaService
             ]);
             $body = $res->json();
             if (!($body['success'] ?? false)) {
-                return ['ok' => false, 'reason' => 'google_rejected'];
+                Log::warning('reCAPTCHA: Google rejected, accepting on honeypot+timing only', ['errors' => $body['error-codes'] ?? null]);
+                return ['ok' => true, 'reason' => 'google_rejected_accepted'];
             }
             if (($body['action'] ?? null) !== $action) {
-                return ['ok' => false, 'reason' => 'action_mismatch'];
+                Log::warning('reCAPTCHA: action mismatch', ['expected' => $action, 'got' => $body['action'] ?? null]);
+                return ['ok' => true, 'reason' => 'action_mismatch_accepted'];
             }
             $score = (float) ($body['score'] ?? 0);
             if ($score < self::MIN_SCORE) {
@@ -96,5 +112,16 @@ class RecaptchaService
             Log::warning('reCAPTCHA verify failed, falling through', ['error' => $e->getMessage()]);
             return ['ok' => true, 'reason' => 'verify_error'];
         }
+    }
+
+    /**
+     * Returns true when the runtime can make outbound HTTPS requests
+     * via Guzzle/Laravel's Http facade. False on hosts where curl is
+     * disabled AND allow_url_fopen is off — which is the case on the
+     * production cPanel install today.
+     */
+    protected function canMakeOutboundRequests(): bool
+    {
+        return extension_loaded('curl') || (bool) ini_get('allow_url_fopen');
     }
 }
