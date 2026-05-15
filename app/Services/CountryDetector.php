@@ -85,19 +85,39 @@ class CountryDetector
      */
     public function diagnose(Request $request): array
     {
+        // Trim the loaded-extensions list to the ones relevant to
+        // outbound HTTP so the diagnose payload stays compact.
+        $extOfInterest = array_intersect(
+            ['curl', 'openssl', 'geoip', 'maxminddb', 'sockets', 'mbstring'],
+            get_loaded_extensions()
+        );
+
         return [
-            'request_ip' => $request->ip(),
-            'cf_ipcountry' => $request->header('CF-IPCountry'),
-            'session_country' => $request->session()->get(self::SESSION_KEY),
-            'session_source' => $request->session()->get(self::SOURCE_KEY),
-            'php_curl_loaded' => extension_loaded('curl'),
-            'php_geoip_loaded' => extension_loaded('geoip'),
-            'php_allow_url_fopen' => (bool) ini_get('allow_url_fopen'),
-            'apache_geoip_header' => $_SERVER['GEOIP_COUNTRY_CODE'] ?? null,
-            'from_cloudflare' => $this->fromCloudflare($request),
-            'from_server_headers' => $this->fromServerHeaders($request),
-            'from_geoip_extension' => $this->fromGeoipExtension($request),
-            'from_ip_lookup' => $this->fromIpLookup($request),
+            'php' => [
+                'version' => PHP_VERSION,
+                'sapi' => php_sapi_name(),
+                'binary_path' => PHP_BINARY,
+                'extensions_loaded' => array_values($extOfInterest),
+                'curl_loaded' => extension_loaded('curl'),
+                'geoip_loaded' => extension_loaded('geoip'),
+                'allow_url_fopen' => (bool) ini_get('allow_url_fopen'),
+            ],
+            'request' => [
+                'ip' => $request->ip(),
+                'real_ip_header' => $request->header('X-Forwarded-For'),
+                'cf_ipcountry' => $request->header('CF-IPCountry'),
+                'apache_geoip_country' => $_SERVER['GEOIP_COUNTRY_CODE'] ?? null,
+            ],
+            'session' => [
+                'country' => $request->session()->get(self::SESSION_KEY),
+                'source' => $request->session()->get(self::SOURCE_KEY),
+            ],
+            'lookups' => [
+                'from_cloudflare' => $this->fromCloudflare($request),
+                'from_server_headers' => $this->fromServerHeaders($request),
+                'from_geoip_extension' => $this->fromGeoipExtension($request),
+                'from_ip_lookup' => $this->fromIpLookup($request),
+            ],
             'resolved' => $this->resolve($request),
             'supported_codes' => collect($this->supportedCountries())->pluck('country_code')->values(),
         ];

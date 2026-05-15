@@ -21,21 +21,28 @@ Route::get('/currency/{code}', function ($code) {
     return back();
 })->name('currency.switch');
 
+// Reset the explicit lock so the next request re-detects from IP.
+// MUST be declared BEFORE /country/{code} or that catch-all would
+// match /country/reset with $code="reset" and persist "RESET" as
+// an explicit country choice (which is what kept users stuck).
+Route::get('/country/reset', function (\Illuminate\Http\Request $request) {
+    $detector = app(\App\Services\CountryDetector::class);
+    $detector->clearExplicit($request);
+    $request->session()->forget('active_country');
+    // Also drop the per-IP cache entry so the next request actually
+    // re-runs the provider chain instead of returning a stale 'EG'.
+    \Illuminate\Support\Facades\Cache::forget('geoip:' . $request->ip());
+    return redirect('/');
+})->name('country.reset');
+
 // Country switcher — persists the chosen market in session so PricingPlan
 // lookups return prices for that country on every subsequent request.
+// The regex constraint blocks anything that isn't a 2-letter ISO code,
+// so the reset route above can't be hijacked.
 Route::get('/country/{code}', function ($code, \Illuminate\Http\Request $request) {
     app(\App\Services\CountryDetector::class)->setCountry($request, strtoupper($code));
     return back();
-})->name('country.switch');
-
-// Reset the explicit lock so the next request re-detects from IP.
-// Useful for visitors who manually picked the wrong country or
-// traveled to a new region and want auto-detection back on.
-Route::get('/country/reset', function (\Illuminate\Http\Request $request) {
-    app(\App\Services\CountryDetector::class)->clearExplicit($request);
-    $request->session()->forget('active_country');
-    return back();
-})->name('country.reset');
+})->where('code', '[A-Za-z]{2}')->name('country.switch');
 
 // Debug endpoint for country detection — open in local, and on
 // production it requires ?key=<random> matching APP_KEY's prefix
