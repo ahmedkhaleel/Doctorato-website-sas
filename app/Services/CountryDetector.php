@@ -238,17 +238,37 @@ class CountryDetector
             return null;
         }
 
-        // Only cache successful lookups, and only for 24h. Caching
-        // null would mean a one-time provider hiccup pins the visitor
-        // to 'EG' for the rest of the day.
+        // Hard preflight: if the host can't make outbound HTTPS calls
+        // at all (no curl + no allow_url_fopen), every provider in the
+        // chain will throw a Guzzle "requires cURL" exception after a
+        // 3-second timeout. That's ~9s of dead wait per pageview.
+        // Cache the "this host can't reach the network" verdict for
+        // 5 minutes so we skip the entire chain immediately and let
+        // the browser-side fallback (ClientCountryDetector.vue) take
+        // over without server-side latency.
+        if (Cache::has('geoip:host_cannot_reach_network')) {
+            return null;
+        }
+        if (!extension_loaded('curl') && !ini_get('allow_url_fopen')) {
+            Cache::put('geoip:host_cannot_reach_network', true, 300);
+            return null;
+        }
+
+        // Cached successful lookup for this IP — 24h TTL.
         $cached = Cache::get("geoip:{$ip}");
         if ($cached) return $cached;
 
-        // Provider fallback chain, all HTTPS so shared-hosting
-        // firewalls that block raw outbound HTTP (e.g. ea-php on
-        // cPanel) still get a result. Returns the first provider
-        // that succeeds; logs each failure so the chain stays
-        // observable.
+        // Cached "tried this IP, no provider answered" — short TTL so
+        // a flaky provider doesn't pin us to EG for a day. 10 minutes
+        // is long enough to prevent thrash, short enough that a
+        // recovered provider gets a chance.
+        if (Cache::has("geoip:miss:{$ip}")) {
+            return null;
+        }
+
+        // Provider fallback chain, all HTTPS. Returns the first
+        // provider that succeeds; logs each failure so the chain
+        // stays observable.
         foreach ($this->ipProviders() as $label => $resolver) {
             try {
                 $code = $resolver($ip);
@@ -264,6 +284,10 @@ class CountryDetector
                 ]);
             }
         }
+
+        // All providers failed for this IP — remember the miss for
+        // 10 minutes so we don't burn 9 seconds on the next request.
+        Cache::put("geoip:miss:{$ip}", true, 600);
         return null;
     }
 
