@@ -33,9 +33,12 @@ class ContactAdminNotification extends Mailable
 
     public function content(): Content
     {
+        // 'contact' not 'message' — see ContactCustomerConfirmation
+        // for why ($message conflicts with the built-in Illuminate
+        // Mail message instance the view system injects).
         return new Content(
             view: 'emails.contact-admin-notification',
-            with: ['message' => $this->message],
+            with: ['contact' => $this->message],
         );
     }
 }

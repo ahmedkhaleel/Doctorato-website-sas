@@ -24,7 +24,7 @@
                     <tr>
                         <td style="padding:32px 30px;">
                             <p style="font-size:15px;line-height:1.8;color:#5A6C7D;margin:0 0 18px;">
-                                أهلاً <strong style="color:#1C2833;">{{ $message->name }}</strong>،
+                                أهلاً <strong style="color:#1C2833;">{{ $contact->name }}</strong>،
                             </p>
                             <p style="font-size:15px;line-height:1.8;color:#5A6C7D;margin:0 0 22px;">
                                 وصلتنا رسالتك ودلوقتي تحت مراجعة فريقنا. هنرد عليك على نفس البريد ده خلال
@@ -35,8 +35,8 @@
                             <!-- Submitted message preview -->
                             <div style="background:#F8FAFC;border-right:3px solid #C4A265;border-radius:8px;padding:18px 20px;margin:0 0 24px;">
                                 <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#C4A265;font-weight:700;margin:0 0 8px;">ملخص الرسالة</p>
-                                <p style="font-size:13px;color:#5A6C7D;margin:0 0 6px;"><strong style="color:#1C2833;">الموضوع:</strong> {{ $message->subject }}</p>
-                                <p style="font-size:13px;color:#5A6C7D;margin:0;line-height:1.7;"><strong style="color:#1C2833;">الرسالة:</strong> {{ \Illuminate\Support\Str::limit($message->message, 280) }}</p>
+                                <p style="font-size:13px;color:#5A6C7D;margin:0 0 6px;"><strong style="color:#1C2833;">الموضوع:</strong> {{ $contact->subject }}</p>
+                                <p style="font-size:13px;color:#5A6C7D;margin:0;line-height:1.7;"><strong style="color:#1C2833;">الرسالة:</strong> {{ \Illuminate\Support\Str::limit($contact->message, 280) }}</p>
                             </div>
 
                             <!-- Quick info -->

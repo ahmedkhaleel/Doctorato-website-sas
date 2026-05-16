@@ -30,9 +30,13 @@ class ContactCustomerConfirmation extends Mailable
 
     public function content(): Content
     {
+        // NOTE: variable name CANNOT be 'message' — Laravel's mail
+        // pipeline injects its own $message (Illuminate\Mail\Message)
+        // into every view and our variable would clobber it. Use
+        // 'contact' instead so the blade reads `$contact->name`.
         return new Content(
             view: 'emails.contact-customer-confirmation',
-            with: ['message' => $this->message],
+            with: ['contact' => $this->message],
         );
     }
 }
