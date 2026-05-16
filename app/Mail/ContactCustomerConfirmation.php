@@ -24,7 +24,7 @@ class ContactCustomerConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'وصلتنا رسالتك — Doctorato',
+            subject: 'We received your message — Doctorato',
         );
     }
 

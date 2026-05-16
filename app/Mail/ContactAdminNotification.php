@@ -26,7 +26,7 @@ class ContactAdminNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '📩 رسالة جديدة من ' . $this->message->name,
+            subject: 'New contact form submission — ' . $this->message->name,
             replyTo: [new Address($this->message->email, $this->message->name)],
         );
     }

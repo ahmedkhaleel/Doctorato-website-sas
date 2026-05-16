@@ -26,7 +26,7 @@ class DemoAdminNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🎯 طلب ديمو جديد — ' . $this->demo->clinic_name,
+            subject: 'New demo request — ' . $this->demo->clinic_name,
             replyTo: [new Address($this->demo->email, $this->demo->full_name)],
         );
     }

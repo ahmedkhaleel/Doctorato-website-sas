@@ -25,7 +25,7 @@ class DemoCustomerConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'استلمنا طلبك للديمو — Doctorato',
+            subject: 'Your demo request received — Doctorato',
         );
     }
 
