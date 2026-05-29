@@ -14,6 +14,7 @@ import { computed, ref } from 'vue';
 
 const props = defineProps({
     customer: Object,
+    trial: { type: Object, default: null },
     subscriptions: Array,
     invoices: Array,
 });
@@ -98,6 +99,79 @@ function formatDate(iso) {
                 </svg>
                 <p class="text-sm text-emerald-900">{{ portalMessage }}</p>
             </div>
+
+            <!-- Trial status panel — visible only while the customer
+                 is on their free trial and hasn't activated a paid sub. -->
+            <section v-if="trial" class="mb-10">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-[#C4A265] mb-4">Your trial</h2>
+                <article class="bg-white rounded-2xl border border-gray-200 p-6 sm:p-7">
+                    <div class="flex items-start justify-between gap-4 flex-wrap mb-4">
+                        <div>
+                            <p class="text-sm text-[#5A6C7D] mb-1">Days remaining</p>
+                            <p class="text-3xl font-bold text-[#0A1628] leading-none">
+                                {{ trial.days_left }}<span class="text-base font-medium text-[#5A6C7D] ml-2">/ {{ trial.total_days }}</span>
+                            </p>
+                            <p class="text-xs text-[#8B9BAC] mt-2">Ends {{ formatDate(trial.ends_at) }}</p>
+                        </div>
+                        <a
+                            v-if="trial.subdomain"
+                            :href="`https://${trial.subdomain}.doctorato.app`"
+                            target="_blank"
+                            rel="noopener"
+                            class="inline-flex items-center gap-2 bg-[#0A1628] hover:bg-[#1C2833] text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition"
+                        >
+                            Open my clinic
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        </a>
+                        <Link
+                            v-else
+                            href="/pricing"
+                            class="inline-flex items-center gap-2 bg-[#0A1628] hover:bg-[#1C2833] text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition"
+                        >
+                            See plans
+                        </Link>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="h-1.5 bg-[#F4F1EA] rounded-full overflow-hidden mb-5">
+                        <div class="h-full bg-[#C4A265] transition-all duration-500" :style="{ width: trial.progress_pct + '%' }"></div>
+                    </div>
+
+                    <!-- Onboarding checklist driven by drip_step (1=welcome sent, 2=tour sent, 3=case study sent) -->
+                    <ul class="space-y-2.5">
+                        <li class="flex items-start gap-3">
+                            <span :class="trial.drip_step >= 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'" class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                <svg v-if="trial.drip_step >= 1" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                <span v-else class="text-xs font-bold">1</span>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-[#0A1628]">Welcome guide</p>
+                                <p class="text-xs text-[#8B9BAC]">Sent to your inbox the day you signed up.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span :class="trial.drip_step >= 2 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'" class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                <svg v-if="trial.drip_step >= 2" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                <span v-else class="text-xs font-bold">2</span>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-[#0A1628]">Feature tour</p>
+                                <p class="text-xs text-[#8B9BAC]">Day 3 — the three workflows worth setting up first.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span :class="trial.drip_step >= 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'" class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                <svg v-if="trial.drip_step >= 3" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                <span v-else class="text-xs font-bold">3</span>
+                            </span>
+                            <div>
+                                <p class="text-sm font-semibold text-[#0A1628]">Case study + ROI</p>
+                                <p class="text-xs text-[#8B9BAC]">Day 7 — how a Riyadh clinic doubled bookings.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </article>
+            </section>
 
             <!-- Subscriptions -->
             <section class="mb-10">

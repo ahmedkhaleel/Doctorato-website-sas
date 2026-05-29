@@ -39,6 +39,8 @@ class DemoRequest extends Model
         'admin_reminder_seen',
         'marketing_opt_in',
         'marketing_opted_out_at',
+        'trial_drip_step',
+        'trial_drip_last_sent_at',
     ];
 
     protected $casts = [
@@ -54,6 +56,7 @@ class DemoRequest extends Model
         'trial_ending_soon_notified_at' => 'datetime',
         'admin_reminder_seen' => 'boolean',
         'is_instant_trial' => 'boolean',
+        'trial_drip_last_sent_at' => 'datetime',
     ];
 
     protected $appends = [

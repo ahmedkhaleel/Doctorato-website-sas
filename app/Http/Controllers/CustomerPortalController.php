@@ -126,12 +126,34 @@ class CustomerPortalController extends Controller
                 'paid_at' => $i->paid_at?->toIso8601String(),
             ]);
 
+        // Trial status — only relevant when the customer is still in
+        // their free-trial window AND hasn't already converted to a
+        // paid subscription. Once any subscription is 'active' the
+        // trial card is hidden (subscription card takes over).
+        $trial = null;
+        $hasActiveSub = $subscriptions->contains(fn ($s) => $s['status'] === 'active');
+        if (!$hasActiveSub && $customer->trial_status === 'active' && $customer->trial_ends_at?->isFuture()) {
+            $totalDays = (int) ($customer->trial_started_at?->diffInDays($customer->trial_ends_at) ?: 14);
+            $daysLeft = max(0, (int) now()->diffInDays($customer->trial_ends_at, false));
+            $trial = [
+                'status' => 'active',
+                'starts_at' => $customer->trial_started_at?->toIso8601String(),
+                'ends_at' => $customer->trial_ends_at->toIso8601String(),
+                'days_left' => $daysLeft,
+                'total_days' => $totalDays,
+                'progress_pct' => $totalDays > 0 ? min(100, max(0, (int) round((($totalDays - $daysLeft) / $totalDays) * 100))) : 0,
+                'drip_step' => (int) ($customer->trial_drip_step ?? 0),
+                'subdomain' => $customer->subdomain ?? null,
+            ];
+        }
+
         return Inertia::render('Portal/Dashboard', [
             'customer' => [
                 'name' => $customer->full_name,
                 'clinic' => $customer->clinic_name,
                 'email' => $customer->email,
             ],
+            'trial' => $trial,
             'subscriptions' => $subscriptions,
             'invoices' => $invoices,
         ]);

@@ -42,6 +42,14 @@ Schedule::command('billing:dunning')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Trial welcome drip — runs once a day at 10:00 server time. Walks
+// the 3-step drip (welcome / tour / case study) and advances each
+// active trial at most one step per run. Idempotent.
+Schedule::command('trials:drip')
+    ->dailyAt('10:00')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Queue health check — every 15 minutes. If the worker is dead or
 // the queue is backing up, exits non-zero. Pair this with an
 // external monitor (HealthChecks.io, UptimeRobot) for paging.
