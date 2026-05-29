@@ -172,6 +172,7 @@ function formatDate(iso) {
                                 <th class="text-left text-xs uppercase tracking-wider text-[#8B9BAC] font-bold px-5 py-3">Date</th>
                                 <th class="text-left text-xs uppercase tracking-wider text-[#8B9BAC] font-bold px-5 py-3">Amount</th>
                                 <th class="text-left text-xs uppercase tracking-wider text-[#8B9BAC] font-bold px-5 py-3">Status</th>
+                                <th class="text-right text-xs uppercase tracking-wider text-[#8B9BAC] font-bold px-5 py-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -183,6 +184,17 @@ function formatDate(iso) {
                                     <span class="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full" :class="statusBadgeClass(inv.status)">
                                         {{ inv.status }}
                                     </span>
+                                </td>
+                                <td class="px-5 py-4 text-right whitespace-nowrap">
+                                    <a :href="`/portal/invoices/${inv.id}`" target="_blank" rel="noopener" class="text-xs font-semibold text-[#1B4F72] hover:text-[#0A1628] transition inline-flex items-center gap-1 me-3" title="View invoice">
+                                        View
+                                    </a>
+                                    <a :href="`/portal/invoices/${inv.id}?print=1`" target="_blank" rel="noopener" class="text-xs font-semibold text-[#C4A265] hover:text-[#0A1628] transition inline-flex items-center gap-1" title="Open in print dialog">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        PDF
+                                    </a>
                                 </td>
                             </tr>
                         </tbody>

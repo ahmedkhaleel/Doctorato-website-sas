@@ -177,6 +177,8 @@ Route::get('/portal/auth/{token}', [\App\Http\Controllers\CustomerPortalControll
 
 Route::middleware('customer')->prefix('portal')->name('portal.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\CustomerPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/invoices/{id}', [\App\Http\Controllers\CustomerPortalController::class, 'showInvoice'])
+        ->where('id', '[0-9]+')->name('invoice.show');
     Route::post('/subscriptions/{id}/cancel', [\App\Http\Controllers\CustomerPortalController::class, 'cancelSubscription'])
         ->where('id', '[0-9]+')->name('subscription.cancel');
     Route::post('/logout', [\App\Http\Controllers\CustomerPortalController::class, 'logout'])->name('logout');

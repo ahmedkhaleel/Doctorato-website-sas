@@ -137,6 +137,40 @@ class CustomerPortalController extends Controller
         ]);
     }
 
+    /**
+     * Print-ready HTML invoice. The browser handles the actual PDF
+     * export via Cmd+P / Ctrl+P, which avoids bundling a PHP PDF
+     * library (mpdf/dompdf both pull in dozens of transitive deps).
+     *
+     * The view uses an @media print stylesheet that hides the nav
+     * + the "Download" button, leaving only the invoice. Users hit
+     * "Save as PDF" in the print dialog and get a clean document.
+     *
+     * Strict ownership check: 404 if the invoice doesn't belong to
+     * the signed-in customer. A subscription mismatch is silently
+     * indistinguishable from "this id doesn't exist".
+     */
+    public function showInvoice(Request $request, int $invoiceId)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $invoice = Invoice::with(['subscription.plan', 'payments'])
+            ->where('id', $invoiceId)
+            ->whereHas('subscription', fn ($q) => $q->where('demo_request_id', $customer->id))
+            ->first();
+
+        if (!$invoice) {
+            abort(404);
+        }
+
+        return view('portal.invoice', [
+            'invoice' => $invoice,
+            'customer' => $customer,
+            'subscription' => $invoice->subscription,
+            'autoPrint' => (bool) $request->query('print'),
+        ]);
+    }
+
     public function cancelSubscription(Request $request, int $subscriptionId)
     {
         $customer = $request->attributes->get('customer');
