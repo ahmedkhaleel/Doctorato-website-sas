@@ -39,6 +39,54 @@ function subjectShort(type) {
     return parts[parts.length - 1];
 }
 
+// Track which rows have their diff expanded. We keep this client-side
+// so the user can pop several rows open without round-tripping.
+const expandedRows = ref(new Set());
+function toggleRow(id) {
+    if (expandedRows.value.has(id)) {
+        expandedRows.value.delete(id);
+    } else {
+        expandedRows.value.add(id);
+    }
+    // Force reactivity since we're mutating a Set in place
+    expandedRows.value = new Set(expandedRows.value);
+}
+
+// Convert the changes JSON written by the LogsActivity trait into a
+// flat array we can iterate in the template:
+//   updated: { field: { from, to } } → [{ field, from, to }]
+//   created/deleted: { field: value }      → [{ field, value }]
+function changeRows(log) {
+    const c = log.changes;
+    if (!c || typeof c !== 'object') return [];
+    if (log.action === 'updated') {
+        return Object.entries(c)
+            .filter(([, v]) => v && typeof v === 'object' && ('from' in v || 'to' in v))
+            .map(([field, v]) => ({ field, from: v.from, to: v.to, kind: 'diff' }));
+    }
+    return Object.entries(c).map(([field, value]) => ({ field, value, kind: 'snapshot' }));
+}
+
+// Stringify a value for display. Long strings get truncated; nulls
+// and booleans get a special render so a "0" doesn't read as null.
+function fmtValue(v) {
+    if (v === null || v === undefined) return '∅';
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    if (typeof v === 'object') return JSON.stringify(v).slice(0, 200);
+    const s = String(v);
+    return s.length > 200 ? s.slice(0, 200) + '…' : s;
+}
+
+function exportCsv() {
+    // Walk through the current filter state and hit the export endpoint
+    // in a new tab. The server streams the CSV so the user's browser
+    // gets a download dialog without us holding bytes in memory here.
+    const params = new URLSearchParams(
+        Object.entries(filter.value).filter(([, v]) => Boolean(v))
+    );
+    window.open('/admin/activity-logs/export?' + params.toString(), '_blank');
+}
+
 function fmtDateTime(d) {
     if (!d) return '—';
     return new Date(d).toLocaleString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -108,6 +156,12 @@ function clearFilters() {
             <input v-model="filter.from" @change="applyFilters" type="date" class="px-4 py-2 border border-gray-200 rounded-lg text-sm" />
             <input v-model="filter.to" @change="applyFilters" type="date" class="px-4 py-2 border border-gray-200 rounded-lg text-sm" />
             <button @click="clearFilters" class="px-3 py-2 text-sm text-gray-500 hover:text-[#1B4F72]">إعادة تعيين</button>
+            <button @click="exportCsv" class="px-3 py-2 text-sm font-semibold text-[#1B4F72] hover:text-[#0A1628] flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                تصدير CSV
+            </button>
         </div>
 
         <!-- Timeline -->
@@ -117,41 +171,81 @@ function clearFilters() {
                 <div
                     v-for="log in logs.data"
                     :key="log.id"
-                    class="flex items-start gap-4 px-5 py-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 transition-colors"
+                    class="border-b border-gray-100 last:border-b-0"
                 >
-                    <!-- Action icon -->
+                    <!-- Summary row (always visible) -->
                     <div
-                        :class="[colorFor(log.action).bg, colorFor(log.action).text]"
-                        class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg"
+                        class="flex items-start gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors cursor-pointer"
+                        @click="toggleRow(log.id)"
                     >
-                        {{ colorFor(log.action).icon }}
+                        <div
+                            :class="[colorFor(log.action).bg, colorFor(log.action).text]"
+                            class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg"
+                        >
+                            {{ colorFor(log.action).icon }}
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span :class="[colorFor(log.action).bg, colorFor(log.action).text]" class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
+                                    {{ log.action }}
+                                </span>
+                                <span v-if="log.subject_type" class="text-[10px] font-mono text-gray-400 px-2 py-0.5 rounded bg-gray-50">
+                                    {{ subjectShort(log.subject_type) }}{{ log.subject_id ? ' #' + log.subject_id : '' }}
+                                </span>
+                                <span v-if="log.subject_label" class="text-xs text-gray-700 font-medium">
+                                    {{ log.subject_label }}
+                                </span>
+                            </div>
+                            <p v-if="log.description" class="text-sm text-gray-800 font-medium">
+                                {{ log.description }}
+                            </p>
+                            <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
+                                <span class="flex items-center gap-1">
+                                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-[#1B4F72] to-[#0A1628] text-white flex items-center justify-center font-bold text-[10px]">
+                                        {{ (log.user_name || '?')[0] }}
+                                    </div>
+                                    {{ log.user_name || 'النظام' }}
+                                    <span v-if="log.user_role" class="text-gray-400">({{ log.user_role }})</span>
+                                </span>
+                                <span class="text-gray-300">•</span>
+                                <span :title="fmtDateTime(log.created_at)">{{ relativeTime(log.created_at) }}</span>
+                                <span v-if="log.ip_address" class="text-gray-300">•</span>
+                                <span v-if="log.ip_address" class="font-mono text-[10px]">{{ log.ip_address }}</span>
+                                <span v-if="changeRows(log).length" class="text-gray-300">•</span>
+                                <span v-if="changeRows(log).length" class="text-[#1B4F72] font-semibold flex items-center gap-1">
+                                    <svg class="w-3 h-3 transition-transform" :class="expandedRows.has(log.id) ? 'rotate-90' : ''" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                    {{ changeRows(log).length }} {{ log.action === 'updated' ? 'تعديل' : 'حقل' }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Content -->
-                    <div class="flex-1 min-w-0">
-                        <div class="flex flex-wrap items-center gap-2 mb-1">
-                            <span :class="[colorFor(log.action).bg, colorFor(log.action).text]" class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
-                                {{ log.action }}
-                            </span>
-                            <span v-if="log.subject_type" class="text-[10px] font-mono text-gray-400 px-2 py-0.5 rounded bg-gray-50">
-                                {{ subjectShort(log.subject_type) }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-800 font-medium">
-                            {{ log.description || '—' }}
-                        </p>
-                        <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
-                            <span class="flex items-center gap-1">
-                                <div class="w-5 h-5 rounded-full bg-gradient-to-br from-[#1B4F72] to-[#0A1628] text-white flex items-center justify-center font-bold text-[10px]">
-                                    {{ (log.user_name || '?')[0] }}
-                                </div>
-                                {{ log.user_name || 'النظام' }}
-                                <span v-if="log.user_role" class="text-gray-400">({{ log.user_role }})</span>
-                            </span>
-                            <span class="text-gray-300">•</span>
-                            <span :title="fmtDateTime(log.created_at)">{{ relativeTime(log.created_at) }}</span>
-                            <span v-if="log.ip_address" class="text-gray-300">•</span>
-                            <span v-if="log.ip_address" class="font-mono text-[10px]">{{ log.ip_address }}</span>
+                    <!-- Expanded diff (lazy-rendered only when toggled) -->
+                    <div v-if="expandedRows.has(log.id) && changeRows(log).length" class="px-5 pb-4 ms-14">
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr class="bg-gray-100 border-b border-gray-200">
+                                        <th class="text-start px-3 py-2 text-[10px] uppercase tracking-wider text-gray-500 font-bold w-32">الحقل</th>
+                                        <th v-if="log.action === 'updated'" class="text-start px-3 py-2 text-[10px] uppercase tracking-wider text-gray-500 font-bold">السابق</th>
+                                        <th class="text-start px-3 py-2 text-[10px] uppercase tracking-wider text-gray-500 font-bold">{{ log.action === 'updated' ? 'الجديد' : 'القيمة' }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="change in changeRows(log)" :key="change.field" class="border-b border-gray-100 last:border-0">
+                                        <td class="px-3 py-2 font-mono text-[11px] text-gray-700 align-top">{{ change.field }}</td>
+                                        <td v-if="log.action === 'updated'" class="px-3 py-2 text-rose-700 line-through align-top break-all">
+                                            {{ fmtValue(change.from) }}
+                                        </td>
+                                        <td class="px-3 py-2 text-emerald-700 align-top break-all">
+                                            {{ fmtValue(change.kind === 'diff' ? change.to : change.value) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

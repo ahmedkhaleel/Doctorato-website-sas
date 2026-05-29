@@ -297,6 +297,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/addons/{addon}', [\App\Http\Controllers\Admin\AddOnController::class, 'destroy'])->name('addons.destroy');
 
     Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('/activity-logs/export', [\App\Http\Controllers\Admin\ActivityLogController::class, 'export'])->name('activity-logs.export');
     Route::get('/search', [\App\Http\Controllers\Admin\SearchController::class, 'global'])->name('search.global');
 
     Route::get('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'index'])->name('email-templates.index');

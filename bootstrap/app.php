@@ -51,6 +51,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Mail the admin on unexpected production exceptions.
+        // Self-throttled by signature (one email per hour per file:line)
+        // so a bad loop doesn't flood the inbox. Skips the obvious
+        // user-flow exceptions (validation, 404, throttle, etc.).
+        $exceptions->report(function (\Throwable $e) {
+            app(\App\Exceptions\AdminExceptionNotifier::class)->notify($e);
+        });
+
         // Render a custom Inertia 404 so visitors who hit a stale or
         // mistyped URL see the brand-styled page (with internal links
         // back into the main funnels) instead of Laravel's default
