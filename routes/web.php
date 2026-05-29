@@ -323,4 +323,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update')->middleware('admin.perm:users.manage');
     Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy')->middleware('admin.perm:users.manage');
     Route::put('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UsersController::class, 'toggleActive'])->name('users.toggle')->middleware('admin.perm:users.manage');
+
+    // GDPR data-subject rights (Art. 15 access + Art. 17 erasure).
+    // Read + write both gated on gdpr.manage — see GdprController for
+    // why erase() is irreversible and what gets preserved.
+    Route::get('/gdpr', [\App\Http\Controllers\Admin\GdprController::class, 'index'])
+        ->name('gdpr.index')->middleware('admin.perm:gdpr.manage');
+    Route::post('/gdpr/export', [\App\Http\Controllers\Admin\GdprController::class, 'export'])
+        ->name('gdpr.export')->middleware('admin.perm:gdpr.manage');
+    Route::post('/gdpr/erase', [\App\Http\Controllers\Admin\GdprController::class, 'erase'])
+        ->name('gdpr.erase')->middleware('admin.perm:gdpr.manage');
 });

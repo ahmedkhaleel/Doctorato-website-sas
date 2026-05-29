@@ -67,6 +67,9 @@ class User extends Authenticatable
             'demos.manage' => 'إدارة طلبات العرض',
             'users.manage' => 'إدارة المستخدمين',
             'settings.manage' => 'إدارة الإعدادات',
+            // GDPR/PDPL data-subject rights — restricted to DPO/owner.
+            // Grants read + export + irreversible erase.
+            'gdpr.manage' => 'إدارة طلبات الخصوصية (GDPR)',
         ];
     }
 
