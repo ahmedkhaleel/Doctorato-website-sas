@@ -38,10 +38,28 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $tracker = app(\App\Services\LoginAttemptTracker::class);
+        $ip = $request->ip();
+        $ua = (string) $request->userAgent();
+
+        // Pre-check: is this email or IP currently locked out from
+        // repeated failures? We don't even attempt password validation
+        // — that would let an attacker confirm a valid email by
+        // timing the response.
+        $lockedUntil = $tracker->lockedUntil($credentials['email'], $ip);
+        if ($lockedUntil) {
+            $tracker->record($credentials['email'], $ip, $ua, false, 'locked_out');
+            $mins = (int) ceil(now()->diffInSeconds($lockedUntil, false) / 60);
+            return back()->withErrors([
+                'email' => "تم قفل الحساب مؤقتاً بسبب محاولات فاشلة. حاول بعد {$mins} دقيقة.",
+            ]);
+        }
+
         // Stage 1: credentials. Auth::validate() (not attempt) so the
         // session isn't promoted until is_active + 2FA also pass.
         if (!Auth::validate($credentials)) {
-            Log::info('auth.login_failed', ['email' => $credentials['email'], 'ip' => $request->ip()]);
+            $tracker->record($credentials['email'], $ip, $ua, false, 'bad_password');
+            Log::info('auth.login_failed', ['email' => $credentials['email'], 'ip' => $ip]);
             return back()->withErrors(['email' => 'بيانات الدخول غير صحيحة']);
         }
 
@@ -49,7 +67,8 @@ class AuthController extends Controller
 
         // Stage 2: is_active
         if ($user->is_active === false) {
-            Log::warning('auth.login_blocked_inactive', ['user_id' => $user->id, 'ip' => $request->ip()]);
+            $tracker->record($credentials['email'], $ip, $ua, false, 'inactive');
+            Log::warning('auth.login_blocked_inactive', ['user_id' => $user->id, 'ip' => $ip]);
             return back()->withErrors(['email' => 'تم تعطيل هذا الحساب — تواصل مع مدير النظام.']);
         }
 
@@ -61,6 +80,7 @@ class AuthController extends Controller
             return redirect()->route('admin.2fa.challenge');
         }
 
+        $tracker->record($credentials['email'], $ip, $ua, true);
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
         $this->stampLogin($user, $request);

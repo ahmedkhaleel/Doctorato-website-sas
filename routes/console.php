@@ -50,6 +50,15 @@ Schedule::command('trials:drip')
     ->onOneServer()
     ->withoutOverlapping();
 
+// Retention pruner — daily at 03:30, after the backup window so the
+// backup captures the full dataset before the prune removes anything.
+// Trims activity_logs (365d), failed_jobs (30d), sessions (30d),
+// customer_login_tokens (7d). Permanent actions preserved.
+Schedule::command('maint:prune')
+    ->dailyAt('03:30')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Queue health check — every 15 minutes. If the worker is dead or
 // the queue is backing up, exits non-zero. Pair this with an
 // external monitor (HealthChecks.io, UptimeRobot) for paging.
