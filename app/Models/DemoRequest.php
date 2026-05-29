@@ -41,6 +41,7 @@ class DemoRequest extends Model
         'marketing_opted_out_at',
         'trial_drip_step',
         'trial_drip_last_sent_at',
+        'referred_by_code',
     ];
 
     protected $casts = [

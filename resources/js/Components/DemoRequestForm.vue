@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useTracking } from '@/composables/useTracking';
@@ -22,6 +22,9 @@ const form = useForm({
     specialty: '',
     interested_modules: [],
     referral_source: '',
+    // Captured from ?ref= cookie via Inertia shared props. Sent
+    // hidden so attribution flows into the DB on submit.
+    referred_by_code: usePage().props.referralCode || '',
     notes: '',
     // Bot defenses (honeypot + rendered-at timestamp + reCAPTCHA token).
     hp_trap: '',

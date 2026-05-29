@@ -47,6 +47,10 @@ class HandleInertiaRequests extends Middleware
             // Expose the reCAPTCHA site key to forms that need it. Null
             // when reCAPTCHA isn't configured — frontend falls back to
             // the honeypot + timing defenses only.
+            // Referral code captured from ?ref= via CaptureReferralCode
+            // middleware. Demo form reads this so attribution survives
+            // browsing several pages before the visitor submits.
+            'referralCode' => $request->cookie(\App\Http\Middleware\CaptureReferralCode::COOKIE_NAME),
             'recaptcha' => fn () => [
                 'site_key' => app(RecaptchaService::class)->siteKey(),
                 'enabled' => app(RecaptchaService::class)->isEnabled(),

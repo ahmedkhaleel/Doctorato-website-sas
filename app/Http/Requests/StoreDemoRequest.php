@@ -20,6 +20,24 @@ class StoreDemoRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Normalise + sanity-check the referrer code BEFORE rules() runs.
+     * Junk values become null instead of triggering a validation error,
+     * which keeps a malformed referral cookie from blocking real demo
+     * submissions.
+     */
+    protected function prepareForValidation(): void
+    {
+        $code = $this->input('referred_by_code');
+        if ($code) {
+            $code = strtoupper(trim((string) $code));
+            if (!preg_match('/^DOC-[A-Z2-9]{8}$/', $code)) {
+                $code = null;
+            }
+            $this->merge(['referred_by_code' => $code]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -37,6 +55,11 @@ class StoreDemoRequest extends FormRequest
             'interested_modules'  => 'nullable|array',
             'interested_modules.*' => 'string|max:50',
             'referral_source'     => 'nullable|string|max:100',
+            // Referrer code captured from ?ref=. Format-validated here
+            // so a junk cookie doesn't poison the DB; we silently drop
+            // invalid codes by translating the validation failure into
+            // a null prepareForValidation rewrite.
+            'referred_by_code'    => ['nullable', 'string', 'max:32', 'regex:/^DOC-[A-Z2-9]{8}$/'],
             'notes'               => 'nullable|string|max:1000',
         ];
     }

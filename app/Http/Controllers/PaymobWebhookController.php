@@ -95,6 +95,13 @@ class PaymobWebhookController extends Controller
                     'starts_at' => $starts,
                     'ends_at' => $ends,
                 ]);
+
+                // Generate this sub's share code + credit any
+                // referrer captured at signup. Inside the same DB
+                // transaction as the activation so retries can't
+                // partially apply.
+                app(\App\Services\ReferralService::class)
+                    ->onSubscriptionActivated($subscription->fresh(['demoRequest']));
             } elseif (! $success && $invoice->status === 'pending') {
                 $invoice->update(['status' => 'failed']);
             }

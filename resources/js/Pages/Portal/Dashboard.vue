@@ -75,6 +75,9 @@ function formatDate(iso) {
                     <span class="text-xs uppercase tracking-widest text-[#C4A265] font-bold hidden sm:inline">Portal</span>
                 </div>
                 <div class="flex items-center gap-5">
+                    <Link href="/portal/refer" class="text-sm text-[#5A6C7D] hover:text-[#0A1628] transition font-medium">
+                        Refer
+                    </Link>
                     <Link href="/portal/profile" class="text-sm text-[#5A6C7D] hover:text-[#0A1628] transition font-medium">
                         Profile
                     </Link>

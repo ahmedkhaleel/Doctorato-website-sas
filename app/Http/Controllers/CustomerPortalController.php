@@ -259,6 +259,62 @@ class CustomerPortalController extends Controller
     }
 
     /**
+     * Referral hub — shows the customer their share link, accumulated
+     * credit, and a list of subs they've referred. Only meaningful
+     * once they have at least one ACTIVE subscription (referral codes
+     * are generated at activation, not at trial signup), so if they
+     * don't, we render the page in a "complete your subscription to
+     * unlock" empty state.
+     */
+    public function showReferrals(Request $request)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $sub = Subscription::where('demo_request_id', $customer->id)
+            ->where('status', 'active')
+            ->whereNotNull('referral_code')
+            ->orderByDesc('starts_at')
+            ->first();
+
+        $referrals = [];
+        $creditCents = 0;
+        $currency = 'USD';
+        $referralCode = null;
+        $shareUrl = null;
+
+        if ($sub) {
+            $referralCode = $sub->referral_code;
+            $creditCents = (int) ($sub->referral_credit_cents ?? 0);
+            $currency = $sub->currency ?? 'USD';
+            $shareUrl = url('/demo?ref=' . $referralCode);
+
+            $referrals = Subscription::where('referred_by_subscription_id', $sub->id)
+                ->with('demoRequest:id,clinic_name')
+                ->orderByDesc('created_at')
+                ->limit(50)
+                ->get()
+                ->map(fn ($r) => [
+                    'id' => $r->id,
+                    'clinic_name' => $r->demoRequest?->clinic_name ?? $r->customer_name ?? '—',
+                    'status' => $r->status,
+                    'activated_at' => $r->starts_at?->toIso8601String(),
+                ])
+                ->toArray();
+        }
+
+        return Inertia::render('Portal/Refer', [
+            'hasActiveSubscription' => (bool) $sub,
+            'referralCode' => $referralCode,
+            'shareUrl' => $shareUrl,
+            'creditCents' => $creditCents,
+            'creditFormatted' => number_format($creditCents / 100, 2),
+            'currency' => $currency,
+            'rewardBps' => \App\Services\ReferralService::REWARD_BPS,
+            'referrals' => $referrals,
+        ]);
+    }
+
+    /**
      * Profile page — bare-bones edit form for the customer's own
      * details. Email is read-only because it's the magic-link
      * identifier; changing it would lock the customer out.
