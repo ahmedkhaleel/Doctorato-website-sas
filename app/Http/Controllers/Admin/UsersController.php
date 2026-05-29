@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -29,17 +31,9 @@ class UsersController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8',
-            'role' => ['required', Rule::in(array_keys(User::roles()))],
-            'permissions' => 'nullable|array',
-            'permissions.*' => ['string', Rule::in(array_keys(User::availablePermissions()))],
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['permissions'] = $validated['permissions']
@@ -49,17 +43,9 @@ class UsersController extends Controller
         return back()->with('success', 'تم إضافة المستخدم بنجاح');
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8',
-            'role' => ['required', Rule::in(array_keys(User::roles()))],
-            'permissions' => 'nullable|array',
-            'permissions.*' => ['string', Rule::in(array_keys(User::availablePermissions()))],
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);

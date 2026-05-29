@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             SetLocale::class,
             \App\Http\Middleware\CaptureReferralCode::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         // Trust Cloudflare (and any other proxy in front of the app) so

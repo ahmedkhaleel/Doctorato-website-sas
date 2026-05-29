@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PlanRequest;
 use App\Models\ActivityLog;
 use App\Models\PricingPlan;
 use Illuminate\Http\Request;
@@ -17,28 +18,9 @@ class PlanController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(PlanRequest $request)
     {
-        $validated = $request->validate([
-            'name_ar' => 'required|string',
-            'name_en' => 'required|string',
-            'slug' => 'required|string|unique:pricing_plans,slug',
-            'description_ar' => 'nullable|string',
-            'description_en' => 'nullable|string',
-            'monthly_price' => 'required|numeric|min:0',
-            'yearly_price' => 'required|numeric|min:0',
-            'currency' => 'nullable|string',
-            'is_popular' => 'boolean',
-            'is_custom' => 'boolean',
-            'is_active' => 'boolean',
-            'features_ar' => 'nullable|array',
-            'features_en' => 'nullable|array',
-            'modules_included' => 'nullable|array',
-            'max_users' => 'nullable|integer',
-            'max_patients' => 'nullable|integer',
-            'support_level' => 'nullable|string',
-            'display_order' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         // Defaults for columns that don't have a DB-level default.
         // Without these the insert throws "Field '...' doesn't have a default value".
@@ -52,27 +34,9 @@ class PlanController extends Controller
         return back()->with('success', 'تم إضافة الخطة بنجاح');
     }
 
-    public function update(Request $request, PricingPlan $plan)
+    public function update(PlanRequest $request, PricingPlan $plan)
     {
-        $validated = $request->validate([
-            'name_ar' => 'required|string',
-            'name_en' => 'required|string',
-            'description_ar' => 'nullable|string',
-            'description_en' => 'nullable|string',
-            'monthly_price' => 'required|numeric|min:0',
-            'yearly_price' => 'required|numeric|min:0',
-            'currency' => 'nullable|string',
-            'is_popular' => 'boolean',
-            'is_custom' => 'boolean',
-            'is_active' => 'boolean',
-            'features_ar' => 'nullable|array',
-            'features_en' => 'nullable|array',
-            'modules_included' => 'nullable|array',
-            'max_users' => 'nullable|integer',
-            'max_patients' => 'nullable|integer',
-            'support_level' => 'nullable|string',
-            'display_order' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         $plan->update($validated);
         ActivityLog::record('updated', $plan, "عدّل خطة: {$plan->name_ar}");
