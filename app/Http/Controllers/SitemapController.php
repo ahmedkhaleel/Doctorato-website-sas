@@ -35,6 +35,7 @@ class SitemapController extends Controller
         ['path' => '/roi-calculator', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/privacy', 'priority' => '0.3', 'freq' => 'yearly'],
         ['path' => '/terms', 'priority' => '0.3', 'freq' => 'yearly'],
+        ['path' => '/status', 'priority' => '0.3', 'freq' => 'daily'],
         // Country-specific landing pages — high priority because they
         // carry the local-SEO payload (LocalBusiness JSON-LD, native
         // currency, regional insurers).

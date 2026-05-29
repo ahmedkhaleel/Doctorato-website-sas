@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // ->middleware('admin.perm:plans.manage') etc.
         $middleware->alias([
             'admin.perm' => AdminPermission::class,
+            'customer' => \App\Http\Middleware\CustomerAuth::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

@@ -76,6 +76,11 @@ Route::get('/_debug/country', function (\Illuminate\Http\Request $request) {
     );
 });
 
+// Public, branded status page for customers. Cache-fronted (60s)
+// so a trending link doesn't DDoS the DB during an actual incident.
+Route::get('/status', [\App\Http\Controllers\StatusPageController::class, 'show'])
+    ->middleware('throttle:60,1')->name('status');
+
 // Health checks — public, throttled lightly to absorb monitors that
 // poll every 30s without enabling a load-spike vector. The shallow
 // endpoint deliberately skips DB / cache reads so it stays cheap
@@ -162,6 +167,20 @@ Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('che
 
 // Paymob webhook (CSRF-exempt — see bootstrap/app.php)
 Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])->name('webhooks.paymob');
+
+// Customer portal — magic-link auth, separate from admin
+Route::get('/portal', [\App\Http\Controllers\CustomerPortalController::class, 'showLogin'])->name('portal.login');
+Route::post('/portal/login', [\App\Http\Controllers\CustomerPortalController::class, 'sendLoginLink'])
+    ->middleware('throttle:3,1')->name('portal.send-link');
+Route::get('/portal/auth/{token}', [\App\Http\Controllers\CustomerPortalController::class, 'authenticate'])
+    ->where('token', '[a-f0-9]{64}')->name('portal.authenticate');
+
+Route::middleware('customer')->prefix('portal')->name('portal.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\CustomerPortalController::class, 'dashboard'])->name('dashboard');
+    Route::post('/subscriptions/{id}/cancel', [\App\Http\Controllers\CustomerPortalController::class, 'cancelSubscription'])
+        ->where('id', '[0-9]+')->name('subscription.cancel');
+    Route::post('/logout', [\App\Http\Controllers\CustomerPortalController::class, 'logout'])->name('logout');
+});
 
 // Admin Auth
 // Rate-limit admin auth endpoints — 5 tries per minute keeps brute-force
