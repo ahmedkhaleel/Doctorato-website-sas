@@ -22,6 +22,7 @@ class Invoice extends Model
         'total',
         'currency',
         'status',
+        'dunning_stage',
         'due_at',
         'paid_at',
         'line_items',

@@ -76,6 +76,15 @@ Route::get('/_debug/country', function (\Illuminate\Http\Request $request) {
     );
 });
 
+// Health checks — public, throttled lightly to absorb monitors that
+// poll every 30s without enabling a load-spike vector. The shallow
+// endpoint deliberately skips DB / cache reads so it stays cheap
+// during a database outage (a 200 here = "PHP is up").
+Route::get('/healthz', [\App\Http\Controllers\HealthController::class, 'shallow'])
+    ->middleware('throttle:120,1')->name('healthz');
+Route::get('/healthz/deep', [\App\Http\Controllers\HealthController::class, 'deep'])
+    ->middleware('throttle:30,1')->name('healthz.deep');
+
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-index.xml', [SitemapController::class, 'indexFile'])->name('sitemap.index');
