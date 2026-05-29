@@ -202,4 +202,111 @@ class CustomerPortalController extends Controller
 
         return back()->with('portalMessage', 'تم إلغاء الاشتراك. ستحتفظ بالوصول حتى ' . $sub->ends_at?->format('Y-m-d') . '.');
     }
+
+    /**
+     * Reactivate a subscription the customer just canceled, as long
+     * as the grace period (ends_at) hasn't expired yet. After
+     * ends_at the renewal cron has stopped touching the row and a
+     * fresh checkout is required.
+     */
+    public function resumeSubscription(Request $request, int $subscriptionId)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $sub = Subscription::where('id', $subscriptionId)
+            ->where('demo_request_id', $customer->id)
+            ->first();
+        if (!$sub) {
+            abort(404);
+        }
+        if ($sub->status !== 'canceled') {
+            return back()->withErrors(['subscription' => 'هذا الاشتراك ليس ملغى.']);
+        }
+        if ($sub->ends_at && $sub->ends_at->isPast()) {
+            return back()->withErrors(['subscription' => 'انتهت فترة السماح. اشترك من جديد عبر صفحة الأسعار.']);
+        }
+
+        $sub->update(['status' => 'active', 'canceled_at' => null]);
+
+        Log::info('portal.subscription_resumed', [
+            'subscription_id' => $sub->id,
+            'customer_id' => $customer->id,
+        ]);
+
+        return back()->with('portalMessage', 'تم استئناف اشتراكك. سيستمر التجديد كالمعتاد.');
+    }
+
+    /**
+     * Profile page — bare-bones edit form for the customer's own
+     * details. Email is read-only because it's the magic-link
+     * identifier; changing it would lock the customer out.
+     */
+    public function showProfile(Request $request)
+    {
+        $customer = $request->attributes->get('customer');
+        return Inertia::render('Portal/Profile', [
+            'customer' => [
+                'full_name' => $customer->full_name,
+                'clinic_name' => $customer->clinic_name,
+                'phone' => $customer->phone,
+                'email' => $customer->email,
+                'country' => $customer->country,
+                'specialty' => $customer->specialty,
+                'marketing_opt_in' => (bool) ($customer->marketing_opt_in ?? true),
+            ],
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $data = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'clinic_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:50',
+            'country' => 'nullable|string|max:100',
+            'specialty' => 'nullable|string|max:100',
+        ]);
+
+        $customer->update($data);
+
+        Log::info('portal.profile_updated', [
+            'customer_id' => $customer->id,
+            'fields' => array_keys($data),
+        ]);
+
+        return back()->with('portalMessage', 'تم تحديث بياناتك.');
+    }
+
+    /**
+     * Marketing email preferences. Compliance touchpoint — once a
+     * customer opts out we stamp the timestamp so the newsletter /
+     * re-engagement sends can filter on it. Transactional emails
+     * (login link, invoice receipt, dunning) ignore this flag.
+     */
+    public function updatePreferences(Request $request)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $optIn = (bool) $request->boolean('marketing_opt_in');
+        $patch = ['marketing_opt_in' => $optIn];
+        $previously = (bool) ($customer->marketing_opt_in ?? true);
+        if (!$optIn && $previously) {
+            // First time toggling off — capture when, so an audit
+            // can verify we stopped emailing on the right date.
+            $patch['marketing_opted_out_at'] = now();
+        }
+
+        $customer->update($patch);
+
+        Log::info('portal.preferences_updated', [
+            'customer_id' => $customer->id,
+            'marketing_opt_in' => $optIn,
+        ]);
+
+        return back()->with('portalMessage', $optIn
+            ? 'تم تفعيل التحديثات البريدية.'
+            : 'تم إيقاف التحديثات البريدية. ستستمر الفواتير وإشعارات الاشتراك في الوصول إليك.');
+    }
 }

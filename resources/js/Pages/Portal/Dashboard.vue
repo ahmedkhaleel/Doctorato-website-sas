@@ -23,6 +23,7 @@ const portalMessage = computed(() => page.props.flash?.portalMessage ?? null);
 
 const logoutForm = useForm({});
 const cancelForm = useForm({});
+const resumeForm = useForm({});
 const showCancelFor = ref(null);
 
 function logout() { logoutForm.post('/portal/logout'); }
@@ -31,6 +32,7 @@ function confirmCancel(id) {
         onFinish: () => showCancelFor.value = null,
     });
 }
+function resumeSubscription(id) { resumeForm.post(`/portal/subscriptions/${id}/resume`); }
 
 function statusBadgeClass(status) {
     switch (status) {
@@ -71,9 +73,14 @@ function formatDate(iso) {
                     <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-32 h-auto" />
                     <span class="text-xs uppercase tracking-widest text-[#C4A265] font-bold hidden sm:inline">Portal</span>
                 </div>
-                <button @click="logout" class="text-sm text-[#5A6C7D] hover:text-[#0A1628] transition font-medium">
-                    Sign out
-                </button>
+                <div class="flex items-center gap-5">
+                    <Link href="/portal/profile" class="text-sm text-[#5A6C7D] hover:text-[#0A1628] transition font-medium">
+                        Profile
+                    </Link>
+                    <button @click="logout" class="text-sm text-[#5A6C7D] hover:text-[#0A1628] transition font-medium">
+                        Sign out
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -151,6 +158,16 @@ function formatDate(iso) {
                                     </button>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Resume UI — appears for soft-canceled subs still in grace period -->
+                        <div v-else-if="sub.status === 'canceled' && sub.ends_at && new Date(sub.ends_at) > new Date()" class="mt-6 pt-6 border-t border-gray-100">
+                            <p class="text-sm text-[#5A6C7D] mb-3">
+                                Your subscription is scheduled to end on <strong>{{ formatDate(sub.ends_at) }}</strong>. Changed your mind?
+                            </p>
+                            <button @click="resumeSubscription(sub.id)" :disabled="resumeForm.processing" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition disabled:opacity-60">
+                                {{ resumeForm.processing ? 'Resuming…' : 'Resume subscription' }}
+                            </button>
                         </div>
                     </article>
                 </div>

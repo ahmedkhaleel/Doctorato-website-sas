@@ -181,6 +181,11 @@ Route::middleware('customer')->prefix('portal')->name('portal.')->group(function
         ->where('id', '[0-9]+')->name('invoice.show');
     Route::post('/subscriptions/{id}/cancel', [\App\Http\Controllers\CustomerPortalController::class, 'cancelSubscription'])
         ->where('id', '[0-9]+')->name('subscription.cancel');
+    Route::post('/subscriptions/{id}/resume', [\App\Http\Controllers\CustomerPortalController::class, 'resumeSubscription'])
+        ->where('id', '[0-9]+')->name('subscription.resume');
+    Route::get('/profile', [\App\Http\Controllers\CustomerPortalController::class, 'showProfile'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\CustomerPortalController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/preferences', [\App\Http\Controllers\CustomerPortalController::class, 'updatePreferences'])->name('preferences.update');
     Route::post('/logout', [\App\Http\Controllers\CustomerPortalController::class, 'logout'])->name('logout');
 });
 

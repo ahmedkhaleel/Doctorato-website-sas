@@ -37,6 +37,8 @@ class DemoRequest extends Model
         'trial_ending_soon_notified',
         'trial_ending_soon_notified_at',
         'admin_reminder_seen',
+        'marketing_opt_in',
+        'marketing_opted_out_at',
     ];
 
     protected $casts = [
@@ -47,6 +49,8 @@ class DemoRequest extends Model
         'trial_expiry_notified' => 'boolean',
         'trial_expiry_notified_at' => 'datetime',
         'trial_ending_soon_notified' => 'boolean',
+        'marketing_opt_in' => 'boolean',
+        'marketing_opted_out_at' => 'datetime',
         'trial_ending_soon_notified_at' => 'datetime',
         'admin_reminder_seen' => 'boolean',
         'is_instant_trial' => 'boolean',
