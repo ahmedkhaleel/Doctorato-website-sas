@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\FaqRequest;
 use App\Models\ActivityLog;
 use App\Models\Faq;
 use Illuminate\Http\Request;
@@ -17,36 +18,16 @@ class FaqController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(FaqRequest $request)
     {
-        $validated = $request->validate([
-            'category' => 'required|in:general,pricing,technical',
-            'question_ar' => 'required|string',
-            'question_en' => 'required|string',
-            'answer_ar' => 'required|string',
-            'answer_en' => 'required|string',
-            'display_order' => 'integer',
-            'is_active' => 'boolean',
-        ]);
-
-        $faq = Faq::create($validated);
+        $faq = Faq::create($request->validated());
         ActivityLog::record('created', $faq, "أضاف سؤال: " . mb_substr($faq->question_ar, 0, 50));
         return back()->with('success', 'تم إضافة السؤال بنجاح');
     }
 
-    public function update(Request $request, Faq $faq)
+    public function update(FaqRequest $request, Faq $faq)
     {
-        $validated = $request->validate([
-            'category' => 'required|in:general,pricing,technical',
-            'question_ar' => 'required|string',
-            'question_en' => 'required|string',
-            'answer_ar' => 'required|string',
-            'answer_en' => 'required|string',
-            'display_order' => 'integer',
-            'is_active' => 'boolean',
-        ]);
-
-        $faq->update($validated);
+        $faq->update($request->validated());
         ActivityLog::record('updated', $faq, "عدّل سؤال: " . mb_substr($faq->question_ar, 0, 50));
         return back()->with('success', 'تم تحديث السؤال بنجاح');
     }

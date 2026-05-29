@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PlanPriceRequest;
 use App\Models\PlanPrice;
 use App\Models\PricingPlan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -35,9 +35,9 @@ class PlanPriceController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(PlanPriceRequest $request): RedirectResponse
     {
-        $data = $this->validatePrice($request);
+        $data = $request->validated();
         $data['country_code'] = strtoupper($data['country_code']);
         $data['currency_code'] = strtoupper($data['currency_code']);
 
@@ -50,9 +50,9 @@ class PlanPriceController extends Controller
         return back()->with('success', 'تم حفظ السعر');
     }
 
-    public function update(Request $request, PlanPrice $price): RedirectResponse
+    public function update(PlanPriceRequest $request, PlanPrice $price): RedirectResponse
     {
-        $data = $this->validatePrice($request, $price->id);
+        $data = $request->validated();
         $data['country_code'] = strtoupper($data['country_code']);
         $data['currency_code'] = strtoupper($data['currency_code']);
         $price->update($data);
@@ -67,35 +67,6 @@ class PlanPriceController extends Controller
         $this->flushCaches();
 
         return back()->with('success', 'تم الحذف');
-    }
-
-    protected function validatePrice(Request $request, ?int $ignoreId = null): array
-    {
-        $planId = (int) $request->input('pricing_plan_id');
-        $country = strtoupper((string) $request->input('country_code'));
-
-        return $request->validate([
-            'pricing_plan_id' => ['required', 'integer', 'exists:pricing_plans,id'],
-            'country_code' => [
-                'required', 'string', 'size:2',
-                // Unique composite (plan, country). Skip on the current
-                // row so editing the monthly/yearly figures doesn't
-                // collide with itself. `pricing_plan_id` matcher means
-                // one (Basic, EG) can coexist with (Pro, EG).
-                Rule::unique('plan_prices', 'country_code')
-                    ->where(fn ($q) => $q->where('pricing_plan_id', $planId))
-                    ->ignore($ignoreId),
-            ],
-            'country_name_ar' => ['required', 'string', 'max:80'],
-            'country_name_en' => ['required', 'string', 'max:80'],
-            'country_flag' => ['nullable', 'string', 'max:8'],
-            'currency_code' => ['required', 'string', 'size:3'],
-            'currency_symbol' => ['required', 'string', 'max:12'],
-            'monthly_price' => ['required', 'numeric', 'min:0'],
-            'yearly_price' => ['required', 'numeric', 'min:0'],
-            'setup_fee' => ['nullable', 'numeric', 'min:0'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
     }
 
     /** Clear caches that depend on PlanPrice rows (supported countries list). */

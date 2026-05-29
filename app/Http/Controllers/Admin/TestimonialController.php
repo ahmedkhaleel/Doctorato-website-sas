@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TestimonialRequest;
 use App\Models\ActivityLog;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
@@ -17,48 +18,16 @@ class TestimonialController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(TestimonialRequest $request)
     {
-        $validated = $request->validate([
-            'client_name_ar' => 'required|string',
-            'client_name_en' => 'required|string',
-            'clinic_name_ar' => 'nullable|string',
-            'clinic_name_en' => 'nullable|string',
-            'role_ar' => 'nullable|string',
-            'role_en' => 'nullable|string',
-            // min:3 prevents a single space / punctuation character from
-            // passing the required rule as a valid review.
-            'review_ar' => 'required|string|min:3',
-            'review_en' => 'required|string|min:3',
-            'rating' => 'required|integer|min:1|max:5',
-            'display_order' => 'integer',
-            'is_active' => 'boolean',
-        ]);
-
-        $t = Testimonial::create($validated);
+        $t = Testimonial::create($request->validated());
         ActivityLog::record('created', $t, "أضاف شهادة من: {$t->client_name_ar}");
         return back()->with('success', 'تم إضافة الشهادة بنجاح');
     }
 
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(TestimonialRequest $request, Testimonial $testimonial)
     {
-        $validated = $request->validate([
-            'client_name_ar' => 'required|string',
-            'client_name_en' => 'required|string',
-            'clinic_name_ar' => 'nullable|string',
-            'clinic_name_en' => 'nullable|string',
-            'role_ar' => 'nullable|string',
-            'role_en' => 'nullable|string',
-            // min:3 prevents a single space / punctuation character from
-            // passing the required rule as a valid review.
-            'review_ar' => 'required|string|min:3',
-            'review_en' => 'required|string|min:3',
-            'rating' => 'required|integer|min:1|max:5',
-            'display_order' => 'integer',
-            'is_active' => 'boolean',
-        ]);
-
-        $testimonial->update($validated);
+        $testimonial->update($request->validated());
         ActivityLog::record('updated', $testimonial, "عدّل شهادة: {$testimonial->client_name_ar}");
         return back()->with('success', 'تم تحديث الشهادة بنجاح');
     }

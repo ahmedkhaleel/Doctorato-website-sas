@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\EmailTemplateRequest;
 use App\Models\EmailTemplate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,17 +19,9 @@ class EmailTemplateController extends Controller
         ]);
     }
 
-    public function update(Request $request, EmailTemplate $template): RedirectResponse
+    public function update(EmailTemplateRequest $request, EmailTemplate $template): RedirectResponse
     {
-        $data = $request->validate([
-            'subject_ar' => ['required', 'string', 'max:160'],
-            'subject_en' => ['required', 'string', 'max:160'],
-            'body_ar' => ['required', 'string'],
-            'body_en' => ['required', 'string'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
-
-        $template->update($data);
+        $template->update($request->validated());
 
         return back()->with('success', 'تم حفظ القالب');
     }

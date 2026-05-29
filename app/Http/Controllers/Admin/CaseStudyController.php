@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CaseStudyRequest;
 use App\Models\ActivityLog;
 use App\Models\CaseStudy;
 use Illuminate\Http\RedirectResponse;
@@ -42,10 +43,10 @@ class CaseStudyController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(CaseStudyRequest $request): RedirectResponse
     {
-        $data = $this->validateCase($request);
-        $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title_en'] ?: $data['title_ar']);
+        $data = $request->validated();
+        $data['slug'] = $this->uniqueSlug(($data['slug'] ?? null) ?: ($data['title_en'] ?? '') ?: ($data['title_ar'] ?? ''));
 
         $case = CaseStudy::create($data);
         ActivityLog::record('created', $case, "أنشأ دراسة حالة: {$case->title_ar}");
@@ -53,9 +54,9 @@ class CaseStudyController extends Controller
         return back()->with('success', 'تم إنشاء دراسة الحالة');
     }
 
-    public function update(Request $request, CaseStudy $caseStudy): RedirectResponse
+    public function update(CaseStudyRequest $request, CaseStudy $caseStudy): RedirectResponse
     {
-        $data = $this->validateCase($request, $caseStudy->id);
+        $data = $request->validated();
 
         if (!empty($data['slug']) && $data['slug'] !== $caseStudy->slug) {
             $data['slug'] = $this->uniqueSlug($data['slug'], $caseStudy->id);
@@ -88,41 +89,6 @@ class CaseStudyController extends Controller
         ActivityLog::record('deleted', null, "حذف دراسة حالة: {$title}");
 
         return back()->with('success', 'تم حذف دراسة الحالة');
-    }
-
-    protected function validateCase(Request $request, ?int $ignoreId = null): array
-    {
-        return $request->validate([
-            'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
-            'client_name_ar' => ['required', 'string', 'max:150'],
-            'client_name_en' => ['required', 'string', 'max:150'],
-            'industry_ar' => ['nullable', 'string', 'max:120'],
-            'industry_en' => ['nullable', 'string', 'max:120'],
-            'location' => ['nullable', 'string', 'max:120'],
-            'logo' => ['nullable', 'string', 'max:500'],
-            'hero_image' => ['nullable', 'string', 'max:500'],
-            'title_ar' => ['required', 'string', 'max:255'],
-            'title_en' => ['required', 'string', 'max:255'],
-            'summary_ar' => ['nullable', 'string'],
-            'summary_en' => ['nullable', 'string'],
-            'challenge_ar' => ['nullable', 'string'],
-            'challenge_en' => ['nullable', 'string'],
-            'solution_ar' => ['nullable', 'string'],
-            'solution_en' => ['nullable', 'string'],
-            'results_ar' => ['nullable', 'string'],
-            'results_en' => ['nullable', 'string'],
-            'metrics' => ['nullable', 'array'],
-            'modules_used' => ['nullable', 'array'],
-            'testimonial_ar' => ['nullable', 'string'],
-            'testimonial_en' => ['nullable', 'string'],
-            'testimonial_author' => ['nullable', 'string', 'max:120'],
-            'testimonial_role' => ['nullable', 'string', 'max:120'],
-            'seo_title' => ['nullable', 'string', 'max:160'],
-            'seo_description' => ['nullable', 'string', 'max:300'],
-            'is_published' => ['nullable', 'boolean'],
-            'is_featured' => ['nullable', 'boolean'],
-            'display_order' => ['nullable', 'integer', 'min:0'],
-        ]);
     }
 
     protected function uniqueSlug(string $base, ?int $ignoreId = null): string

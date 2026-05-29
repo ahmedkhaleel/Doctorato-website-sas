@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BlogPostRequest;
 use App\Models\ActivityLog;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
@@ -47,9 +48,9 @@ class BlogPostController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(BlogPostRequest $request): RedirectResponse
     {
-        $data = $this->validatePost($request);
+        $data = $request->validated();
         // When the admin leaves slug blank, fall back to the English then
         // Arabic title. Note: validator marks `slug` as nullable, so the
         // key may not exist in the validated output — use null coalescing
@@ -62,9 +63,9 @@ class BlogPostController extends Controller
         return back()->with('success', 'تم إنشاء المقال');
     }
 
-    public function update(Request $request, BlogPost $post): RedirectResponse
+    public function update(BlogPostRequest $request, BlogPost $post): RedirectResponse
     {
-        $data = $this->validatePost($request, $post->id);
+        $data = $request->validated();
 
         // Re-slug only if explicitly changed
         if (!empty($data['slug']) && $data['slug'] !== $post->slug) {
@@ -106,28 +107,6 @@ class BlogPostController extends Controller
         return response()->json([
             'url' => Storage::disk('public')->url($path),
             'path' => $path,
-        ]);
-    }
-
-    protected function validatePost(Request $request, ?int $ignoreId = null): array
-    {
-        return $request->validate([
-            'category_id' => ['nullable', 'integer', 'exists:blog_categories,id'],
-            'title_ar' => ['required', 'string', 'max:255'],
-            'title_en' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/'],
-            'excerpt_ar' => ['nullable', 'string', 'max:500'],
-            'excerpt_en' => ['nullable', 'string', 'max:500'],
-            'content_ar' => ['required', 'string'],
-            'content_en' => ['required', 'string'],
-            'featured_image' => ['nullable', 'string', 'max:500'],
-            'seo_title_ar' => ['nullable', 'string', 'max:160'],
-            'seo_title_en' => ['nullable', 'string', 'max:160'],
-            'seo_desc_ar' => ['nullable', 'string', 'max:300'],
-            'seo_desc_en' => ['nullable', 'string', 'max:300'],
-            'status' => ['required', 'in:draft,published,scheduled'],
-            'is_featured' => ['nullable', 'boolean'],
-            'published_at' => ['nullable', 'date'],
         ]);
     }
 

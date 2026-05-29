@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateDemoStatusRequest;
 use App\Models\DemoRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,14 +25,9 @@ class DemoController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, DemoRequest $demo)
+    public function updateStatus(UpdateDemoStatusRequest $request, DemoRequest $demo)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:new,contacted,demo_scheduled,demo_done,converted,lost',
-            'admin_notes' => 'nullable|string',
-        ]);
-
-        $demo->update($validated);
+        $demo->update($request->validated());
         return back()->with('success', 'تم تحديث حالة الطلب');
     }
 

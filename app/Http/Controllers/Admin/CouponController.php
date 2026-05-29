@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CouponRequest;
 use App\Models\ActivityLog;
 use App\Models\Coupon;
 use App\Models\PricingPlan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,9 +28,9 @@ class CouponController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(CouponRequest $request): RedirectResponse
     {
-        $data = $this->validateCoupon($request);
+        $data = $request->validated();
         $data['code'] = strtoupper(trim($data['code']));
         $coupon = Coupon::create($data);
         ActivityLog::record('created', $coupon, "أنشأ كوبون: {$coupon->code}");
@@ -38,9 +38,9 @@ class CouponController extends Controller
         return back()->with('success', 'تم إنشاء الكوبون');
     }
 
-    public function update(Request $request, Coupon $coupon): RedirectResponse
+    public function update(CouponRequest $request, Coupon $coupon): RedirectResponse
     {
-        $data = $this->validateCoupon($request, $coupon->id);
+        $data = $request->validated();
         $data['code'] = strtoupper(trim($data['code']));
         $coupon->update($data);
         ActivityLog::record('updated', $coupon, "عدّل كوبون: {$coupon->code}");
@@ -55,30 +55,5 @@ class CouponController extends Controller
         ActivityLog::record('deleted', null, "حذف كوبون: {$code}");
 
         return back()->with('success', 'تم حذف الكوبون');
-    }
-
-    protected function validateCoupon(Request $request, ?int $ignoreId = null): array
-    {
-        return $request->validate([
-            'code' => [
-                'required', 'string', 'max:40', 'regex:/^[A-Z0-9_-]+$/i',
-                // Use Rule::unique so the current record is properly excluded
-                // on update — the string form silently misbehaves when
-                // $ignoreId is null or comes from a different column.
-                Rule::unique('coupons', 'code')->ignore($ignoreId),
-            ],
-            'description_ar' => ['nullable', 'string', 'max:160'],
-            'description_en' => ['nullable', 'string', 'max:160'],
-            'type' => ['required', 'in:percentage,fixed'],
-            'value' => ['required', 'numeric', 'min:0'],
-            'min_amount' => ['nullable', 'numeric', 'min:0'],
-            'max_uses' => ['nullable', 'integer', 'min:1'],
-            'max_uses_per_customer' => ['nullable', 'integer', 'min:1'],
-            'plan_ids' => ['nullable', 'array'],
-            'plan_ids.*' => ['integer', 'exists:pricing_plans,id'],
-            'starts_at' => ['nullable', 'date'],
-            'expires_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
     }
 }

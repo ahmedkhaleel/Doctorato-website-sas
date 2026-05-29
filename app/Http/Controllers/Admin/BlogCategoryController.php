@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BlogCategoryRequest;
 use App\Models\ActivityLog;
 use App\Models\BlogCategory;
 use Illuminate\Http\RedirectResponse;
@@ -20,9 +21,9 @@ class BlogCategoryController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(BlogCategoryRequest $request): RedirectResponse
     {
-        $data = $this->validateCategory($request);
+        $data = $request->validated();
         $data['slug'] = $this->uniqueSlug($data['name_en'] ?: $data['name_ar']);
 
         $cat = BlogCategory::create($data);
@@ -31,9 +32,9 @@ class BlogCategoryController extends Controller
         return back()->with('success', 'تم إنشاء التصنيف');
     }
 
-    public function update(Request $request, BlogCategory $category): RedirectResponse
+    public function update(BlogCategoryRequest $request, BlogCategory $category): RedirectResponse
     {
-        $data = $this->validateCategory($request);
+        $data = $request->validated();
         // Regenerate the slug only if the base name changed, and skip
         // the category's own row when checking uniqueness.
         if ($category->name_en !== $data['name_en'] || $category->name_ar !== $data['name_ar']) {
@@ -61,15 +62,6 @@ class BlogCategoryController extends Controller
         ActivityLog::record('deleted', null, "حذف تصنيف: {$name}");
 
         return back()->with('success', 'تم حذف التصنيف');
-    }
-
-    protected function validateCategory(Request $request): array
-    {
-        return $request->validate([
-            'name_ar' => ['required', 'string', 'max:120'],
-            'name_en' => ['required', 'string', 'max:120'],
-            'display_order' => ['nullable', 'integer', 'min:0'],
-        ]);
     }
 
     /** Generate a unique slug, suffixing -2, -3, ... on collision. */
