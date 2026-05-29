@@ -174,19 +174,34 @@ Route::get('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, '
 Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:3,1');
 Route::post('/admin/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('admin.logout');
 
+// 2FA challenge — sits OUTSIDE the auth middleware group because the
+// user is half-authenticated at this point (credentials passed,
+// session holds 2fa.user_id, but Auth::check() is still false).
+Route::get('/admin/2fa/challenge', [\App\Http\Controllers\Admin\AuthController::class, 'showTwoFactorChallenge'])
+    ->name('admin.2fa.challenge');
+Route::post('/admin/2fa/verify', [\App\Http\Controllers\Admin\AuthController::class, 'verifyTwoFactor'])
+    ->middleware('throttle:5,1')->name('admin.2fa.verify');
+
 // Admin Dashboard (Protected)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
+    // 2FA self-service — every authenticated admin can manage their own
+    Route::get('/2fa', [\App\Http\Controllers\Admin\TwoFactorController::class, 'index'])->name('2fa.index');
+    Route::post('/2fa/setup', [\App\Http\Controllers\Admin\TwoFactorController::class, 'setup'])->name('2fa.setup');
+    Route::post('/2fa/confirm', [\App\Http\Controllers\Admin\TwoFactorController::class, 'confirm'])->name('2fa.confirm');
+    Route::post('/2fa/disable', [\App\Http\Controllers\Admin\TwoFactorController::class, 'disable'])->name('2fa.disable');
+    Route::post('/2fa/recovery', [\App\Http\Controllers\Admin\TwoFactorController::class, 'regenerateRecoveryCodes'])->name('2fa.recovery');
+
     Route::get('/faqs', [\App\Http\Controllers\Admin\FaqController::class, 'index'])->name('faqs.index');
-    Route::post('/faqs', [\App\Http\Controllers\Admin\FaqController::class, 'store'])->name('faqs.store');
-    Route::put('/faqs/{faq}', [\App\Http\Controllers\Admin\FaqController::class, 'update'])->name('faqs.update');
-    Route::delete('/faqs/{faq}', [\App\Http\Controllers\Admin\FaqController::class, 'destroy'])->name('faqs.destroy');
+    Route::post('/faqs', [\App\Http\Controllers\Admin\FaqController::class, 'store'])->name('faqs.store')->middleware('admin.perm:faqs.manage');
+    Route::put('/faqs/{faq}', [\App\Http\Controllers\Admin\FaqController::class, 'update'])->name('faqs.update')->middleware('admin.perm:faqs.manage');
+    Route::delete('/faqs/{faq}', [\App\Http\Controllers\Admin\FaqController::class, 'destroy'])->name('faqs.destroy')->middleware('admin.perm:faqs.manage');
 
     Route::get('/plan-prices', [\App\Http\Controllers\Admin\PlanPriceController::class, 'index'])->name('plan-prices.index');
-    Route::post('/plan-prices', [\App\Http\Controllers\Admin\PlanPriceController::class, 'store'])->name('plan-prices.store');
-    Route::put('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'update'])->name('plan-prices.update');
-    Route::delete('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'destroy'])->name('plan-prices.destroy');
+    Route::post('/plan-prices', [\App\Http\Controllers\Admin\PlanPriceController::class, 'store'])->name('plan-prices.store')->middleware('admin.perm:plans.manage');
+    Route::put('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'update'])->name('plan-prices.update')->middleware('admin.perm:plans.manage');
+    Route::delete('/plan-prices/{price}', [\App\Http\Controllers\Admin\PlanPriceController::class, 'destroy'])->name('plan-prices.destroy')->middleware('admin.perm:plans.manage');
 
     // Plan management is gated by plans.manage (admin + super_admin roles
     // bypass automatically via User::hasPermission).
@@ -196,24 +211,24 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/plans/{plan}', [\App\Http\Controllers\Admin\PlanController::class, 'destroy'])->name('plans.destroy')->middleware('admin.perm:plans.manage');
 
     Route::get('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'index'])->name('testimonials.index');
-    Route::post('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'store'])->name('testimonials.store');
-    Route::put('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('testimonials.update');
-    Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy');
+    Route::post('/testimonials', [\App\Http\Controllers\Admin\TestimonialController::class, 'store'])->name('testimonials.store')->middleware('admin.perm:testimonials.manage');
+    Route::put('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'update'])->name('testimonials.update')->middleware('admin.perm:testimonials.manage');
+    Route::delete('/testimonials/{testimonial}', [\App\Http\Controllers\Admin\TestimonialController::class, 'destroy'])->name('testimonials.destroy')->middleware('admin.perm:testimonials.manage');
 
     Route::get('/currencies', [\App\Http\Controllers\Admin\CurrencyController::class, 'index'])->name('currencies.index');
-    Route::post('/currencies', [\App\Http\Controllers\Admin\CurrencyController::class, 'store'])->name('currencies.store');
-    Route::put('/currencies/{currency}', [\App\Http\Controllers\Admin\CurrencyController::class, 'update'])->name('currencies.update');
-    Route::delete('/currencies/{currency}', [\App\Http\Controllers\Admin\CurrencyController::class, 'destroy'])->name('currencies.destroy');
+    Route::post('/currencies', [\App\Http\Controllers\Admin\CurrencyController::class, 'store'])->name('currencies.store')->middleware('admin.perm:currencies.manage');
+    Route::put('/currencies/{currency}', [\App\Http\Controllers\Admin\CurrencyController::class, 'update'])->name('currencies.update')->middleware('admin.perm:currencies.manage');
+    Route::delete('/currencies/{currency}', [\App\Http\Controllers\Admin\CurrencyController::class, 'destroy'])->name('currencies.destroy')->middleware('admin.perm:currencies.manage');
 
     Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('contacts.index');
-    Route::put('/contacts/{contact}/read', [\App\Http\Controllers\Admin\ContactController::class, 'markRead'])->name('contacts.read');
-    Route::delete('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])->name('contacts.destroy');
+    Route::put('/contacts/{contact}/read', [\App\Http\Controllers\Admin\ContactController::class, 'markRead'])->name('contacts.read')->middleware('admin.perm:contacts.manage');
+    Route::delete('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])->name('contacts.destroy')->middleware('admin.perm:contacts.manage');
 
     Route::get('/demos', [\App\Http\Controllers\Admin\DemoController::class, 'index'])->name('demos.index');
-    Route::put('/demos/{demo}/status', [\App\Http\Controllers\Admin\DemoController::class, 'updateStatus'])->name('demos.status');
-    Route::post('/demos/{demo}/extend-trial', [\App\Http\Controllers\Admin\DemoController::class, 'extendTrial'])->name('demos.extend');
+    Route::put('/demos/{demo}/status', [\App\Http\Controllers\Admin\DemoController::class, 'updateStatus'])->name('demos.status')->middleware('admin.perm:demos.manage');
+    Route::post('/demos/{demo}/extend-trial', [\App\Http\Controllers\Admin\DemoController::class, 'extendTrial'])->name('demos.extend')->middleware('admin.perm:demos.manage');
     Route::post('/demos/{demo}/seen', [\App\Http\Controllers\Admin\DemoController::class, 'markReminderSeen'])->name('demos.seen');
-    Route::delete('/demos/{demo}', [\App\Http\Controllers\Admin\DemoController::class, 'destroy'])->name('demos.destroy');
+    Route::delete('/demos/{demo}', [\App\Http\Controllers\Admin\DemoController::class, 'destroy'])->name('demos.destroy')->middleware('admin.perm:demos.manage');
 
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
 
