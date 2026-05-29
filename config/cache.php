@@ -15,7 +15,12 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    // Default flipped to 'file'. File cache on cPanel is roughly 10x
+    // faster than the database driver for the read-heavy pattern
+    // we have (PricingPlan + FAQ + BlogPost lookups), and it doesn't
+    // contend with the queue or session tables for write locks. Set
+    // CACHE_STORE=redis in .env once a Redis server is available.
+    'default' => env('CACHE_STORE', 'file'),
 
     /*
     |--------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreContactRequest;
 use App\Mail\ContactAdminNotification;
 use App\Mail\ContactCustomerConfirmation;
 use App\Models\ContactMessage;
@@ -12,27 +13,16 @@ use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
-    public function store(Request $request, RecaptchaService $captcha)
+    public function store(StoreContactRequest $request, RecaptchaService $captcha)
     {
+        // Bot defenses fire first — honeypot + timing + (optional)
+        // reCAPTCHA. Validation is already done by the form request.
         $check = $captcha->verify($request->only(['hp_trap', 'form_rendered_at', 'recaptcha_token']), 'contact');
         if (!$check['ok']) {
             return back()->withInput()->withErrors(['message' => 'تعذر التحقق من الرسالة، حاول مرة أخرى.']);
         }
 
-        // Phone is generous on length because formatted numbers carry
-        // brackets, spaces, and a country prefix ("+1 (963) 646-4167"
-        // is 19 chars on its own, hits 23+ once we prepend the dial
-        // code). The previous max:20 was rejecting realistic numbers
-        // silently. Country code can be 7 chars in odd cases (e.g.
-        // "+1-242" Bahamas) — bumped to 8.
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:50',
-            'country_code' => 'nullable|string|max:8',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:5000',
-        ]);
+        $validated = $request->validated();
 
         // Combine country code + phone if both provided
         if (!empty($validated['phone']) && !empty($validated['country_code'])) {

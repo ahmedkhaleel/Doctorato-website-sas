@@ -2,69 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AddOn;
 use App\Models\Currency;
-use App\Models\Faq;
-use App\Models\PricingPlan;
-use App\Models\Testimonial;
 use App\Services\CountryDetector;
+use App\Services\PublicContentCache;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PricingController extends Controller
 {
-    public function index(Request $request, CountryDetector $detector)
+    public function index(Request $request, CountryDetector $detector, PublicContentCache $cache)
     {
         $country = $detector->resolve($request);
 
-        // Eager-load prices so priceFor() doesn't trigger N+1 queries.
-        $plans = PricingPlan::where('is_active', true)
-            ->with(['prices' => fn ($q) => $q->where('is_active', true)])
-            ->orderBy('display_order')
-            ->get()
-            ->map(function ($plan) use ($country) {
-                $price = $plan->priceFor($country);
-                return array_merge($plan->toArray(), [
-                    'monthly_price' => $price['monthly'],
-                    'yearly_price' => $price['yearly'],
-                    'setup_fee' => $price['setup_fee'] ?? 0,
-                    'setup_fee_yearly' => $price['setup_fee_yearly'] ?? 0,
-                    'currency' => $price['currency'],
-                    'currency_symbol' => $price['currency_symbol'],
-                    'country_code' => $price['country_code'],
-                    'price_source' => $price['source'],
-                ]);
-            });
+        // All four reads below now hit Cache::remember inside the
+        // service (file driver, 10 min TTL). Admin edits invalidate
+        // via the model observers, so we get freshness on save.
+        $plans = $cache->plans($country);
+        $faqs = $cache->faqs('pricing');
+        $addons = $cache->addons();
+        $testimonials = $cache->topTestimonials(3);
 
-        // Figure out the active country's currency so add-ons (stored in
-        // EGP) can be rendered in the same currency as the plans without
-        // needing a user-facing currency selector. If the country's
-        // currency isn't in the `currencies` table we fall back to EGP
-        // (base rate = 1) which keeps the numbers truthful.
-        $countryCurrencyCode = optional($plans->first())['currency'] ?? 'EGP';
+        // The currency lookup stays uncached because it's a single
+        // primary-key fetch with the country's currency code, which
+        // is already in the cached plans array.
+        $countryCurrencyCode = $plans[0]['currency'] ?? 'EGP';
         $currency = Currency::where('code', $countryCurrencyCode)->first()
             ?? Currency::where('code', 'EGP')->first();
 
         $activeCurrency = [
             'code' => $currency->code ?? 'EGP',
             'symbol' => $currency->symbol ?? 'ج.م',
-            'rate_from_egp' => (float) ($currency->rate_to_sar ?? 1), // column reused as "rate from EGP"
+            'rate_from_egp' => (float) ($currency->rate_to_sar ?? 1),
             'decimal_places' => (int) ($currency->decimal_places ?? 2),
             'symbol_position' => $currency->symbol_position ?? 'after',
         ];
 
         return Inertia::render('Pricing', [
             'plans' => $plans,
-            'faqs' => Faq::where('is_active', true)->where('category', 'pricing')->orderBy('display_order')->get(),
-            'addons' => AddOn::active()->orderBy('display_order')->get(),
+            'faqs' => $faqs,
+            'addons' => $addons,
             'activeCurrency' => $activeCurrency,
-            // Top 3 active testimonials with 5 stars for the Pricing trust
-            // section. Falls back to fewer if the pool is small.
-            'testimonials' => Testimonial::where('is_active', true)
-                ->orderByDesc('rating')
-                ->orderBy('display_order')
-                ->limit(3)
-                ->get(),
+            'testimonials' => $testimonials,
         ]);
     }
 }

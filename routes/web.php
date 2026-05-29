@@ -31,7 +31,10 @@ Route::post('/_set-detected-country', function (\Illuminate\Http\Request $reques
         app(\App\Services\CountryDetector::class)->setFromBrowser($request, $code);
     }
     return response()->noContent();
-})->name('country.detect_client');
+})->name('country.detect_client')->middleware('throttle:6,1');
+// Browser detection is a one-shot per session, so 6/minute is
+// generous for real users and a hard cap on anyone trying to abuse
+// the session-write to spam different countries.
 
 // Reset the explicit lock so the next request re-detects from IP.
 // MUST be declared BEFORE /country/{code} or that catch-all would
@@ -140,7 +143,10 @@ Route::get('/roi-calculator', fn () => \Inertia\Inertia::render('RoiCalculator')
 
 // Checkout
 Route::get('/checkout/{planSlug}', [CheckoutController::class, 'show'])->name('checkout.show');
-Route::post('/checkout/validate-coupon', [CheckoutController::class, 'validateCoupon'])->name('checkout.validate-coupon')->middleware('throttle:20,1');
+// Coupon validation throttled at 6/min — generous for a real user
+// who's typing and retrying, tight enough to prevent code enumeration
+// (was 20/min; an attacker could brute-force 5-char codes at that rate).
+Route::post('/checkout/validate-coupon', [CheckoutController::class, 'validateCoupon'])->name('checkout.validate-coupon')->middleware('throttle:6,1');
 Route::post('/checkout/start', [CheckoutController::class, 'start'])->name('checkout.start')->middleware('throttle:6,1');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('checkout.failed');
@@ -153,7 +159,10 @@ Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])->nam
 // attackers out while staying out of the way of real admins fat-fingering
 // their password once.
 Route::get('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('admin.login');
-Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:5,1');
+// Admin login: 3/minute by IP. The previous 5/min lets a botnet
+// distributed across a /24 try 1,275 passwords in an hour against
+// each address — too permissive for the highest-value entry point.
+Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:3,1');
 Route::post('/admin/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('admin.logout');
 
 // Admin Dashboard (Protected)
