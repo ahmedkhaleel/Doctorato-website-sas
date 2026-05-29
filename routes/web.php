@@ -86,9 +86,9 @@ Route::get('/status', [\App\Http\Controllers\StatusPageController::class, 'show'
 // endpoint deliberately skips DB / cache reads so it stays cheap
 // during a database outage (a 200 here = "PHP is up").
 Route::get('/healthz', [\App\Http\Controllers\HealthController::class, 'shallow'])
-    ->middleware('throttle:120,1')->name('healthz');
+    ->middleware('throttle:healthchecks')->name('healthz');
 Route::get('/healthz/deep', [\App\Http\Controllers\HealthController::class, 'deep'])
-    ->middleware('throttle:30,1')->name('healthz.deep');
+    ->middleware('throttle:healthchecks')->name('healthz.deep');
 
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -136,9 +136,10 @@ Route::get('/privacy', fn () => \Inertia\Inertia::render('Privacy'))->name('priv
 Route::get('/terms', fn () => \Inertia\Inertia::render('Terms'))->name('terms');
 
 // Forms
-Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo.store')->middleware('throttle:3,1');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
-Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store')->middleware('throttle:3,1');
+// Named rate limiters defined in AppServiceProvider::registerRateLimiters
+Route::post('/demo-request', [DemoRequestController::class, 'store'])->name('demo.store')->middleware('throttle:demo-submit');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:contact-submit');
+Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store')->middleware('throttle:newsletter-submit');
 
 // Blog
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
@@ -166,12 +167,14 @@ Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('c
 Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('checkout.failed');
 
 // Paymob webhook (CSRF-exempt — see bootstrap/app.php)
-Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])->name('webhooks.paymob');
+Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])
+    ->middleware('throttle:webhooks')
+    ->name('webhooks.paymob');
 
 // Customer portal — magic-link auth, separate from admin
 Route::get('/portal', [\App\Http\Controllers\CustomerPortalController::class, 'showLogin'])->name('portal.login');
 Route::post('/portal/login', [\App\Http\Controllers\CustomerPortalController::class, 'sendLoginLink'])
-    ->middleware('throttle:3,1')->name('portal.send-link');
+    ->middleware('throttle:portal-login')->name('portal.send-link');
 Route::get('/portal/auth/{token}', [\App\Http\Controllers\CustomerPortalController::class, 'authenticate'])
     ->where('token', '[a-f0-9]{64}')->name('portal.authenticate');
 
@@ -198,7 +201,7 @@ Route::get('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, '
 // Admin login: 3/minute by IP. The previous 5/min lets a botnet
 // distributed across a /24 try 1,275 passwords in an hour against
 // each address — too permissive for the highest-value entry point.
-Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:3,1');
+Route::post('/admin/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:admin-login');
 Route::post('/admin/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('admin.logout');
 
 // 2FA challenge — sits OUTSIDE the auth middleware group because the
@@ -207,7 +210,7 @@ Route::post('/admin/logout', [\App\Http\Controllers\Admin\AuthController::class,
 Route::get('/admin/2fa/challenge', [\App\Http\Controllers\Admin\AuthController::class, 'showTwoFactorChallenge'])
     ->name('admin.2fa.challenge');
 Route::post('/admin/2fa/verify', [\App\Http\Controllers\Admin\AuthController::class, 'verifyTwoFactor'])
-    ->middleware('throttle:5,1')->name('admin.2fa.verify');
+    ->middleware('throttle:two-factor')->name('admin.2fa.verify');
 
 // Admin Dashboard (Protected)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
