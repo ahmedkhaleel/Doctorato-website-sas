@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\DemoRequest;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -13,11 +14,14 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Admin notification — fires whenever /demo form is submitted.
  * Includes all qualification fields so sales can call prepared.
- * ReplyTo set to the lead's email for one-click reply.
+ * Queued so the form responds fast; SMTP runs in the worker.
  */
-class DemoAdminNotification extends Mailable
+class DemoAdminNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public int $tries = 3;
+    public int $backoff = 60;
 
     public function __construct(public DemoRequest $demo)
     {

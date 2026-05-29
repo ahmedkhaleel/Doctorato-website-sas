@@ -43,7 +43,33 @@ class PaymobWebhookController extends Controller
             return response()->json(['status' => 'not_found'], 404);
         }
 
+        // Idempotency guard — Paymob retries webhooks on any non-200
+        // response, plus the same transaction can land twice via the
+        // redirect callback + the server-to-server notification. If
+        // we already stamped this exact transaction id as processed,
+        // ack and exit instead of flipping the subscription twice.
+        if ($payment->gateway_transaction_id === $txId && $payment->processed_at !== null) {
+            Log::info('Paymob webhook: duplicate, already processed', [
+                'order_id' => $orderId,
+                'tx_id' => $txId,
+                'payment_id' => $payment->id,
+            ]);
+
+            return response()->json(['status' => 'ok', 'duplicate' => true]);
+        }
+
         DB::transaction(function () use ($payment, $obj, $txId, $success) {
+            // Lock the payment row for the duration of the txn so two
+            // simultaneous webhook deliveries from Paymob can't both
+            // pass the idempotency check above and double-activate.
+            $payment = Payment::where('id', $payment->id)->lockForUpdate()->first();
+
+            // Re-check after lock in case a sibling worker just won
+            // the race and stamped it.
+            if ($payment->gateway_transaction_id === $txId && $payment->processed_at !== null) {
+                return;
+            }
+
             $invoice = $payment->invoice;
             $subscription = $invoice->subscription;
 

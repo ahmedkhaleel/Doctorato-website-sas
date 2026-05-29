@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\ContactMessage;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -12,10 +13,16 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Auto-reply sent to the visitor right after they submit /contact.
  * Confirms receipt and reassures them about the SLA (1 business hour).
+ * Queued so the HTTP request returns immediately — SMTP delivery
+ * happens in the background worker.
  */
-class ContactCustomerConfirmation extends Mailable
+class ContactCustomerConfirmation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    /** Retry up to 3 times if SMTP transiently fails. */
+    public int $tries = 3;
+    public int $backoff = 60;
 
     public function __construct(public ContactMessage $message)
     {

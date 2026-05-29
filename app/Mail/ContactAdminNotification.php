@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\ContactMessage;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -12,12 +13,15 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Admin notification — fires whenever a /contact form is submitted.
- * Sets ReplyTo to the visitor's email so admin can hit reply and
- * answer the lead directly from their inbox.
+ * Queued so the HTTP request returns immediately. ReplyTo is set to
+ * the visitor's email so admin can hit reply and answer directly.
  */
-class ContactAdminNotification extends Mailable
+class ContactAdminNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public int $tries = 3;
+    public int $backoff = 60;
 
     public function __construct(public ContactMessage $message)
     {
