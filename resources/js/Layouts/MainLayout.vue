@@ -9,6 +9,7 @@ import TrackingScripts from '@/Components/TrackingScripts.vue';
 import ExitIntentModal from '@/Components/ExitIntentModal.vue';
 import ClientCountryDetector from '@/Components/ClientCountryDetector.vue';
 import CookieConsent from '@/Components/CookieConsent.vue';
+import LaunchCountdown from '@/Components/LaunchCountdown.vue';
 
 const { locale } = useI18n();
 const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
@@ -16,6 +17,7 @@ const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
 
 <template>
     <div :dir="dir" :lang="locale">
+        <LaunchCountdown sticky :ends-at="'2026-12-31T23:59:59'" />
         <Navbar />
         <main class="pt-20">
             <slot />
