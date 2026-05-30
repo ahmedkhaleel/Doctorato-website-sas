@@ -7,6 +7,7 @@
  */
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import OfflineIndicator from '@/Components/Portal/OfflineIndicator.vue';
 
 const form = useForm({ email: '' });
 const page = usePage();
@@ -17,6 +18,8 @@ function submit() { form.post('/portal/login'); }
 
 <template>
     <Head title="Sign in — Doctorato Portal" />
+
+    <OfflineIndicator />
 
     <div class="min-h-screen bg-gradient-to-br from-[#F4F1EA] to-[#E8E2D0] flex items-center justify-center p-4">
         <div class="w-full max-w-md">
