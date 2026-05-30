@@ -497,7 +497,7 @@ const pricingJsonLd = computed(() => ({
                     </h2>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-5">
+                <div class="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
                     <!-- Monthly -->
                     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
                         <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
@@ -528,25 +528,6 @@ const pricingJsonLd = computed(() => ({
                             <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'خصم 50% على رسوم التشغيل' : '50% off setup fee' }}</span></li>
                             <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'سعر ثابت لمدة سنة' : 'Locked price for a year' }}</span></li>
                         </ul>
-                    </div>
-
-                    <!-- 3 installments -->
-                    <div class="bg-white rounded-3xl border-2 border-emerald-200 p-6">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                        </div>
-                        <h3 class="text-base font-bold text-[#1C2833] mb-1">{{ locale === 'ar' ? '3 دفعات (للسنوي)' : '3 payments (annual)' }}</h3>
-                        <p class="text-xs text-[#5A6C7D] leading-relaxed mb-3">
-                            {{ locale === 'ar' ? 'نفس مزايا السنوي بدفع مقسّط على 3 دفعات بدون فوائد.' : 'Same annual benefits, split into 3 interest-free payments.' }}
-                        </p>
-                        <ul class="space-y-1.5 text-xs text-[#5A6C7D]">
-                            <li class="flex items-center justify-between"><span>{{ locale === 'ar' ? 'الدفعة 1' : 'Payment 1' }}</span> <strong class="text-[#1C2833]">40% {{ locale === 'ar' ? 'عند الاشتراك' : 'at signup' }}</strong></li>
-                            <li class="flex items-center justify-between"><span>{{ locale === 'ar' ? 'الدفعة 2' : 'Payment 2' }}</span> <strong class="text-[#1C2833]">30% — {{ locale === 'ar' ? 'بعد 4 شهور' : 'month 4' }}</strong></li>
-                            <li class="flex items-center justify-between"><span>{{ locale === 'ar' ? 'الدفعة 3' : 'Payment 3' }}</span> <strong class="text-[#1C2833]">30% — {{ locale === 'ar' ? 'بعد 8 شهور' : 'month 8' }}</strong></li>
-                        </ul>
-                        <p class="text-[10px] text-emerald-700 font-semibold mt-3">
-                            ✓ {{ locale === 'ar' ? 'بدون فوائد • تأكيد بطاقة ائتمانية' : 'No interest • credit card confirmation' }}
-                        </p>
                     </div>
                 </div>
             </div>

@@ -66,13 +66,6 @@ const setupFee = computed(() => {
 });
 const setupFeeFull = computed(() => props.plan.setup_fee || 0);
 
-// 3-instalment view for the annual customer
-const showInstallments = ref(false);
-const installments = computed(() => props.plan.installments || []);
-const installmentsTotal = computed(() =>
-    installments.value.reduce((sum, x) => sum + (x.amount || 0), 0)
-);
-
 // Specialties pill — labels per tier so the visitor knows what they
 // can choose from BEFORE buying.
 const specialtiesLabel = computed(() => {
@@ -233,44 +226,6 @@ const checkoutUrl = computed(() => {
                         </p>
                     </div>
                 </div>
-            </div>
-
-            <!-- ───── INSTALMENT OPTION (annual only) ───── -->
-            <div v-if="!isCustom && isYearly && plan.supports_installments" class="mb-5">
-                <button
-                    type="button"
-                    @click="showInstallments = !showInstallments"
-                    class="flex items-center gap-2 w-full text-start text-xs font-semibold text-[#1B4F72] hover:text-[#0D2B45] transition"
-                >
-                    <svg class="w-4 h-4 transition-transform" :class="showInstallments ? 'rotate-90' : ''" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                    </svg>
-                    <span>{{ tr('متاح التقسيط على 3 دفعات بدون فوائد', 'Available: 3-instalment plan, no interest') }}</span>
-                </button>
-                <Transition
-                    enter-active-class="transition-all duration-300 ease-out"
-                    enter-from-class="opacity-0 max-h-0"
-                    enter-to-class="opacity-100 max-h-64"
-                    leave-active-class="transition-all duration-200 ease-in"
-                    leave-from-class="opacity-100 max-h-64"
-                    leave-to-class="opacity-0 max-h-0"
-                >
-                    <ul v-if="showInstallments" class="mt-3 space-y-1.5 text-xs">
-                        <li
-                            v-for="inst in installments"
-                            :key="inst.index"
-                            class="flex items-center justify-between bg-white border border-gray-100 rounded-lg p-2"
-                        >
-                            <span class="text-[#5A6C7D]">
-                                {{ tr(`الدفعة ${inst.index}`, `Payment ${inst.index}`) }}
-                                <span class="text-[10px] text-[#8B9BAC] ms-1">
-                                    ({{ inst.due_after_months === 0 ? tr('عند الاشتراك', 'at signup') : tr(`بعد ${inst.due_after_months} شهور`, `after ${inst.due_after_months} months`) }})
-                                </span>
-                            </span>
-                            <span class="font-bold text-[#1C2833] tabular-nums">{{ formatPrice(inst.amount) }}</span>
-                        </li>
-                    </ul>
-                </Transition>
             </div>
 
             <!-- ───── LIMITS STRIP ───── -->

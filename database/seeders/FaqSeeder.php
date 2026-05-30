@@ -78,8 +78,8 @@ class FaqSeeder extends Seeder
                 'category' => 'pricing',
                 'question_ar' => 'ما هي طرق الدفع المقبولة؟',
                 'question_en' => 'What payment methods are accepted?',
-                'answer_ar' => 'نقبل الدفع عبر: بطاقات الائتمان (Visa, Mastercard, Mada)، التحويل البنكي المباشر، وApple Pay. للاشتراك السنوي يمكنك اختيار الدفع الكامل Upfront أو التقسيط على 3 دفعات بدون فوائد (40% عند الاشتراك، 30% بعد 4 شهور، 30% بعد 8 شهور).',
-                'answer_en' => 'We accept: Credit cards (Visa, Mastercard, Mada), bank transfer, and Apple Pay. For annual subscriptions you can choose full upfront payment or 3 interest-free instalments (40% at signup, 30% after 4 months, 30% after 8 months).',
+                'answer_ar' => 'نقبل الدفع عبر: بطاقات الائتمان (Visa, Mastercard, Mada)، التحويل البنكي المباشر، وApple Pay. يمكنك اختيار الاشتراك الشهري أو السنوي. الاشتراك السنوي يحصل على خصم 21% على القيمة + 50% خصم على رسوم التشغيل.',
+                'answer_en' => 'We accept: Credit cards (Visa, Mastercard, Mada), bank transfer, and Apple Pay. You can choose monthly or annual billing. Annual subscriptions get 21% off the rate + 50% off the setup fee.',
                 'display_order' => 9,
             ],
             // ─── Phase F — new pricing FAQs for the launch tier model ───
@@ -90,14 +90,6 @@ class FaqSeeder extends Seeder
                 'answer_ar' => 'رسوم التشغيل هي مقابل خدمات بدء الاستخدام: جلسة Implementation kickoff، نقل بياناتك من نظامك القديم (حتى 2,000 مريض)، تخصيص النظام بهويتك (لوجو، ألوان، قوالب)، تدريب الفريق، قوالب طبية مخصصة لتخصصك، 30 يوم Priority Support بعد الإطلاق، وإعداد التكاملات. تُدفع مرة واحدة عند بدء الاستخدام. مع الاشتراك السنوي تحصل على خصم 50% على رسوم التشغيل تلقائياً.',
                 'answer_en' => 'The setup fee covers the kickoff session, data migration (up to 2,000 patients), branded customisation, team training, specialty-specific templates, 30 days of priority support after launch, and integration setup. Paid once at signup. Annual subscribers get an automatic 50% off the setup fee.',
                 'display_order' => 11,
-            ],
-            [
-                'category' => 'pricing',
-                'question_ar' => 'كيف يعمل التقسيط على 3 دفعات؟',
-                'question_en' => 'How does the 3-instalment plan work?',
-                'answer_ar' => 'للاشتراك السنوي فقط: تنقسم القيمة الإجمالية (اشتراك + رسوم تشغيل مخفّضة) على 3 دفعات بدون فوائد. الدفعة الأولى 40% عند الاشتراك، الثانية 30% بعد 4 شهور، الثالثة 30% بعد 8 شهور. نطلب تأكيد بطاقة ائتمانية لضمان الدفعات. لا تنطبق فوائد ولا رسوم إدارية إضافية.',
-                'answer_en' => 'Available only for annual plans: the total (subscription + discounted setup) splits across 3 interest-free payments. First 40% at signup, second 30% after 4 months, third 30% after 8 months. A credit card confirmation is required to secure the schedule. No interest, no admin fees.',
-                'display_order' => 12,
             ],
             [
                 'category' => 'pricing',

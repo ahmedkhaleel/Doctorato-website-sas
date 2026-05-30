@@ -19,8 +19,11 @@ use Illuminate\Database\Seeder;
  *   setup_fee                = one-time implementation fee (regular)
  *   setup_fee_launch         = setup fee under the launch offer
  *   yearly_setup_discount_pct= additional 50% off setup for annual subscribers
- *   supports_installments    = annual customers can split into 3 payments
- *   installment_split        = [40, 30, 30] — 40% upfront, 30% at month 4, 30% at month 8
+ *   supports_installments    = false on launch (instalments disabled
+ *                              by product decision — column kept so
+ *                              we can flip it back without a migration
+ *                              if we re-enable later)
+ *   installment_split        = [40, 30, 30] — kept for the future
  *
  * Each tier steps up on five clean dimensions:
  *   - Specialties (1 → 3 → all → all + early access)
@@ -57,7 +60,7 @@ class PricingPlanSeeder extends Seeder
                 'yearly_setup_discount_pct' => 50,
                 'is_launch_offer_active' => true,
                 'launch_offer_ends_at' => $launchEndsAt,
-                'supports_installments' => true,
+                'supports_installments' => false,
                 'installment_count' => 3,
                 'installment_split' => $installmentSplit,
                 'included_specialties_count' => 'one',
@@ -116,7 +119,7 @@ class PricingPlanSeeder extends Seeder
                 'yearly_setup_discount_pct' => 50,
                 'is_launch_offer_active' => true,
                 'launch_offer_ends_at' => $launchEndsAt,
-                'supports_installments' => true,
+                'supports_installments' => false,
                 'installment_count' => 3,
                 'installment_split' => $installmentSplit,
                 'included_specialties_count' => 'three',
@@ -180,7 +183,7 @@ class PricingPlanSeeder extends Seeder
                 'yearly_setup_discount_pct' => 50,
                 'is_launch_offer_active' => true,
                 'launch_offer_ends_at' => $launchEndsAt,
-                'supports_installments' => true,
+                'supports_installments' => false,
                 'installment_count' => 3,
                 'installment_split' => $installmentSplit,
                 'included_specialties_count' => 'all',
@@ -248,7 +251,7 @@ class PricingPlanSeeder extends Seeder
                 'yearly_setup_discount_pct' => 50,
                 'is_launch_offer_active' => true,
                 'launch_offer_ends_at' => $launchEndsAt,
-                'supports_installments' => true,
+                'supports_installments' => false,
                 'installment_count' => 3,
                 'installment_split' => $installmentSplit,
                 'included_specialties_count' => 'all_plus_early',
