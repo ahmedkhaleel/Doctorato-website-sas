@@ -91,7 +91,7 @@ jobs:
         # real regressions in the green suite.
         run: |
           php artisan test \
-            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest|SubscriptionPauseTest|WebhookRetentionTest|EmailLogTest|EmailFailureBridgeTest|DunningAdminTest|SubscriptionMetricsTest|PwaPortalTest|MetricSnapshotTest"
+            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest|SubscriptionPauseTest|WebhookRetentionTest|EmailLogTest|EmailFailureBridgeTest|DunningAdminTest|SubscriptionMetricsTest|PwaPortalTest|MetricSnapshotTest|SecurityBatchTest"
 
   lint:
     name: PHP syntax check
@@ -120,3 +120,37 @@ jobs:
             exit 1
           fi
           echo "All PHP files parse cleanly."
+
+  audit:
+    name: Dependency vulnerability audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer audit (PHP deps)
+        # Fails the build on any known CVE in our composer.lock.
+        # If a CVE lands in a transitive we don't control, the
+        # mitigation is documented in OPERATIONS.md §"Security
+        # patching" — pin the safe version explicitly.
+        run: composer audit --no-interaction --no-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: npm audit (JS deps)
+        # --omit=dev excludes dev-only deps from the audit; the
+        # production bundle wouldnt include them anyway. We use
+        # --audit-level=high so an info/low advisory doesn't break
+        # CI on every PR (those go in a weekly review instead).
+        run: |
+          npm ci --omit=dev
+          npm audit --audit-level=high --omit=dev
+

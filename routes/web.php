@@ -171,6 +171,14 @@ Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])
     ->middleware('throttle:webhooks')
     ->name('webhooks.paymob');
 
+// Public security policy (linked from /.well-known/security.txt).
+// Served as a plain blade view so it's reachable even when JS is
+// disabled — security researchers often run with strict CSPs.
+Route::get('/responsible-disclosure', fn () => response()
+    ->view('public.responsible-disclosure')
+    ->header('Cache-Control', 'public, max-age=3600')
+)->name('public.responsible-disclosure');
+
 // PWA offline shell. Served as a plain blade view (no Inertia) so
 // the SW cache can store the rendered HTML once and replay it on
 // every offline open without needing the JS bundle. Sits in front

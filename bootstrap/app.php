@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             SetLocale::class,
             \App\Http\Middleware\CaptureReferralCode::class,
+            // Nonce MUST run before SecurityHeaders so the header
+            // builder can read the nonce off the request.
+            \App\Http\Middleware\GenerateCspNonce::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 

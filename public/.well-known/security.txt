@@ -1,0 +1,22 @@
+# Doctorato — Security contact (RFC 9116)
+#
+# Researchers: please report vulnerabilities at the Contact below.
+# We aim for first acknowledgement within 48 hours and a fix or
+# mitigation timeline within 7 days for confirmed issues.
+#
+# Coordinated disclosure window: 90 days. Earlier public disclosure
+# is welcome if the issue is already patched.
+#
+# Out of scope:
+#   - Issues requiring physical access to a customer device
+#   - Self-XSS on a victim's own browser session
+#   - SPF / DKIM / DMARC report-only findings without proof of
+#     real-world abuse
+#   - Outdated TLS cipher suites (Cloudflare front-door, not ours)
+
+Contact: mailto:security@doctorato.com
+Contact: https://doctorato.com/contact
+Expires: 2027-05-30T00:00:00.000Z
+Preferred-Languages: en, ar
+Canonical: https://doctorato.com/.well-known/security.txt
+Policy: https://doctorato.com/responsible-disclosure

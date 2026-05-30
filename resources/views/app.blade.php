@@ -146,8 +146,10 @@
          positive in mobile-first indexing). --}}
     <link rel="manifest" href="/site.webmanifest">
 
-    {{-- Organization + WebSite JSON-LD (global, always present) --}}
-    <script type="application/ld+json">{!! json_encode($globalJsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    {{-- Organization + WebSite JSON-LD (global, always present).
+         Nonce-annotated so the CSP-aware browsers validate it as one
+         of our trusted inline scripts. --}}
+    <script type="application/ld+json" nonce="{{ $cspNonce ?? '' }}">{!! json_encode($globalJsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
     {{-- PWA — manifest is global so a customer can install from any
          page; the SW we register has scope='/portal/' so only portal
@@ -171,7 +173,7 @@
          the portal scope. Guarded by isSecureContext so the SW skips
          on http:// local dev (browsers refuse to install it there
          anyway) but is silent rather than throwing. --}}
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         if ('serviceWorker' in navigator && window.isSecureContext
             && location.pathname.startsWith('/portal')) {
             window.addEventListener('load', () => {

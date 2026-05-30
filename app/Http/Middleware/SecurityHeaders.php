@@ -84,7 +84,8 @@ class SecurityHeaders
         // it would add noise to monitoring.
         $contentType = (string) $response->headers->get('Content-Type', '');
         if (str_contains($contentType, 'text/html')) {
-            $headers['Content-Security-Policy'] = $this->buildCsp();
+            $nonce = (string) $request->attributes->get('csp_nonce', '');
+            $headers['Content-Security-Policy'] = $this->buildCsp($nonce);
         }
 
         foreach ($headers as $key => $value) {
@@ -101,8 +102,16 @@ class SecurityHeaders
      * (adding a new analytics provider, swapping the CDN) are a
      * single-source edit.
      */
-    protected function buildCsp(): string
+    protected function buildCsp(string $nonce = ''): string
     {
+        // Nonce gates the inline scripts WE control (SW registration,
+        // JSON-LD, analytics bootstrap). 'unsafe-inline' stays for
+        // Vite + Inertia auto-injected blobs we can't easily annotate
+        // — but per CSP3, nonce takes precedence on browsers that
+        // understand both, so our controlled scripts get hash-style
+        // validation either way.
+        $nonceSrc = $nonce !== '' ? "'nonce-{$nonce}' " : '';
+
         $directives = [
             "default-src 'self'",
             // Service worker registration + manifest are same-origin
@@ -113,7 +122,7 @@ class SecurityHeaders
             "manifest-src 'self'",
             // Vite injects inline modulepreload, reCAPTCHA + Google
             // Tag Manager pull from www.google.com / www.gstatic.com.
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com",
+            "script-src 'self' {$nonceSrc}'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com",
             // Tailwind generates inline styles for arbitrary values.
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             // Cloudflare/Google fonts use data: URIs for some weights.
