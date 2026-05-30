@@ -171,6 +171,13 @@ Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])
     ->middleware('throttle:webhooks')
     ->name('webhooks.paymob');
 
+// Public sub-processors list (GDPR Art. 28(2)). Plain blade so
+// auditors with strict CSP / JS-disabled can still read it.
+Route::get('/sub-processors', fn () => response()
+    ->view('public.sub-processors')
+    ->header('Cache-Control', 'public, max-age=3600')
+)->name('public.sub-processors');
+
 // Public security policy (linked from /.well-known/security.txt).
 // Served as a plain blade view so it's reachable even when JS is
 // disabled — security researchers often run with strict CSPs.

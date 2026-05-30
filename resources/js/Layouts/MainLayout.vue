@@ -8,6 +8,7 @@ import ScrollToTop from '@/Components/ScrollToTop.vue';
 import TrackingScripts from '@/Components/TrackingScripts.vue';
 import ExitIntentModal from '@/Components/ExitIntentModal.vue';
 import ClientCountryDetector from '@/Components/ClientCountryDetector.vue';
+import CookieConsent from '@/Components/CookieConsent.vue';
 
 const { locale } = useI18n();
 const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
@@ -25,5 +26,6 @@ const dir = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr');
         <TrackingScripts />
         <ExitIntentModal />
         <ClientCountryDetector />
+        <CookieConsent />
     </div>
 </template>
