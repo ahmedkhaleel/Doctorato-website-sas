@@ -365,11 +365,29 @@ class PricingPlanSeeder extends Seeder
             ],
         ];
 
+        // Upsert the new lineup
+        $newSlugs = collect($plans)->pluck('slug')->all();
         foreach ($plans as $plan) {
             PricingPlan::updateOrCreate(
                 ['slug' => $plan['slug']],
                 $plan
             );
         }
+
+        // Clean-up: deactivate any plan whose slug is NOT in the new
+        // catalogue. Common case after this seeder runs over a v1
+        // database: the legacy 'basic' row stays orphaned because
+        // updateOrCreate keys on slug and doesn't touch rows that
+        // weren't in the new list. Soft-deactivating (rather than
+        // hard-deleting) preserves the foreign keys from subscriptions
+        // and invoices that may still reference the old plan id.
+        //
+        // If a customer is still on a deactivated plan, their
+        // subscription keeps working — the cache layer just stops
+        // surfacing the plan on the public pricing page (it filters
+        // on is_active = true).
+        PricingPlan::query()
+            ->whereNotIn('slug', $newSlugs)
+            ->update(['is_active' => false]);
     }
 }
