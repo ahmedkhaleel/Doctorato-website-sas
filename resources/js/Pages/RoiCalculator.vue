@@ -121,8 +121,8 @@ const ASSUMPTIONS = computed(() => ({
     online_booking_lift_pct: 0.08,
     retention_uplift_pct: currentSpecialty.value.defaults.retention_uplift,
     // Anchored to the Professional plan, launch annual rate
-    // (34,900 / 12 = 2,908 EGP/month equivalent). Phase A pricing.
-    monthly_cost_egp: 2908,
+    // (41,900 / 12 = 3,492 EGP/month equivalent). +20% pricing.
+    monthly_cost_egp: 3492,
 }));
 
 // ─── Computed metrics ─────────────────────────────────────
