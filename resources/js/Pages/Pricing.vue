@@ -94,75 +94,137 @@ function getSetupFeeFull(plan) {
     return Number(plan.setup_fee) || 0;
 }
 
-// Comparison table data
+// Comparison table — rebuilt for the 4-tier launch lineup
+// (Starter / Growth / Professional / Enterprise + Custom).
+//
+// Values are READ FROM THE PLAN DATA where possible (max_doctors,
+// max_patients, storage_gb, included_specialties_count) instead of
+// being hardcoded. Module presence rows still need hardcoded truth
+// tables because the modules_included JSON arrays carry shipping
+// names not localized labels.
+//
+// Truth tables order matches displayOrder: Starter, Growth,
+// Professional, Enterprise, Custom — 5 columns. If a plan is
+// missing the row falls back to all-false so the table doesn't
+// crash before the seeder runs.
 const comparisonCategories = computed(() => [
     {
-        name: t('pricing.compare_general'),
+        name: locale.value === 'ar' ? 'الحدود والقياس' : 'Limits & scale',
         features: [
-            { label: t('pricing.compare_users'), values: getCompareValues('max_users') },
-            { label: t('pricing.compare_patients'), values: getCompareValues('max_patients') },
-            { label: t('pricing.compare_support'), values: getCompareValues('support_level') },
-            { label: t('pricing.compare_storage'), values: ['5 GB', '25 GB', '100 GB', t('pricing.compare_unlimited')] },
+            { label: locale.value === 'ar' ? 'عدد التخصصات الطبية' : 'Medical specialties', values: getCompareValues('specialties') },
+            { label: locale.value === 'ar' ? 'عدد الأطباء' : 'Doctors', values: getCompareValues('max_doctors') },
+            { label: locale.value === 'ar' ? 'عدد الموظفين' : 'Staff users', values: getCompareValues('max_staff') },
+            { label: locale.value === 'ar' ? 'عدد المرضى' : 'Patients', values: getCompareValues('max_patients') },
+            { label: locale.value === 'ar' ? 'عدد الفروع' : 'Branches', values: getCompareValues('max_branches') },
+            { label: locale.value === 'ar' ? 'التخزين' : 'Storage', values: getCompareValues('storage_gb') },
+            { label: locale.value === 'ar' ? 'مستوى الدعم' : 'Support', values: getCompareValues('support_level') },
         ]
     },
     {
-        name: t('pricing.compare_clinical'),
+        name: locale.value === 'ar' ? 'العيادة والإكلينيكي' : 'Clinical',
         features: [
-            { label: t('pricing.compare_patient_records'), values: [true, true, true, true] },
-            { label: t('pricing.compare_appointments'), values: [true, true, true, true] },
-            { label: t('pricing.compare_prescriptions'), values: [false, true, true, true] },
-            { label: t('pricing.compare_dental'), values: [false, false, true, true] },
-            { label: t('pricing.compare_lab_results'), values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'ملفات المرضى الإلكترونية (EMR)' : 'Patient EMR', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'المواعيد والحجز أونلاين' : 'Appointments + online booking', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'الوصفات الإلكترونية' : 'E-prescriptions', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تكامل صيدليات' : 'Pharmacy integration', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تصوير وأرشيف طبي (PACS)' : 'Medical imaging (PACS)', values: [false, false, true, true, true] },
+            { label: locale.value === 'ar' ? 'تكامل المختبرات' : 'Lab integration', values: ['add-on', 'add-on', 'add-on', true, true] },
         ]
     },
     {
-        name: t('pricing.compare_financial'),
+        name: locale.value === 'ar' ? 'الإدارة والمالية' : 'Operations & finance',
         features: [
-            { label: t('pricing.compare_invoicing'), values: [true, true, true, true] },
-            { label: t('pricing.compare_payments'), values: [true, true, true, true] },
-            { label: t('pricing.compare_insurance'), values: [false, false, true, true] },
-            { label: t('pricing.compare_expenses'), values: [false, true, true, true] },
-            { label: t('pricing.compare_wallet'), values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'الفواتير والمدفوعات' : 'Invoicing + payments', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'المحفظة ونقاط الولاء' : 'Wallet + loyalty', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'مخزون ومنتجات' : 'Inventory', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'المحاسبة المالية' : 'Financial accounting', values: [false, 'basic', true, true, true] },
+            { label: locale.value === 'ar' ? 'الموارد البشرية والرواتب' : 'HR + payroll', values: [false, false, true, true, true] },
+            { label: locale.value === 'ar' ? 'تكامل التأمين (Bupa, GIG, ELAJI)' : 'Insurance integration', values: [false, 'basic', 'basic', true, true] },
         ]
     },
     {
-        name: t('pricing.compare_management'),
+        name: locale.value === 'ar' ? 'التواصل والمشاركة' : 'Engagement & communication',
         features: [
-            { label: t('pricing.compare_crm'), values: [false, true, true, true] },
-            { label: t('pricing.compare_hr'), values: [false, false, true, true] },
-            { label: t('pricing.compare_inventory'), values: [false, false, true, true] },
-            { label: t('pricing.compare_reports'), values: [t('pricing.compare_basic'), t('pricing.compare_advanced'), t('pricing.compare_full'), t('pricing.compare_full')] },
-            { label: t('pricing.compare_rbac'), values: [false, false, true, true] },
-            { label: t('pricing.compare_audit'), values: [false, false, true, true] },
+            { label: locale.value === 'ar' ? 'تذكيرات SMS' : 'SMS reminders', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تذكيرات WhatsApp' : 'WhatsApp reminders', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'WhatsApp Business API كامل' : 'WhatsApp Business API (full)', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'CRM طبي' : 'Medical CRM', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تقييم رضا المريض (NPS)' : 'Patient satisfaction (NPS)', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'بوابة المريض' : 'Patient portal', values: ['basic', true, true, true, true] },
         ]
     },
     {
-        name: t('pricing.compare_extras'),
+        name: locale.value === 'ar' ? 'التحليل والذكاء' : 'Analytics & insights',
         features: [
-            { label: t('pricing.compare_website'), values: [true, true, true, true] },
-            { label: t('pricing.compare_sms'), values: [false, true, true, true] },
-            { label: t('pricing.compare_whatsapp'), values: [false, false, true, true] },
-            { label: t('pricing.compare_api'), values: [false, false, true, true] },
-            { label: t('pricing.compare_custom_domain'), values: [false, false, true, true] },
-            { label: t('pricing.compare_white_label'), values: [false, false, false, true] },
+            { label: locale.value === 'ar' ? 'تقارير أساسية' : 'Basic reports', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'Analytics متقدمة' : 'Advanced analytics', values: [false, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'AI insights' : 'AI insights', values: [false, false, true, true, true] },
+            { label: locale.value === 'ar' ? 'تقارير ضريبية' : 'Tax reports', values: [false, false, true, true, true] },
+        ]
+    },
+    {
+        name: locale.value === 'ar' ? 'الأمان والإدارة الإدارية' : 'Security & admin',
+        features: [
+            { label: locale.value === 'ar' ? '6 بوابات منفصلة' : '6 separate portals', values: ['3', '5', true, true, true] },
+            { label: locale.value === 'ar' ? 'RBAC (80+ صلاحية)' : 'RBAC (80+ permissions)', values: ['basic', 'basic', true, true, true] },
+            { label: locale.value === 'ar' ? 'Audit Log' : 'Audit log', values: [false, false, true, true, true] },
+            { label: locale.value === 'ar' ? '2FA للأدمن' : '2FA admin', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'GDPR / PDPL متوافق' : 'GDPR / PDPL', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'SLA 99.9% مكتوب' : 'Signed 99.9% SLA', values: [false, false, false, true, true] },
+            { label: locale.value === 'ar' ? 'Backup' : 'Backup', values: ['يومي', 'يومي', 'يومي', 'ساعي', 'مخصّص'] },
+        ]
+    },
+    {
+        name: locale.value === 'ar' ? 'API و White-label' : 'API & White-label',
+        features: [
+            { label: locale.value === 'ar' ? 'موقع عيادتك' : 'Clinic website', values: [true, true, true, true, true] },
+            { label: locale.value === 'ar' ? 'Webmaster Mode' : 'Webmaster mode', values: [false, false, false, true, true] },
+            { label: locale.value === 'ar' ? 'API + Webhooks' : 'API + Webhooks', values: [false, false, false, true, true] },
+            { label: locale.value === 'ar' ? 'Custom integrations' : 'Custom integrations', values: [false, false, false, true, true] },
+            { label: locale.value === 'ar' ? 'White-label (تطبيق بشعارك)' : 'White-label (your branding)', values: [false, false, 'add-on', true, true] },
+            { label: locale.value === 'ar' ? 'On-premise' : 'On-premise', values: [false, false, false, false, true] },
         ]
     },
 ]);
 
 function getCompareValues(field) {
     return props.plans.map(plan => {
-        if (field === 'max_users') {
-            return plan.max_users ? `${plan.max_users} ${t('pricing.compare_users_count')}` : t('pricing.compare_unlimited');
+        if (field === 'specialties') {
+            const map = {
+                one: locale.value === 'ar' ? 'تخصص واحد' : '1 specialty',
+                three: locale.value === 'ar' ? '3 تخصصات' : '3 specialties',
+                all: locale.value === 'ar' ? 'الكل (6)' : 'All (6)',
+                all_plus_early: locale.value === 'ar' ? 'الكل + Early access' : 'All + early access',
+            };
+            return map[plan.included_specialties_count] || (plan.is_custom ? '—' : '—');
+        }
+        if (field === 'max_doctors') {
+            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            return plan.max_doctors ? String(plan.max_doctors) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
+        }
+        if (field === 'max_staff') {
+            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            return plan.max_staff ? String(plan.max_staff) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'max_patients') {
-            return plan.max_patients ? `${plan.max_patients}` : t('pricing.compare_unlimited');
+            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            return plan.max_patients ? new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US').format(plan.max_patients) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
+        }
+        if (field === 'max_branches') {
+            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            return plan.max_branches ? String(plan.max_branches) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
+        }
+        if (field === 'storage_gb') {
+            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            return plan.storage_gb ? `${plan.storage_gb} GB` : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'support_level') {
             const levels = {
-                'email': t('pricing.support_email'),
-                'phone': t('pricing.support_phone'),
-                'priority': t('pricing.support_priority'),
-                'dedicated': t('pricing.support_dedicated'),
+                email:      locale.value === 'ar' ? 'Email 24س'   : 'Email 24h',
+                chat:       locale.value === 'ar' ? 'Email+Chat 8س' : 'Email+Chat 8h',
+                phone:      locale.value === 'ar' ? 'Phone 4س'    : 'Phone 4h',
+                priority:   locale.value === 'ar' ? 'Priority 1س 24/7' : 'Priority 1h 24/7',
+                dedicated:  locale.value === 'ar' ? 'مخصص'        : 'Dedicated',
             };
             return levels[plan.support_level] || plan.support_level;
         }
@@ -666,6 +728,18 @@ const pricingJsonLd = computed(() => ({
                                                         </svg>
                                                     </div>
                                                 </div>
+                                            </template>
+                                            <!-- Add-on tag — feature available but as a paid add-on -->
+                                            <template v-else-if="val === 'add-on'">
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider border border-amber-100">
+                                                    {{ locale === 'ar' ? 'إضافة' : 'Add-on' }}
+                                                </span>
+                                            </template>
+                                            <!-- 'basic' — feature included but limited -->
+                                            <template v-else-if="val === 'basic'">
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                                                    {{ locale === 'ar' ? 'أساسي' : 'Basic' }}
+                                                </span>
                                             </template>
                                             <!-- String value -->
                                             <template v-else>

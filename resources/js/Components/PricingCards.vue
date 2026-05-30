@@ -27,7 +27,28 @@ function toggleBilling() {
 
 function getPlanPrice(plan) {
     if (plan.is_custom) return null;
+    // Prefer the launch price when the offer is active; otherwise
+    // fall back to the regular (anchor) price. Same logic as
+    // PricingPlan::activeMonthlyPrice() on the backend.
+    const launchActive = plan.is_launch_offer_active;
+    if (isYearly.value) {
+        return launchActive && plan.yearly_price_launch != null
+            ? plan.yearly_price_launch
+            : plan.yearly_price;
+    }
+    return launchActive && plan.monthly_price_launch != null
+        ? plan.monthly_price_launch
+        : plan.monthly_price;
+}
+
+function getRegularPrice(plan) {
+    if (plan.is_custom) return null;
     return isYearly.value ? plan.yearly_price : plan.monthly_price;
+}
+
+function hasLaunchDiscount(plan) {
+    if (plan.is_custom || !plan.is_launch_offer_active) return false;
+    return getRegularPrice(plan) !== getPlanPrice(plan);
 }
 
 function getFormattedPrice(plan) {
@@ -134,17 +155,26 @@ function getFormattedPrice(plan) {
                             {{ localizedField(plan, 'name') }}
                         </h3>
 
-                        <!-- Price -->
+                        <!-- Price — anchor + launch + badge (Phase B logic) -->
                         <div class="mb-4">
                             <template v-if="!plan.is_custom">
+                                <!-- Strikethrough anchor only when the launch
+                                     offer is active AND the launch price
+                                     actually differs from the anchor. -->
+                                <div v-if="hasLaunchDiscount(plan)" class="text-sm text-gray-400 line-through tabular-nums">
+                                    {{ formatPrice(getRegularPrice(plan)) }}
+                                </div>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-4xl font-extrabold text-primary">
+                                    <span class="text-4xl font-extrabold text-primary tabular-nums">
                                         {{ getFormattedPrice(plan) }}
                                     </span>
                                     <span class="text-sm text-gray">
                                         / {{ isYearly ? $t('pricing.year') : $t('pricing.month') }}
                                     </span>
                                 </div>
+                                <span v-if="hasLaunchDiscount(plan)" class="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[10px] font-bold uppercase tracking-wider border border-rose-100">
+                                    🔥 {{ $t('pricing.launch_price') || 'سعر الإطلاق' }}
+                                </span>
                             </template>
                             <template v-else>
                                 <span class="text-2xl font-bold text-primary">
