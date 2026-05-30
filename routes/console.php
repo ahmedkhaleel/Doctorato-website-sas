@@ -22,9 +22,26 @@ Artisan::command('inspire', function () {
 | times each one specifies — you don't need a separate cron per task.
 */
 
-// Trial expiry notifications — runs every hour so a trial that ends
-// at 14:23 gets the "ending soon" mail by 15:00 at the latest.
-Schedule::command('trials:check')->hourly();
+/*
+ * Cron jitter note
+ * ----------------
+ * The daily/hourly tasks below all run at a fixed wall-clock time.
+ * That's fine when the host is dedicated to one Laravel app, but on
+ * shared cPanel everyone's cron tries to fire at :00 / :30 of the
+ * hour at once, which is the "thundering herd" — CPU spikes, MySQL
+ * thread pool gets exhausted, and our task waits or fails.
+ *
+ * We mitigate two ways without touching the cron entry itself:
+ *   1. ->runInBackground() on long tasks so schedule:run isn't
+ *      blocked by mysqldump while OTHER tasks miss their slot.
+ *   2. Stagger each daily task by a different MINUTE (e.g. backup
+ *      at 03:00, prune at 03:30, dunning at 09:07, drip at 10:13)
+ *      so they don't collide with each other or the host's other
+ *      tenants' rounded-time crons.
+ *
+ * If you add a new daily task: pick a minute that ISN'T already in
+ * use AND ISN'T 00, 15, 30, or 45 (the standard busy slots).
+ */
 
 // Database backup — nightly at 03:00 server time, when traffic is
 // lowest. 14-day retention is configurable in the command's options.
@@ -34,30 +51,33 @@ Schedule::command('db:backup --keep=14')
     ->runInBackground()
     ->withoutOverlapping();
 
-// Dunning loop — runs daily at 09:00 server time so emails land
-// while customers are checking inboxes, not at 3 AM. The state
-// machine is idempotent per day so re-running is safe.
+// Dunning loop — daily at 09:07 (jittered off :00 to avoid the
+// host-wide cron pile-up). Emails land while customers are checking
+// inboxes, not at 3 AM. State machine is idempotent per day.
 Schedule::command('billing:dunning')
-    ->dailyAt('09:00')
+    ->dailyAt('09:07')
     ->onOneServer()
     ->withoutOverlapping();
 
-// Trial welcome drip — runs once a day at 10:00 server time. Walks
-// the 3-step drip (welcome / tour / case study) and advances each
-// active trial at most one step per run. Idempotent.
+// Trial welcome drip — daily at 10:13 (jittered). Walks the 3-step
+// drip (welcome / tour / case study), advancing each active trial
+// at most one step per run. Idempotent.
 Schedule::command('trials:drip')
-    ->dailyAt('10:00')
+    ->dailyAt('10:13')
     ->onOneServer()
     ->withoutOverlapping();
 
-// Retention pruner — daily at 03:30, after the backup window so the
-// backup captures the full dataset before the prune removes anything.
-// Trims activity_logs (365d), failed_jobs (30d), sessions (30d),
-// customer_login_tokens (7d). Permanent actions preserved.
+// Retention pruner — daily at 03:37 (after backup, jittered off the
+// host-busy :30 slot). Trims activity_logs (365d), failed_jobs (30d),
+// sessions (30d), customer_login_tokens (7d). Permanent actions preserved.
 Schedule::command('maint:prune')
-    ->dailyAt('03:30')
+    ->dailyAt('03:37')
     ->onOneServer()
     ->withoutOverlapping();
+
+// Trial expiry/ending-soon — runs once an hour at :11 (off the busy
+// :00 slot). A trial ending at 14:23 gets the heads-up by 15:11.
+Schedule::command('trials:check')->cron('11 * * * *');
 
 // Queue health check — every 15 minutes. If the worker is dead or
 // the queue is backing up, exits non-zero. Pair this with an
