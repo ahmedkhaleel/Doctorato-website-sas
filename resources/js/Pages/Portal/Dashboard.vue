@@ -25,7 +25,10 @@ const portalMessage = computed(() => page.props.flash?.portalMessage ?? null);
 const logoutForm = useForm({});
 const cancelForm = useForm({});
 const resumeForm = useForm({});
+const pauseForm = useForm({ days: 30 });
+const unpauseForm = useForm({});
 const showCancelFor = ref(null);
+const showPauseFor = ref(null);
 
 function logout() { logoutForm.post('/portal/logout'); }
 function confirmCancel(id) {
@@ -34,6 +37,12 @@ function confirmCancel(id) {
     });
 }
 function resumeSubscription(id) { resumeForm.post(`/portal/subscriptions/${id}/resume`); }
+function confirmPause(id) {
+    pauseForm.post(`/portal/subscriptions/${id}/pause`, {
+        onFinish: () => showPauseFor.value = null,
+    });
+}
+function unpauseSubscription(id) { unpauseForm.post(`/portal/subscriptions/${id}/unpause`); }
 
 function statusBadgeClass(status) {
     switch (status) {
@@ -195,8 +204,23 @@ function formatDate(iso) {
                                 <h3 class="font-bold text-[#0A1628] text-lg">{{ sub.plan_name }}</h3>
                                 <p class="text-sm text-[#8B9BAC] capitalize">{{ sub.billing_cycle }} billing</p>
                             </div>
-                            <span class="text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full" :class="statusBadgeClass(sub.status)">
-                                {{ sub.status }}
+                            <span
+                                class="text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full"
+                                :class="sub.is_paused ? 'bg-amber-100 text-amber-800' : statusBadgeClass(sub.status)"
+                            >
+                                {{ sub.is_paused ? 'paused' : sub.status }}
+                            </span>
+                        </div>
+
+                        <!-- Paused notice banner -->
+                        <div v-if="sub.is_paused" class="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-900 flex items-start gap-2">
+                            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>
+                                Subscription paused. Auto-resumes on
+                                <strong>{{ formatDate(sub.paused_until) }}</strong>
+                                — you won't be billed in the meantime.
                             </span>
                         </div>
 
@@ -207,21 +231,75 @@ function formatDate(iso) {
                             </div>
                             <div>
                                 <dt class="text-xs text-[#8B9BAC] uppercase tracking-wider mb-1">
-                                    {{ sub.status === 'canceled' ? 'Access ends' : 'Renews' }}
+                                    {{ sub.status === 'canceled' ? 'Access ends' : (sub.is_paused ? 'Resumes' : 'Renews') }}
                                 </dt>
-                                <dd class="text-[#1C2833] font-medium">{{ formatDate(sub.next_billing_date || sub.ends_at) }}</dd>
+                                <dd class="text-[#1C2833] font-medium">
+                                    {{ formatDate(sub.is_paused ? sub.paused_until : (sub.next_billing_date || sub.ends_at)) }}
+                                </dd>
                             </div>
                         </dl>
 
-                        <!-- Cancel UI -->
-                        <div v-if="sub.status === 'active' || sub.status === 'past_due'" class="mt-6 pt-6 border-t border-gray-100">
+                        <!-- Resume-from-pause UI (paused state) -->
+                        <div v-if="sub.is_paused" class="mt-6 pt-6 border-t border-gray-100">
                             <button
-                                v-if="showCancelFor !== sub.id"
-                                @click="showCancelFor = sub.id"
-                                class="text-sm font-semibold text-rose-700 hover:text-rose-800 transition"
+                                @click="unpauseSubscription(sub.id)"
+                                :disabled="unpauseForm.processing"
+                                class="bg-[#0A1628] hover:bg-[#1C2833] text-white text-sm font-semibold px-4 py-2 rounded-lg transition disabled:opacity-60"
                             >
-                                Cancel subscription
+                                {{ unpauseForm.processing ? 'Resuming…' : 'Resume now' }}
                             </button>
+                        </div>
+
+                        <!-- Pause + Cancel UI (active / past_due state) -->
+                        <div v-else-if="sub.status === 'active' || sub.status === 'past_due'" class="mt-6 pt-6 border-t border-gray-100">
+                            <!-- Idle: show both buttons -->
+                            <div v-if="showCancelFor !== sub.id && showPauseFor !== sub.id" class="flex flex-wrap gap-3">
+                                <button
+                                    @click="showPauseFor = sub.id"
+                                    class="text-sm font-semibold text-[#0A1628] hover:text-[#1C2833] transition"
+                                >
+                                    Pause subscription
+                                </button>
+                                <span class="text-[#8B9BAC]">·</span>
+                                <button
+                                    @click="showCancelFor = sub.id"
+                                    class="text-sm font-semibold text-rose-700 hover:text-rose-800 transition"
+                                >
+                                    Cancel subscription
+                                </button>
+                            </div>
+
+                            <!-- Pause confirmation -->
+                            <div v-else-if="showPauseFor === sub.id" class="space-y-3">
+                                <p class="text-sm text-[#5A6C7D]">
+                                    Pause billing for a while. You can resume any time.
+                                </p>
+                                <div class="flex flex-wrap items-end gap-3">
+                                    <label class="block">
+                                        <span class="text-xs text-[#8B9BAC] uppercase tracking-wider block mb-1">Days</span>
+                                        <input
+                                            v-model.number="pauseForm.days"
+                                            type="number"
+                                            min="7"
+                                            max="90"
+                                            class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-[#0A1628] focus:ring-1 focus:ring-[#0A1628] outline-none"
+                                        />
+                                    </label>
+                                    <button
+                                        @click="confirmPause(sub.id)"
+                                        :disabled="pauseForm.processing || pauseForm.days < 7 || pauseForm.days > 90"
+                                        class="bg-[#0A1628] hover:bg-[#1C2833] text-white text-sm font-semibold px-4 py-2 rounded-lg transition disabled:opacity-60"
+                                    >
+                                        Pause
+                                    </button>
+                                    <button @click="showPauseFor = null" class="text-sm text-[#5A6C7D] hover:text-[#0A1628] px-4 py-2">
+                                        Cancel
+                                    </button>
+                                </div>
+                                <p v-if="pauseForm.errors.days" class="text-xs text-rose-700">{{ pauseForm.errors.days }}</p>
+                            </div>
+
+                            <!-- Cancel confirmation -->
                             <div v-else class="space-y-3">
                                 <p class="text-sm text-[#5A6C7D]">
                                     Are you sure? You'll keep access until <strong>{{ formatDate(sub.ends_at) }}</strong>, but no further renewals will be billed.

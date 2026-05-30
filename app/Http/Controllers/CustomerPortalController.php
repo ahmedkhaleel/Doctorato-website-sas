@@ -117,6 +117,11 @@ class CustomerPortalController extends Controller
                 'starts_at' => $s->starts_at?->toIso8601String(),
                 'ends_at' => $s->ends_at?->toIso8601String(),
                 'next_billing_date' => $s->next_billing_date?->toIso8601String() ?? null,
+                // Pause flags surfaced so the dashboard can show the
+                // right CTA (Pause when running, Resume when paused).
+                'is_paused' => $s->isPaused(),
+                'paused_at' => $s->paused_at?->toIso8601String(),
+                'paused_until' => $s->paused_until?->toIso8601String(),
             ]);
 
         $invoices = Invoice::whereIn('subscription_id', $subscriptions->pluck('id'))
