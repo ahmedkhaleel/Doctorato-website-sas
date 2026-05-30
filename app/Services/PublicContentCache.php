@@ -43,11 +43,28 @@ class PublicContentCache
                 ->get()
                 ->map(function ($plan) use ($country) {
                     $price = $plan->priceFor($country);
+                    // Active price respects the launch toggle. We still surface
+                    // the regular price too so the Vue layer can render the
+                    // strikethrough anchor without recomputing.
+                    $launchActive = $plan->isLaunchActive();
                     return array_merge($plan->toArray(), [
                         'monthly_price' => $price['monthly'],
                         'yearly_price' => $price['yearly'],
-                        'setup_fee' => $price['setup_fee'] ?? 0,
-                        'setup_fee_yearly' => $price['setup_fee_yearly'] ?? 0,
+                        'monthly_price_launch' => $launchActive
+                            ? (float) ($plan->monthly_price_launch ?? $price['monthly'])
+                            : null,
+                        'yearly_price_launch' => $launchActive
+                            ? (float) ($plan->yearly_price_launch ?? $price['yearly'])
+                            : null,
+                        'setup_fee' => (float) ($plan->setup_fee ?? 0),
+                        'setup_fee_launch' => $launchActive
+                            ? (float) ($plan->setup_fee_launch ?? 0)
+                            : null,
+                        'setup_fee_yearly' => $plan->activeSetupFee('yearly'),
+                        'is_launch_offer_active' => $launchActive,
+                        'launch_offer_ends_at' => $plan->launch_offer_ends_at?->toIso8601String(),
+                        'supports_installments' => (bool) $plan->supports_installments,
+                        'installments' => $plan->yearlyInstallments(),
                         'currency' => $price['currency'],
                         'currency_symbol' => $price['currency_symbol'],
                         'country_code' => $price['country_code'],
