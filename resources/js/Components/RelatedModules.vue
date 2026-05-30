@@ -63,6 +63,15 @@ const ALL_MODULES = [
         body_en: 'HD video, e-prescriptions, pre-session payment, EMR integration',
     },
     {
+        slug: 'obstetrics',
+        href: '/obstetrics',
+        icon: '🤰',
+        gradient: 'from-pink-100/40 to-white border-pink-200/50',
+        title_ar: 'النساء والتوليد', title_en: 'Obstetrics & Gynecology',
+        body_ar: 'متابعة حمل WHO، سونار، Pap Smear، تنظيم أسرة، بوابة مريضة',
+        body_en: 'WHO antenatal care, ultrasound, Pap smear, family planning, patient portal',
+    },
+    {
         slug: 'emr',
         href: '/emr',
         icon: '📋',

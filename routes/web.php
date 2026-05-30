@@ -103,6 +103,7 @@ Route::get('/dental', [PageController::class, 'dental'])->name('dental');
 Route::get('/dermatology', [PageController::class, 'dermatology'])->name('dermatology');
 Route::get('/pediatrics', [PageController::class, 'pediatrics'])->name('pediatrics');
 Route::get('/telemedicine', [PageController::class, 'telemedicine'])->name('telemedicine');
+Route::get('/obstetrics', [PageController::class, 'obstetrics'])->name('obstetrics');
 Route::get('/solutions', [PageController::class, 'solutions'])->name('solutions');
 Route::get('/technology', [PageController::class, 'technology'])->name('technology');
 Route::get('/reports', [PageController::class, 'reports'])->name('reports');

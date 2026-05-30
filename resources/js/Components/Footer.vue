@@ -56,6 +56,7 @@ const productLinks = [
     { label: 'footer.link_dental', href: '/dental', fallback: { ar: 'عيادات الأسنان', en: 'Dental' } },
     { label: 'footer.link_pediatrics', href: '/pediatrics', fallback: { ar: 'طب الأطفال', en: 'Pediatrics' } },
     { label: 'footer.link_telemedicine', href: '/telemedicine', fallback: { ar: 'الاستشارات الأون لاين', en: 'Telemedicine' } },
+    { label: 'footer.link_obstetrics', href: '/obstetrics', fallback: { ar: 'النساء والتوليد', en: 'Obstetrics & Gynecology' } },
 ];
 
 const resourcesLinks = [

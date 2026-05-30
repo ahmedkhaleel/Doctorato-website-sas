@@ -441,8 +441,8 @@ const homeJsonLd = computed(() => ({
                     </p>
                 </div>
 
-                <!-- 4 spotlight cards: Dermatology (flagship) + Dental + Pediatrics + Telemedicine -->
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 animate-stagger">
+                <!-- 5 spotlight cards: Dermatology (flagship) + Dental + Pediatrics + Telemedicine + Obstetrics -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6 animate-stagger">
                     <!-- Dermatology & Cosmetics — flagship specialty (rose→fuchsia accent) -->
                     <Link
                         href="/dermatology"
@@ -599,6 +599,49 @@ const homeJsonLd = computed(() => ({
                                     : 'HD video, digital prescriptions, instant payment, live-synced records — a complete virtual clinic.' }}
                             </p>
                             <span class="inline-flex items-center gap-2 text-[#5DADE2] text-sm font-bold group-hover:gap-3 transition-all">
+                                {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </Link>
+
+                    <!-- Obstetrics & Gynecology -->
+                    <Link
+                        href="/obstetrics"
+                        class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#0D2F45] to-[#0A1628] text-white p-8 border border-white/10 hover:border-[#E91E63]/40 hover:-translate-y-1 transition-all duration-500 shadow-lg"
+                    >
+                        <div class="absolute -top-24 -end-24 w-64 h-64 bg-[#E91E63]/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                        <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="hx-ob" x="0" y="0" width="48" height="56" patternUnits="userSpaceOnUse">
+                                    <polygon points="24,2 44,14 44,42 24,54 4,42 4,14" fill="none" stroke="white" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#hx-ob)"/>
+                        </svg>
+
+                        <!-- NEW badge -->
+                        <div class="absolute top-5 end-5 px-2.5 py-1 rounded-full bg-[#E91E63]/20 border border-[#E91E63]/30 text-[#F8BBD0] text-[10px] font-bold uppercase tracking-widest">
+                            {{ locale === 'ar' ? 'جديد' : 'New' }}
+                        </div>
+
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E91E63] to-[#9C27B0] flex items-center justify-center mb-5 shadow-lg shadow-[#E91E63]/30 group-hover:rotate-6 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-extrabold mb-2">
+                                {{ locale === 'ar' ? 'النساء والتوليد' : 'Obstetrics & Gynecology' }}
+                            </h3>
+                            <p class="text-white/60 text-sm leading-relaxed mb-5">
+                                {{ locale === 'ar'
+                                    ? 'متابعة الحمل بمعايير WHO، سونار التوليد، Pap Smear، تنظيم الأسرة، وبوابة مريضة مع تذكيرات WhatsApp.'
+                                    : 'WHO antenatal care, obstetric ultrasound, Pap smear, family planning, and a patient portal with WhatsApp reminders.' }}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-[#F8BBD0] text-sm font-bold group-hover:gap-3 transition-all">
                                 {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
                                 <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
