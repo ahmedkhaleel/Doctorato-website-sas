@@ -149,11 +149,40 @@
     {{-- Organization + WebSite JSON-LD (global, always present) --}}
     <script type="application/ld+json">{!! json_encode($globalJsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
+    {{-- PWA — manifest is global so a customer can install from any
+         page; the SW we register has scope='/portal/' so only portal
+         pages cache + go offline. The manifest itself is a static
+         JSON file under public/, no auth required. --}}
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#0A1628">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Doctorato">
+    <link rel="apple-touch-icon" href="/images/doctorato-logo.png">
+
     @routes
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @inertiaHead
 </head>
 <body class="antialiased">
     @inertia
+
+    {{-- Service-worker registration only fires when the path is in
+         the portal scope. Guarded by isSecureContext so the SW skips
+         on http:// local dev (browsers refuse to install it there
+         anyway) but is silent rather than throwing. --}}
+    <script>
+        if ('serviceWorker' in navigator && window.isSecureContext
+            && location.pathname.startsWith('/portal')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/portal-sw.js', { scope: '/portal/' })
+                    .catch((err) => {
+                        // Failure is non-fatal — the portal still
+                        // works, just without offline support.
+                        console.warn('[Doctorato] SW registration failed', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,45 @@
+{
+    "name": "Doctorato Portal",
+    "short_name": "Doctorato",
+    "description": "Manage your Doctorato subscription, invoices, and trial from one place.",
+    "lang": "en",
+    "dir": "ltr",
+    "start_url": "/portal/dashboard",
+    "scope": "/portal/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "theme_color": "#0A1628",
+    "background_color": "#F4F1EA",
+    "icons": [
+        {
+            "src": "/images/doctorato-logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/doctorato-logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["medical", "business", "productivity"],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "url": "/portal/dashboard",
+            "description": "Subscriptions + invoices overview"
+        },
+        {
+            "name": "Invoices",
+            "url": "/portal/dashboard#invoices",
+            "description": "Recent invoices"
+        },
+        {
+            "name": "Refer a clinic",
+            "url": "/portal/refer",
+            "description": "Share link + credit balance"
+        }
+    ]
+}

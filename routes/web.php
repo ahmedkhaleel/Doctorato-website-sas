@@ -171,6 +171,15 @@ Route::post('/webhooks/paymob', [PaymobWebhookController::class, 'handle'])
     ->middleware('throttle:webhooks')
     ->name('webhooks.paymob');
 
+// PWA offline shell. Served as a plain blade view (no Inertia) so
+// the SW cache can store the rendered HTML once and replay it on
+// every offline open without needing the JS bundle. Sits in front
+// of /portal so the SW scope='/portal/' picks it up.
+Route::get('/portal/offline', fn () => response()
+    ->view('portal.offline')
+    ->header('Cache-Control', 'public, max-age=3600')
+)->name('portal.offline');
+
 // Customer portal — magic-link auth, separate from admin
 Route::get('/portal', [\App\Http\Controllers\CustomerPortalController::class, 'showLogin'])->name('portal.login');
 Route::post('/portal/login', [\App\Http\Controllers\CustomerPortalController::class, 'sendLoginLink'])

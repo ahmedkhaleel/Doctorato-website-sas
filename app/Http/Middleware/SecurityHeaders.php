@@ -105,6 +105,12 @@ class SecurityHeaders
     {
         $directives = [
             "default-src 'self'",
+            // Service worker registration + manifest are same-origin
+            // by definition; the worker-src directive is required
+            // explicitly because Chrome treats SW as a separate
+            // resource class from script-src.
+            "worker-src 'self'",
+            "manifest-src 'self'",
             // Vite injects inline modulepreload, reCAPTCHA + Google
             // Tag Manager pull from www.google.com / www.gstatic.com.
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com",
