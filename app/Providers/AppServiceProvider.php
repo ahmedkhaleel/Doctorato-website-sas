@@ -12,6 +12,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -40,6 +41,11 @@ class AppServiceProvider extends ServiceProvider
         // listener stays a thin POPO with no boot dependency.
         Event::listen(MessageSending::class, [\App\Listeners\LogEmailDelivery::class, 'handleSending']);
         Event::listen(MessageSent::class, [\App\Listeners\LogEmailDelivery::class, 'handleSent']);
+        // Queue-side companion: when a queued mail job exhausts retries
+        // and lands in failed_jobs, flip the matching EmailLog row to
+        // 'failed' so the dashboard reflects ground truth without an
+        // admin having to cross-reference two tables.
+        Event::listen(JobFailed::class, [\App\Listeners\LogEmailFailure::class, 'handle']);
     }
 
     /**
