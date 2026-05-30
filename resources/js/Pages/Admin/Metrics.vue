@@ -12,12 +12,20 @@
  * busts the cache.
  */
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import Sparkline from '@/Components/Admin/Sparkline.vue';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps({
     snapshot: Object,
+    trend: { type: Array, default: () => [] },
 });
+
+const trendMrr = computed(() => props.trend.map((p) => p.mrr));
+const trendActive = computed(() => props.trend.map((p) => p.active));
+const trendChurn = computed(() => props.trend.map((p) => p.churn));
+const trendLabels = computed(() => props.trend.map((p) => p.date));
+const hasTrend = computed(() => props.trend.length >= 2);
 
 const page = usePage();
 const flash = computed(() => page.props.flash?.success ?? null);
@@ -120,6 +128,33 @@ function asOfRelative(iso) {
                 <p class="text-xs text-gray-500 uppercase tracking-widest mb-1">إلغاءات (30 يوم)</p>
                 <p class="text-2xl font-bold leading-none text-gray-800">{{ snapshot.cancelled_30d }}</p>
             </article>
+        </div>
+
+        <!-- Trend row — 90-day sparklines (hidden when no snapshots yet) -->
+        <div v-if="hasTrend" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <article class="bg-white border border-gray-100 rounded-2xl p-5">
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">اتجاه MRR (90 يوم)</p>
+                <Sparkline :points="trendMrr" :labels="trendLabels" :width="260" :height="50"
+                           stroke="#0A1628" fill="rgba(10, 22, 40, 0.08)"
+                           :format="(v) => formatSAR(v)" />
+            </article>
+            <article class="bg-white border border-gray-100 rounded-2xl p-5">
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">اتجاه الاشتراكات النشطة</p>
+                <Sparkline :points="trendActive" :labels="trendLabels" :width="260" :height="50"
+                           stroke="#C4A265" fill="rgba(196, 162, 101, 0.18)"
+                           :format="(v) => `${v} sub`" />
+            </article>
+            <article class="bg-white border border-gray-100 rounded-2xl p-5">
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-3">اتجاه الـ Churn (%)</p>
+                <Sparkline :points="trendChurn" :labels="trendLabels" :width="260" :height="50"
+                           stroke="#b91c1c" fill="rgba(185, 28, 28, 0.10)"
+                           :format="(v) => `${v.toFixed(1)}%`" />
+            </article>
+        </div>
+        <div v-else class="bg-amber-50 border border-amber-100 rounded-2xl p-5 mb-6 text-sm text-amber-900">
+            لا توجد لقطات تاريخية بعد. شغّل
+            <code class="bg-white px-1.5 py-0.5 rounded font-mono text-xs">php artisan metrics:snapshot</code>
+            أو انتظر التشغيل التلقائي عند الساعة 23:55.
         </div>
 
         <!-- Row 3: churn -->

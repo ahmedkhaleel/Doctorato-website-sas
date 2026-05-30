@@ -79,6 +79,13 @@ Schedule::command('maint:prune')
 // :00 slot). A trial ending at 14:23 gets the heads-up by 15:11.
 Schedule::command('trials:check')->cron('11 * * * *');
 
+// Metrics snapshot — daily at 23:55, just before midnight, so the
+// snapshot captures the "end of day" state. Idempotent.
+Schedule::command('metrics:snapshot')
+    ->dailyAt('23:55')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Auto-resume paused subscriptions — daily at 02:23 (jittered).
 // Walks subs where paused_until <= now and clears both pause cols.
 // Idempotent.
