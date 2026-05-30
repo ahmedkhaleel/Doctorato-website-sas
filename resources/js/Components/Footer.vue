@@ -1,31 +1,30 @@
 <script setup>
 /**
- * Footer — editorial-precision redesign (v2).
+ * Footer — v3 production-grade redesign.
  *
- * The previous attempt used col-start utilities to position link
- * columns inside a 12-col grid. Tailwinds JIT resolved the conflict
- * between md:col-span-7 (base) and md:col-span-2 (conditional)
- * unpredictably, which is why the columns landed scattered in the
- * screenshot instead of in a row.
+ * Fixes from v2:
+ *   - Logo was rendering as a dark RGBA PNG against the dark
+ *     background. Now CSS-inverted to pure white with a subtle
+ *     gold drop-shadow on hover. Apple/Stripe-style treatment.
+ *   - Typography drifted off-system. v2 used arbitrary text-[13px]
+ *     + font-mono on trust chips, both of which made the footer
+ *     read like a different page. Removed: now uses standard
+ *     Tailwind text-sm / text-xs scale + inherits IBM Plex Arabic
+ *     / Inter from the body root.
  *
- * Rebuilt with a robust 12-col grid using only col-span (no
- * col-start hacks). Layout: brand 6 / Product 2 / Resources 2 /
- * Company 2 — sums to 12, items lay out in document order, RTL is
- * handled by CSS automatically.
+ * New visual atmosphere:
+ *   - Layered background: noise SVG + grid lines + animated
+ *     gradient orb that drifts left/right over 20s.
+ *   - Floating ambient particles (4 small gold dots drifting up)
+ *     give life without distracting from content.
+ *   - Eyebrow marks pulse subtly (3s cycle).
+ *   - Link underline already animates on hover; now also has a
+ *     1px gold caret that fades in.
+ *   - Logo gets a soft gold halo on hover.
+ *   - Newsletter input glows on focus.
+ *   - Social icons rotate-tilt subtly on hover.
  *
- * Visual upgrades from v1:
- *   - Eyebrow gets a tiny gold square mark before the text
- *     (replaces the all-caps-only treatment)
- *   - Each link reveals a 1px underline on hover (editorial feel,
- *     replaces the dot indicator)
- *   - Brand gets a small EST detail under the wordmark
- *   - Newsletter is a borderless underline-only input with a tiny
- *     gold arrow button (Linear-style minimalism)
- *   - Trust chips use a monospace-tabular font for the numbers
- *   - Bottom bar uses em-dash separators (more editorial than dots)
- *   - Single gold corner ornament instead of radial vignette
- *
- * Total height target: ~330px desktop, ~700px stacked mobile.
+ * Honours prefers-reduced-motion — every animation has a fallback.
  */
 import { ref, computed } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
@@ -86,12 +85,10 @@ const socialLinks = [
 
 const trustChips = computed(() => [
     { label: 'SSL', value: '256-bit' },
-    { label: isAr.value ? 'GDPR' : 'GDPR', value: isAr.value ? 'متوافق' : 'ready' },
+    { label: 'GDPR', value: isAr.value ? 'متوافق' : 'ready' },
     { label: isAr.value ? 'استقرار' : 'Uptime', value: '99.9%', live: true },
 ]);
 
-// Each column rendered from this list — same structure, same depth,
-// so the visual rhythm reads as a clean three-column masthead.
 const linkColumns = computed(() => [
     { title: isAr.value ? 'المنتج' : 'Product',    links: productLinks },
     { title: isAr.value ? 'الموارد' : 'Resources', links: resourcesLinks },
@@ -100,17 +97,35 @@ const linkColumns = computed(() => [
 </script>
 
 <template>
-    <footer class="relative text-white bg-[#08111E] overflow-hidden">
-        <!-- Single gold hairline at top -->
+    <footer class="doctorato-footer relative text-white overflow-hidden">
+        <!-- Layered backdrop: solid → grid → noise → animated orb → particles -->
+        <div class="absolute inset-0 bg-[#06101C]"></div>
+
+        <!-- Subtle grid pattern, fades top → bottom -->
+        <div class="absolute inset-0 footer-grid pointer-events-none"></div>
+
+        <!-- SVG noise texture for that premium tactile feel -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
+            <filter id="footer-noise">
+                <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/>
+                <feColorMatrix values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1   0 0 0 1 0"/>
+            </filter>
+            <rect width="100%" height="100%" filter="url(#footer-noise)"/>
+        </svg>
+
+        <!-- Animated gradient orb that drifts slowly across the top edge -->
+        <div class="absolute top-[-20%] inset-x-0 h-[400px] pointer-events-none footer-orb"></div>
+
+        <!-- Top hairline -->
         <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/45 to-transparent"></div>
 
-        <!-- Subtle gold corner ornament — small luminous arc top-start.
-             Replaces the previous wide radial vignette. -->
-        <div
-            class="absolute top-0 w-[420px] h-[420px] pointer-events-none opacity-[0.07]"
-            :class="isAr ? 'right-0' : 'left-0'"
-            style="background: radial-gradient(circle at top, #C4A265 0%, transparent 55%);"
-        ></div>
+        <!-- Floating ambient particles — 4 tiny gold dots drifting up -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <span class="footer-particle" style="--x: 12%;  --delay: 0s;  --duration: 14s;"></span>
+            <span class="footer-particle" style="--x: 32%;  --delay: 4s;  --duration: 17s;"></span>
+            <span class="footer-particle" style="--x: 68%;  --delay: 8s;  --duration: 15s;"></span>
+            <span class="footer-particle" style="--x: 88%;  --delay: 11s; --duration: 19s;"></span>
+        </div>
 
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
 
@@ -118,62 +133,67 @@ const linkColumns = computed(() => [
             <div class="pt-14 pb-10">
                 <div class="grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-12">
 
-                    <!-- BRAND  (cols 1-6 on desktop, full row on mobile) -->
+                    <!-- BRAND  (cols 1-6 on desktop) -->
                     <div class="col-span-2 md:col-span-6 footer-fade" style="--delay: 0ms">
-                        <Link href="/" class="inline-flex items-center gap-3 mb-5">
-                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-9 w-auto" />
+
+                        <!-- Logo with white inversion + hover halo -->
+                        <Link href="/" class="inline-block mb-5 group footer-logo-link">
+                            <img
+                                src="/images/doctorato-logo.png"
+                                alt="Doctorato"
+                                class="h-9 w-auto footer-logo"
+                            />
                         </Link>
 
-                        <p class="text-[13px] leading-[1.75] text-white/55 max-w-md mb-7">
+                        <p class="text-sm leading-relaxed text-white/55 max-w-md mb-7">
                             {{ $t('footer.description') }}
                         </p>
 
-                        <!-- Newsletter — underline-only input + tiny gold arrow.
-                             Quiet but high-contrast on the page. -->
+                        <!-- Newsletter -->
                         <form @submit.prevent="submitNewsletter" class="max-w-sm">
                             <div class="footer-eyebrow mb-3">
                                 <span class="footer-eyebrow-mark"></span>
                                 <span>{{ isAr ? 'النشرة الشهرية' : 'Monthly briefing' }}</span>
                             </div>
-                            <div class="relative flex items-center border-b border-white/15 focus-within:border-[#C4A265]/60 transition-colors pb-1">
+                            <div class="footer-newsletter-field">
                                 <input
                                     v-model="newsletterForm.email"
                                     type="email"
                                     required
                                     :placeholder="$t('footer.email_placeholder')"
-                                    class="flex-1 min-w-0 py-2 bg-transparent text-[13px] text-white placeholder-white/30 outline-none"
+                                    class="flex-1 min-w-0 py-2 bg-transparent text-sm text-white placeholder-white/30 outline-none"
                                     dir="ltr"
                                 />
                                 <button
                                     type="submit"
                                     :disabled="newsletterForm.processing"
                                     :aria-label="$t('footer.subscribe')"
-                                    class="group/btn shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#C4A265]/15 hover:bg-[#C4A265] text-[#C4A265] hover:text-[#0A1320] transition-colors disabled:opacity-50"
+                                    class="footer-arrow-btn group/btn"
                                 >
-                                    <svg class="w-3.5 h-3.5 rtl:rotate-180 group-hover/btn:translate-x-px rtl:group-hover/btn:-translate-x-px transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 rtl:rotate-180 group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6" />
                                     </svg>
                                 </button>
                             </div>
                             <Transition
                                 enter-active-class="transition duration-300"
-                                enter-from-class="opacity-0"
-                                enter-to-class="opacity-100"
+                                enter-from-class="opacity-0 -translate-y-0.5"
+                                enter-to-class="opacity-100 translate-y-0"
                             >
-                                <p v-if="newsletterSuccess" class="flex items-center gap-1.5 text-emerald-400/90 text-[11px] mt-2">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                <p v-if="newsletterSuccess" class="flex items-center gap-1.5 text-emerald-400/95 text-xs mt-2">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                     {{ $t('footer.subscribe_success') }}
                                 </p>
                             </Transition>
-                            <p v-if="newsletterForm.errors.email" class="text-rose-400/90 text-[11px] mt-2">
+                            <p v-if="newsletterForm.errors.email" class="text-rose-400/90 text-xs mt-2">
                                 {{ newsletterForm.errors.email }}
                             </p>
                         </form>
 
-                        <!-- Socials — small ghost glyphs -->
-                        <div class="flex items-center gap-1 mt-7">
+                        <!-- Socials -->
+                        <div class="flex items-center gap-1.5 mt-7">
                             <a
                                 v-for="social in socialLinks"
                                 :key="social.name"
@@ -181,29 +201,33 @@ const linkColumns = computed(() => [
                                 :aria-label="social.name"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="group/social w-8 h-8 rounded-md flex items-center justify-center text-white/35 hover:text-white hover:bg-white/[0.04] transition-colors"
+                                class="footer-social"
                             >
-                                <svg class="w-[14px] h-[14px] fill-current" viewBox="0 0 24 24">
+                                <svg class="w-[15px] h-[15px] fill-current" viewBox="0 0 24 24">
                                     <path :d="social.icon" />
                                 </svg>
                             </a>
                         </div>
                     </div>
 
-                    <!-- LINK COLUMNS — each col-span-2 on desktop (6+2+2+2=12),
-                         col-span-1 on mobile (2-col grid → 2 cols visible). -->
+                    <!-- LINK COLUMNS (6+2+2+2=12) -->
                     <div
                         v-for="(column, idx) in linkColumns"
                         :key="column.title"
                         class="col-span-1 md:col-span-2 footer-fade"
-                        :style="`--delay: ${120 + idx * 70}ms;`"
+                        :style="`--delay: ${120 + idx * 80}ms;`"
                     >
                         <div class="footer-eyebrow mb-5">
                             <span class="footer-eyebrow-mark"></span>
                             <span>{{ column.title }}</span>
                         </div>
                         <ul class="space-y-3">
-                            <li v-for="link in column.links" :key="link.href">
+                            <li
+                                v-for="(link, lidx) in column.links"
+                                :key="link.href"
+                                class="footer-link-item"
+                                :style="`--link-delay: ${250 + idx * 80 + lidx * 50}ms;`"
+                            >
                                 <Link
                                     :href="link.href"
                                     class="footer-link group/link"
@@ -216,23 +240,23 @@ const linkColumns = computed(() => [
                 </div>
             </div>
 
-            <!-- ════ ZONE 2 — legal bar with folded trust chips ════ -->
+            <!-- ════ ZONE 2 — legal bar ════ -->
             <div class="border-t border-white/[0.07]">
-                <div class="py-5 flex flex-col lg:flex-row items-center justify-between gap-y-3 gap-x-6 text-[11px]">
+                <div class="py-5 flex flex-col lg:flex-row items-center justify-between gap-y-3 gap-x-6">
 
                     <!-- Copyright + Markeza -->
-                    <p class="text-white/45 flex items-center flex-wrap justify-center lg:justify-start gap-x-2">
+                    <p class="text-xs text-white/45 flex items-center flex-wrap justify-center lg:justify-start gap-x-2">
                         <span>&copy; {{ new Date().getFullYear() }} Doctorato</span>
                         <span class="text-white/15 mx-1">—</span>
                         <span class="text-white/40">{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
                     </p>
 
-                    <!-- Trust chips inline — KEY/VALUE pairs, mono numbers -->
+                    <!-- Trust chips -->
                     <ul class="flex items-center gap-x-5 gap-y-2 flex-wrap justify-center">
                         <li
                             v-for="chip in trustChips"
                             :key="chip.label"
-                            class="inline-flex items-center gap-1.5 text-white/45"
+                            class="inline-flex items-center gap-1.5 text-xs"
                         >
                             <span v-if="chip.live" class="relative flex h-1.5 w-1.5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
@@ -240,23 +264,12 @@ const linkColumns = computed(() => [
                             </span>
                             <span v-else class="w-1 h-1 rounded-full bg-[#C4A265]/70"></span>
                             <span class="text-white/55 font-medium">{{ chip.label }}</span>
-                            <span class="font-mono tabular-nums text-white/40">{{ chip.value }}</span>
+                            <span class="text-white/40">{{ chip.value }}</span>
                         </li>
                     </ul>
 
-                    <!-- Legal links — classic Privacy + Terms only.
-                         /sub-processors and /responsible-disclosure exist
-                         at their URLs (linked from DPA + security.txt
-                         respectively) but DON'T belong in the public
-                         footer:
-                           - Sub-processors leaks infra detail to
-                             competitors and confuses non-technical
-                             buyers (Stripe / Linear / Notion all keep
-                             this behind customer-portal or DPA refs).
-                           - Responsible-disclosure is read by security
-                             scanners + researchers via security.txt;
-                             they don't need a footer hint. -->
-                    <ul class="flex items-center gap-x-4 text-white/45 flex-wrap justify-center">
+                    <!-- Legal links — Privacy + Terms only -->
+                    <ul class="flex items-center gap-x-4 text-xs text-white/45 flex-wrap justify-center">
                         <li><Link href="/privacy" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.privacy') }}</Link></li>
                         <li class="text-white/15">—</li>
                         <li><Link href="/terms" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.terms') }}</Link></li>
@@ -268,15 +281,77 @@ const linkColumns = computed(() => [
 </template>
 
 <style scoped>
-/* ─── Eyebrow (section label) ─────────────────────────────────
-   Small gold square + uppercase title. Tight tracking, refined
-   weight. Used across newsletter label + all 3 link headings. */
+/* ─── Inherit body font (IBM Plex Arabic / Inter) ────────── */
+.doctorato-footer,
+.doctorato-footer * {
+    font-family: inherit;
+}
+
+/* ─── Logo: invert dark PNG → pure white + hover gold halo ── */
+.footer-logo {
+    filter: brightness(0) invert(1);
+    opacity: 0.92;
+    transition: filter 300ms ease, opacity 300ms ease, transform 300ms ease;
+}
+.footer-logo-link:hover .footer-logo {
+    opacity: 1;
+    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(196, 162, 101, 0.45));
+    transform: translateY(-1px);
+}
+
+/* ─── Grid pattern that fades from top ──────────────────── */
+.footer-grid {
+    background-image:
+        linear-gradient(to right,  rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+}
+
+/* ─── Animated gradient orb that drifts across the top ──── */
+.footer-orb {
+    background: radial-gradient(ellipse at center, rgba(196, 162, 101, 0.20) 0%, transparent 60%);
+    filter: blur(40px);
+    animation: orb-drift 22s ease-in-out infinite alternate;
+}
+@keyframes orb-drift {
+    0%   { transform: translateX(-15%) scale(1);   opacity: 0.7; }
+    50%  { transform: translateX(0%)   scale(1.1); opacity: 1;   }
+    100% { transform: translateX(15%)  scale(1);   opacity: 0.7; }
+}
+
+/* ─── Floating particles ──────────────────────────────── */
+.footer-particle {
+    position: absolute;
+    bottom: -10px;
+    left: var(--x);
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #C4A265;
+    box-shadow: 0 0 6px rgba(196, 162, 101, 0.6);
+    opacity: 0;
+    animation: particle-float var(--duration) linear infinite;
+    animation-delay: var(--delay);
+}
+@keyframes particle-float {
+    0%   { transform: translateY(0)      scale(1);   opacity: 0;   }
+    10%  { opacity: 0.7; }
+    50%  { transform: translateY(-180px) scale(1.2); opacity: 0.4; }
+    90%  { opacity: 0;   }
+    100% { transform: translateY(-360px) scale(0.6); opacity: 0;   }
+}
+
+/* ─── Eyebrow (section label) ───────────────────────────
+   Uses text-xs (12px) — matches the navbar small-cap labels.
+   Square mark pulses slowly for life. */
 .footer-eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     color: rgba(196, 162, 101, 0.95);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.22em;
@@ -289,24 +364,29 @@ const linkColumns = computed(() => [
     background: #C4A265;
     transform: rotate(45deg);
     flex-shrink: 0;
+    animation: eyebrow-pulse 3s ease-in-out infinite;
+}
+@keyframes eyebrow-pulse {
+    0%, 100% { opacity: 0.6; transform: rotate(45deg) scale(1);    }
+    50%      { opacity: 1;   transform: rotate(45deg) scale(1.15); }
 }
 
-/* ─── Footer link with revealing underline ───────────────────
-   Subtle but precise micro-interaction. The underline expands
-   from the start edge to full text width on hover. Works in
-   both LTR and RTL because we anchor on the inline-start side.
-*/
+/* ─── Footer link with revealing underline + caret ───── */
 .footer-link {
     position: relative;
     display: inline-flex;
     align-items: center;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
-    line-height: 1.4;
-    transition: color 200ms ease;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 14px;
+    line-height: 1.5;
+    transition: color 200ms ease, transform 200ms ease;
     padding: 1px 0;
 }
-.footer-link:hover { color: rgba(255, 255, 255, 0.95); }
+.footer-link:hover {
+    color: rgba(255, 255, 255, 0.98);
+    transform: translateX(2px);
+}
+[dir="rtl"] .footer-link:hover { transform: translateX(-2px); }
 
 .footer-link-text {
     position: relative;
@@ -319,26 +399,114 @@ const linkColumns = computed(() => [
     width: 0;
     height: 1px;
     background: #C4A265;
-    transition: width 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .footer-link:hover .footer-link-text::after {
     width: 100%;
 }
 
-/* ─── Single, gentle stagger ─────────────────────────────── */
+/* Staggered link reveal */
+.footer-link-item {
+    animation: link-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--link-delay, 0ms);
+}
+@keyframes link-reveal {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ─── Newsletter field with focus glow ────────────────── */
+.footer-newsletter-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    transition: border-color 250ms ease;
+}
+.footer-newsletter-field::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #C4A265, transparent);
+    transform: scaleX(0);
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-newsletter-field:focus-within::after {
+    transform: scaleX(1);
+}
+
+.footer-arrow-btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(196, 162, 101, 0.12);
+    color: #C4A265;
+    transition: all 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-arrow-btn:hover {
+    background: #C4A265;
+    color: #06101C;
+    box-shadow: 0 0 0 4px rgba(196, 162, 101, 0.18);
+}
+.footer-arrow-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ─── Social glyphs with subtle tilt ─────────────────── */
+.footer-social {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-social:hover {
+    color: #ffffff;
+    background: rgba(196, 162, 101, 0.10);
+    border-color: rgba(196, 162, 101, 0.4);
+    transform: translateY(-2px) rotate(-3deg);
+}
+
+/* ─── Zone reveal stagger ─────────────────────────────── */
 .footer-fade {
-    animation: footer-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: footer-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--delay, 0ms);
 }
 @keyframes footer-fade-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0);     }
 }
 
-/* Honour reduce-motion */
+/* ─── Honour reduce-motion across the board ──────────── */
 @media (prefers-reduced-motion: reduce) {
-    .footer-fade { animation: none; }
-    .animate-ping { animation: none; }
-    .footer-link-text::after { transition: none; }
+    .footer-fade,
+    .footer-link-item,
+    .footer-particle,
+    .footer-orb,
+    .footer-eyebrow-mark,
+    .animate-ping {
+        animation: none !important;
+    }
+    .footer-link-text::after,
+    .footer-newsletter-field::after,
+    .footer-arrow-btn,
+    .footer-social,
+    .footer-logo {
+        transition: none !important;
+    }
 }
 </style>
