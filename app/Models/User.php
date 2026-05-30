@@ -77,6 +77,10 @@ class User extends Authenticatable
             // Outbound email visibility. Read-only — no edit/delete
             // surface. Limited to engineering / support roles.
             'emails.view' => 'عرض سجل البريد المُرسَل',
+            // Billing operations: dunning console + manual stage
+            // controls. Separate from users.manage so a finance ops
+            // account can do this without sysadmin privileges.
+            'billing.manage' => 'إدارة الفوترة والتحصيل',
         ];
     }
 

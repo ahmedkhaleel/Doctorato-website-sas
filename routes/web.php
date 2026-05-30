@@ -354,4 +354,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Outbound email observability — read-only, perm-gated.
     Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])
         ->name('email-logs.index')->middleware('admin.perm:emails.view');
+
+    // Dunning recovery console — ops can advance / reset / resolve
+    // failed-invoice dunning stages manually when the cron's pace
+    // doesnt match a live customer conversation.
+    Route::get('/dunning', [\App\Http\Controllers\Admin\DunningController::class, 'index'])
+        ->name('dunning.index')->middleware('admin.perm:billing.manage');
+    Route::post('/dunning/{invoice}/advance', [\App\Http\Controllers\Admin\DunningController::class, 'advance'])
+        ->name('dunning.advance')->middleware('admin.perm:billing.manage')->where('invoice', '[0-9]+');
+    Route::post('/dunning/{invoice}/reset', [\App\Http\Controllers\Admin\DunningController::class, 'reset'])
+        ->name('dunning.reset')->middleware('admin.perm:billing.manage')->where('invoice', '[0-9]+');
+    Route::post('/dunning/{invoice}/resolve', [\App\Http\Controllers\Admin\DunningController::class, 'resolve'])
+        ->name('dunning.resolve')->middleware('admin.perm:billing.manage')->where('invoice', '[0-9]+');
 });
