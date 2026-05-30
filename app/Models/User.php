@@ -74,6 +74,9 @@ class User extends Authenticatable
             // engineering — viewers should not be able to re-fire a
             // payment webhook against a customer subscription.
             'webhooks.manage' => 'إدارة أحداث Webhooks',
+            // Outbound email visibility. Read-only — no edit/delete
+            // surface. Limited to engineering / support roles.
+            'emails.view' => 'عرض سجل البريد المُرسَل',
         ];
     }
 

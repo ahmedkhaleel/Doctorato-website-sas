@@ -54,6 +54,7 @@ class PruneRetention extends Command
         $totals['sessions'] = $this->pruneSessions($dry);
         $totals['customer_login_tokens'] = $this->pruneLoginTokens($dry);
         $totals['webhook_events'] = $this->pruneWebhookEvents($dry);
+        $totals['email_logs'] = $this->pruneEmailLogs($dry);
 
         $verb = $dry ? 'would prune' : 'pruned';
         foreach ($totals as $table => $count) {
@@ -124,6 +125,22 @@ class PruneRetention extends Command
 
         $cutoff = now()->subDays(180);
         $query = DB::table('webhook_events')->where('received_at', '<', $cutoff);
+
+        return $dry ? $query->count() : $query->delete();
+    }
+
+    /**
+     * Email logs older than 90 days. We keep less than activity_logs
+     * because email reachability questions are typically asked
+     * within a few weeks, and the hashed-recipient column is enough
+     * privacy weight to want it gone sooner.
+     */
+    protected function pruneEmailLogs(bool $dry): int
+    {
+        if (!Schema::hasTable('email_logs')) return 0;
+
+        $cutoff = now()->subDays(90);
+        $query = DB::table('email_logs')->where('queued_at', '<', $cutoff);
 
         return $dry ? $query->count() : $query->delete();
     }

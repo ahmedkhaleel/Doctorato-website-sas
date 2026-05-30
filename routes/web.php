@@ -350,4 +350,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('webhooks.show')->middleware('admin.perm:webhooks.manage')->where('event', '[0-9]+');
     Route::post('/webhooks/{event}/replay', [\App\Http\Controllers\Admin\WebhookController::class, 'replay'])
         ->name('webhooks.replay')->middleware('admin.perm:webhooks.manage')->where('event', '[0-9]+');
+
+    // Outbound email observability — read-only, perm-gated.
+    Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])
+        ->name('email-logs.index')->middleware('admin.perm:emails.view');
 });

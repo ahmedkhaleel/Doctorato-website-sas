@@ -10,6 +10,9 @@ use App\Models\Testimonial;
 use App\Observers\PublicContentObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +34,12 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->registerRateLimiters();
+
+        // Tap the Mail facade events so every outbound message hits
+        // EmailLog. Method-style listener registration so the
+        // listener stays a thin POPO with no boot dependency.
+        Event::listen(MessageSending::class, [\App\Listeners\LogEmailDelivery::class, 'handleSending']);
+        Event::listen(MessageSent::class, [\App\Listeners\LogEmailDelivery::class, 'handleSent']);
     }
 
     /**
