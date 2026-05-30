@@ -81,6 +81,10 @@ class User extends Authenticatable
             // controls. Separate from users.manage so a finance ops
             // account can do this without sysadmin privileges.
             'billing.manage' => 'إدارة الفوترة والتحصيل',
+            // Owner-level KPIs (MRR/ARR/churn). Separate from
+            // billing.manage so a part-time finance ops doesnt see
+            // headline revenue by default.
+            'metrics.view' => 'عرض إحصائيات الاشتراكات',
         ];
     }
 

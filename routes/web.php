@@ -366,4 +366,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('dunning.reset')->middleware('admin.perm:billing.manage')->where('invoice', '[0-9]+');
     Route::post('/dunning/{invoice}/resolve', [\App\Http\Controllers\Admin\DunningController::class, 'resolve'])
         ->name('dunning.resolve')->middleware('admin.perm:billing.manage')->where('invoice', '[0-9]+');
+
+    // Owner KPI dashboard. Cached 15min server-side; the explicit
+    // refresh button busts the cache on demand.
+    Route::get('/metrics', [\App\Http\Controllers\Admin\MetricsController::class, 'index'])
+        ->name('metrics.index')->middleware('admin.perm:metrics.view');
+    Route::post('/metrics/refresh', [\App\Http\Controllers\Admin\MetricsController::class, 'refresh'])
+        ->name('metrics.refresh')->middleware('admin.perm:metrics.view');
 });

@@ -76,6 +76,7 @@ const menuGroups = computed(() => [
         // Groups with a single top-level item are rendered flat (no accordion)
         items: [
             { label: 'لوحة التحكم', icon: 'dashboard', route: '/admin', perm: 'dashboard.view' },
+            { label: 'إحصائيات الاشتراكات', icon: 'chart', route: '/admin/metrics', perm: 'metrics.view' },
         ],
     },
     {
