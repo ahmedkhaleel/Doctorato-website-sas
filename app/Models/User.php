@@ -70,6 +70,10 @@ class User extends Authenticatable
             // GDPR/PDPL data-subject rights — restricted to DPO/owner.
             // Grants read + export + irreversible erase.
             'gdpr.manage' => 'إدارة طلبات الخصوصية (GDPR)',
+            // Webhook event inspector + replay. Restricted to billing /
+            // engineering — viewers should not be able to re-fire a
+            // payment webhook against a customer subscription.
+            'webhooks.manage' => 'إدارة أحداث Webhooks',
         ];
     }
 

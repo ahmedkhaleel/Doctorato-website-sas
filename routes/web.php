@@ -336,4 +336,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         ->name('gdpr.export')->middleware('admin.perm:gdpr.manage');
     Route::post('/gdpr/erase', [\App\Http\Controllers\Admin\GdprController::class, 'erase'])
         ->name('gdpr.erase')->middleware('admin.perm:gdpr.manage');
+
+    // Webhook event inspector + replay. Read gated on the
+    // permission too — payloads contain transaction-level data
+    // that shouldn't leak to a content-only viewer role.
+    Route::get('/webhooks', [\App\Http\Controllers\Admin\WebhookController::class, 'index'])
+        ->name('webhooks.index')->middleware('admin.perm:webhooks.manage');
+    Route::get('/webhooks/{event}', [\App\Http\Controllers\Admin\WebhookController::class, 'show'])
+        ->name('webhooks.show')->middleware('admin.perm:webhooks.manage')->where('event', '[0-9]+');
+    Route::post('/webhooks/{event}/replay', [\App\Http\Controllers\Admin\WebhookController::class, 'replay'])
+        ->name('webhooks.replay')->middleware('admin.perm:webhooks.manage')->where('event', '[0-9]+');
 });
