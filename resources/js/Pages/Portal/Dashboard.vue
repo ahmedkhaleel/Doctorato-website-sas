@@ -50,7 +50,7 @@ function statusBadgeClass(status) {
     switch (status) {
         case 'active':    return 'bg-emerald-100 text-emerald-800';
         case 'past_due':  return 'bg-amber-100 text-amber-800';
-        case 'canceled':  return 'bg-gray-100 text-gray-600';
+        case 'cancelled':  return 'bg-gray-100 text-gray-600';
         case 'paid':      return 'bg-emerald-100 text-emerald-800';
         case 'failed':    return 'bg-rose-100 text-rose-800';
         case 'pending':   return 'bg-blue-100 text-blue-800';
@@ -235,7 +235,7 @@ function formatDate(iso) {
                             </div>
                             <div>
                                 <dt class="text-xs text-[#8B9BAC] uppercase tracking-wider mb-1">
-                                    {{ sub.status === 'canceled' ? 'Access ends' : (sub.is_paused ? 'Resumes' : 'Renews') }}
+                                    {{ sub.status === 'cancelled' ? 'Access ends' : (sub.is_paused ? 'Resumes' : 'Renews') }}
                                 </dt>
                                 <dd class="text-[#1C2833] font-medium">
                                     {{ formatDate(sub.is_paused ? sub.paused_until : (sub.next_billing_date || sub.ends_at)) }}
@@ -320,7 +320,7 @@ function formatDate(iso) {
                         </div>
 
                         <!-- Resume UI — appears for soft-canceled subs still in grace period -->
-                        <div v-else-if="sub.status === 'canceled' && sub.ends_at && new Date(sub.ends_at) > new Date()" class="mt-6 pt-6 border-t border-gray-100">
+                        <div v-else-if="sub.status === 'cancelled' && sub.ends_at && new Date(sub.ends_at) > new Date()" class="mt-6 pt-6 border-t border-gray-100">
                             <p class="text-sm text-[#5A6C7D] mb-3">
                                 Your subscription is scheduled to end on <strong>{{ formatDate(sub.ends_at) }}</strong>. Changed your mind?
                             </p>

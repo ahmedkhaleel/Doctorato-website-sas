@@ -63,11 +63,22 @@ class ExceptionNotifierTest extends TestCase
         // Same signature (class + file + line) hit five times — only
         // the first should mail; the rest should silently increment
         // the recurrence counter.
+        // Same call site = same signature = same throttle bucket.
+        // We assert via the cache counter rather than Mail::assertSentCount
+        // because MailFake::raw() is a no-op in Laravel's testing layer
+        // (Mail::raw bypasses the tracked mailables collection entirely).
+        // The cache counter is the more honest signal that the dedup
+        // logic is doing its job.
+        $exception = new \RuntimeException('Database deadlocked');
         for ($i = 0; $i < 5; $i++) {
-            $notifier->notify(new \RuntimeException('Database deadlocked'));
+            $notifier->notify($exception);
         }
 
-        Mail::assertSentCount(1);
+        $sig = substr(sha1('RuntimeException|' . $exception->getFile() . '|' . $exception->getLine()), 0, 12);
+        $this->assertTrue(\Illuminate\Support\Facades\Cache::has("exception_notify:{$sig}"),
+            'First notify() must stamp the throttle key.');
+        $this->assertSame(5, (int) \Illuminate\Support\Facades\Cache::get("exception_count:{$sig}"),
+            'All 5 hits must increment the counter; only the first mails.');
     }
 
     public function test_local_environment_does_not_send_at_all(): void

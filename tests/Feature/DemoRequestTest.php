@@ -38,7 +38,7 @@ class DemoRequestTest extends TestCase
     {
         Mail::fake();
 
-        $response = $this->from('/demo')->post('/demo', $this->validPayload);
+        $response = $this->from('/demo')->post('/demo-request', $this->validPayload);
 
         $response->assertRedirect('/demo');
         $response->assertSessionHas('success', true);
@@ -54,7 +54,7 @@ class DemoRequestTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/demo', $this->validPayload);
+        $this->post('/demo-request', $this->validPayload);
 
         // interested_modules is a JSON column; cast must round-trip
         // an array — a regression here would break the admin's view.
@@ -68,7 +68,7 @@ class DemoRequestTest extends TestCase
     {
         Mail::fake();
 
-        $this->post('/demo', $this->validPayload);
+        $this->post('/demo-request', $this->validPayload);
 
         Mail::assertQueued(DemoCustomerConfirmation::class, fn ($m) => $m->hasTo('doc@example.com'));
         Mail::assertQueued(DemoAdminNotification::class, fn ($m) => $m->hasTo('info@doctorato.com'));
@@ -78,7 +78,7 @@ class DemoRequestTest extends TestCase
     {
         Mail::fake();
 
-        $response = $this->from('/demo')->post('/demo', [
+        $response = $this->from('/demo')->post('/demo-request', [
             'clinic_name' => '',
             'full_name' => '',
             'email' => 'invalid',
@@ -99,7 +99,7 @@ class DemoRequestTest extends TestCase
             'phone' => '+971 (50) 123-4567 ext. 9999',
         ]);
 
-        $response = $this->post('/demo', $payload);
+        $response = $this->post('/demo-request', $payload);
 
         $response->assertSessionHas('success', true);
     }
@@ -112,7 +112,7 @@ class DemoRequestTest extends TestCase
             'hp_trap' => 'http://crawler.example/',
         ]);
 
-        $response = $this->from('/demo')->post('/demo', $payload);
+        $response = $this->from('/demo')->post('/demo-request', $payload);
 
         $response->assertSessionHasErrors(['clinic_name']);
         $this->assertDatabaseCount('demo_requests', 0);

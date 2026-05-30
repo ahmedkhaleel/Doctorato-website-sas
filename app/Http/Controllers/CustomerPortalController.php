@@ -224,8 +224,8 @@ class CustomerPortalController extends Controller
         // expires naturally. Avoids the surprise of paying for a
         // month and losing access mid-cycle.
         $sub->update([
-            'status' => 'canceled',
-            'canceled_at' => now(),
+            'status' => 'cancelled',
+            'cancelled_at' => now(),
         ]);
 
         Log::info('portal.subscription_canceled', [
@@ -253,14 +253,14 @@ class CustomerPortalController extends Controller
         if (!$sub) {
             abort(404);
         }
-        if ($sub->status !== 'canceled') {
+        if ($sub->status !== 'cancelled') {
             return back()->withErrors(['subscription' => 'هذا الاشتراك ليس ملغى.']);
         }
         if ($sub->ends_at && $sub->ends_at->isPast()) {
             return back()->withErrors(['subscription' => 'انتهت فترة السماح. اشترك من جديد عبر صفحة الأسعار.']);
         }
 
-        $sub->update(['status' => 'active', 'canceled_at' => null]);
+        $sub->update(['status' => 'active', 'cancelled_at' => null]);
 
         Log::info('portal.subscription_resumed', [
             'subscription_id' => $sub->id,

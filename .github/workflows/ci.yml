@@ -85,13 +85,11 @@ jobs:
           SESSION_DRIVER: array
           QUEUE_CONNECTION: sync
           MAIL_MAILER: array
-        # We intentionally filter to the tests we know are green.
-        # The legacy factory-based tests still fail (pre-existing
-        # debt tracked in TODO.md) — running them in CI would mask
-        # real regressions in the green suite.
-        run: |
-          php artisan test \
-            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest|SubscriptionPauseTest|WebhookRetentionTest|EmailLogTest|EmailFailureBridgeTest|DunningAdminTest|SubscriptionMetricsTest|PwaPortalTest|MetricSnapshotTest|SecurityBatchTest|ComplianceDocsTest"
+        # Phase 32 recovered all 11 missing factories and fixed two
+        # route/spelling mismatches (the cancelled/canceled bug in
+        # CustomerPortalController was a real prod bug). Whole suite
+        # now runs in CI.
+        run: php artisan test
 
   lint:
     name: PHP syntax check

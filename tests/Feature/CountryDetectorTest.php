@@ -34,14 +34,14 @@ class CountryDetectorTest extends TestCase
     public function test_explicit_session_choice_wins_over_everything(): void
     {
         $request = Request::create('/');
-        $this->withSession([
-            'active_country' => 'SA',
-            'active_country_source' => 'explicit',
-        ]);
+        $request->setLaravelSession(app('session.store'));
+        $request->session()->put('active_country', 'SA');
+        $request->session()->put('active_country_source', 'explicit');
         // Pretend Cloudflare also has an opinion — should be ignored.
         $request->headers->set('CF-IPCountry', 'AE');
 
-        $resolved = app(CountryDetector::class)->resolve($this->app['request']->merge(['CF-IPCountry' => 'AE']));
+        $resolved = app(CountryDetector::class)->resolve($request);
+        $this->assertSame('SA', $resolved);
 
         // We can't easily inject CF headers through the testing kit's
         // session here, so test via the service directly with a real

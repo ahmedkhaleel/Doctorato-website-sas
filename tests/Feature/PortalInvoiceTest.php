@@ -25,7 +25,7 @@ class PortalInvoiceTest extends TestCase
     {
         $customer = DemoRequest::factory()->create();
         $plan = PricingPlan::factory()->create(['name_en' => 'Pro']);
-        $sub = Subscription::factory()->create(['demo_request_id' => $customer->id, 'plan_id' => $plan->id]);
+        $sub = Subscription::factory()->create(['demo_request_id' => $customer->id, 'pricing_plan_id' => $plan->id]);
         $invoice = Invoice::factory()->create([
             'subscription_id' => $sub->id,
             'number' => 'INV-2026-0001',

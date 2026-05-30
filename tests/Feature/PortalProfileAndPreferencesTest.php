@@ -111,8 +111,8 @@ class PortalProfileAndPreferencesTest extends TestCase
         $customer = $this->signedInCustomer();
         $sub = Subscription::factory()->create([
             'demo_request_id' => $customer->id,
-            'status' => 'canceled',
-            'canceled_at' => now()->subDay(),
+            'status' => 'cancelled',
+            'cancelled_at' => now()->subDay(),
             'ends_at' => now()->addDays(10),
         ]);
 
@@ -120,7 +120,7 @@ class PortalProfileAndPreferencesTest extends TestCase
 
         $sub->refresh();
         $this->assertSame('active', $sub->status);
-        $this->assertNull($sub->canceled_at);
+        $this->assertNull($sub->cancelled_at);
     }
 
     public function test_resume_is_rejected_after_grace_period(): void
@@ -128,15 +128,15 @@ class PortalProfileAndPreferencesTest extends TestCase
         $customer = $this->signedInCustomer();
         $sub = Subscription::factory()->create([
             'demo_request_id' => $customer->id,
-            'status' => 'canceled',
-            'canceled_at' => now()->subMonth(),
+            'status' => 'cancelled',
+            'cancelled_at' => now()->subMonth(),
             'ends_at' => now()->subDay(),  // already past
         ]);
 
         $response = $this->post("/portal/subscriptions/{$sub->id}/resume");
 
         $response->assertSessionHasErrors(['subscription']);
-        $this->assertSame('canceled', $sub->fresh()->status);
+        $this->assertSame('cancelled', $sub->fresh()->status);
     }
 
     public function test_resume_only_works_on_canceled_subs(): void
@@ -157,7 +157,7 @@ class PortalProfileAndPreferencesTest extends TestCase
         $other = DemoRequest::factory()->create();
         $otherSub = Subscription::factory()->create([
             'demo_request_id' => $other->id,
-            'status' => 'canceled',
+            'status' => 'cancelled',
             'ends_at' => now()->addDays(10),
         ]);
 
