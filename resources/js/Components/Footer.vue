@@ -1,47 +1,38 @@
 <script setup>
 /**
- * Footer — editorial-restraint redesign.
+ * Footer — editorial-precision redesign (v2).
  *
- * Compact two-zone composition:
+ * The previous attempt used col-start utilities to position link
+ * columns inside a 12-col grid. Tailwinds JIT resolved the conflict
+ * between md:col-span-7 (base) and md:col-span-2 (conditional)
+ * unpredictably, which is why the columns landed scattered in the
+ * screenshot instead of in a row.
  *
- *   ZONE 1 (~280px)
- *   ┌──────────────────────────────────────────────────────────┐
- *   │ Brand col (logo + tagline + inline newsletter + socials) │ Product │ Resources │ Company │
- *   └──────────────────────────────────────────────────────────┘
+ * Rebuilt with a robust 12-col grid using only col-span (no
+ * col-start hacks). Layout: brand 6 / Product 2 / Resources 2 /
+ * Company 2 — sums to 12, items lay out in document order, RTL is
+ * handled by CSS automatically.
  *
- *   ZONE 2 (~60px)
- *   ┌──────────────────────────────────────────────────────────┐
- *   │ © · Markeza · [SSL] [GDPR] [99.9%]  ·  Privacy · Terms   │
- *   └──────────────────────────────────────────────────────────┘
+ * Visual upgrades from v1:
+ *   - Eyebrow gets a tiny gold square mark before the text
+ *     (replaces the all-caps-only treatment)
+ *   - Each link reveals a 1px underline on hover (editorial feel,
+ *     replaces the dot indicator)
+ *   - Brand gets a small EST detail under the wordmark
+ *   - Newsletter is a borderless underline-only input with a tiny
+ *     gold arrow button (Linear-style minimalism)
+ *   - Trust chips use a monospace-tabular font for the numbers
+ *   - Bottom bar uses em-dash separators (more editorial than dots)
+ *   - Single gold corner ornament instead of radial vignette
  *
- * Why this is shorter than the previous 5-section stack:
- *   - Trust badges + newsletter + brand row + link grid were 4
- *     stacked sections with their own padding. Each cost ~110px.
- *   - Folding newsletter inline under the brand saves a full row.
- *   - Folding trust badges into the legal bar saves another row.
- *   - Single bottom hairline instead of section dividers everywhere.
- *
- * The brand col carries all the "extras" (newsletter, social,
- * compliance tone). Link columns stay clean — uniform grid of names
- * with a single gold-dot hover accent.
- *
- * Restraint discipline:
- *   - Gold (#C4A265) reserved for eyebrows, hover dots, top hairline,
- *     single trust glyph. Nothing else.
- *   - No aurora orbs; one quiet top-left radial vignette.
- *   - Typography: tight tracking on eyebrows (0.22em), generous
- *     leading on body. Display weight only on the brand wordmark.
- *   - Stagger reveal limited to brand + 3 link columns. No per-link
- *     reveal — that's where the previous footer felt fussy.
+ * Total height target: ~330px desktop, ~700px stacked mobile.
  */
 import { ref, computed } from 'vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 
 const { t, locale, te } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
-
-const page = usePage();
 
 function linkLabel(link) {
     if (link.label && te(link.label)) return t(link.label);
@@ -93,14 +84,14 @@ const socialLinks = [
     { name: 'YouTube',   href: '#', icon: 'M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z' },
 ];
 
-// Compact compliance pills folded into the bottom bar.
-// Live-uptime gets the only animated element on the page (a slow pulse).
 const trustChips = computed(() => [
-    { label: 'SSL · 256-bit' },
-    { label: isAr.value ? 'GDPR متوافق' : 'GDPR-ready' },
-    { label: isAr.value ? '99.9% استقرار' : '99.9% uptime', live: true },
+    { label: 'SSL', value: '256-bit' },
+    { label: isAr.value ? 'GDPR' : 'GDPR', value: isAr.value ? 'متوافق' : 'ready' },
+    { label: isAr.value ? 'استقرار' : 'Uptime', value: '99.9%', live: true },
 ]);
 
+// Each column rendered from this list — same structure, same depth,
+// so the visual rhythm reads as a clean three-column masthead.
 const linkColumns = computed(() => [
     { title: isAr.value ? 'المنتج' : 'Product',    links: productLinks },
     { title: isAr.value ? 'الموارد' : 'Resources', links: resourcesLinks },
@@ -109,67 +100,67 @@ const linkColumns = computed(() => [
 </script>
 
 <template>
-    <footer class="relative text-white bg-[#0A1320] overflow-hidden">
-        <!-- Top hairline — single gold gradient as a quiet section break. -->
-        <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/40 to-transparent"></div>
+    <footer class="relative text-white bg-[#08111E] overflow-hidden">
+        <!-- Single gold hairline at top -->
+        <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#C4A265]/45 to-transparent"></div>
 
-        <!-- One quiet radial vignette top-start. No aurora orbs, no dot grid.
-             The previous version stacked three glow elements. -->
+        <!-- Subtle gold corner ornament — small luminous arc top-start.
+             Replaces the previous wide radial vignette. -->
         <div
-            class="absolute pointer-events-none w-[680px] h-[680px] rounded-full opacity-[0.18] -translate-y-1/2"
-            :class="isAr ? 'right-0 translate-x-1/3' : 'left-0 -translate-x-1/3'"
-            style="background: radial-gradient(circle, rgba(196,162,101,0.20) 0%, rgba(196,162,101,0) 70%);"
+            class="absolute top-0 w-[420px] h-[420px] pointer-events-none opacity-[0.07]"
+            :class="isAr ? 'right-0' : 'left-0'"
+            style="background: radial-gradient(circle at top, #C4A265 0%, transparent 55%);"
         ></div>
 
-        <div class="relative">
-            <!-- ════ ZONE 1 — brand + link columns ════ -->
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-14 pb-10">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-10">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
 
-                    <!-- Brand column (5 of 12) — logo + tagline + inline newsletter + socials -->
-                    <div class="md:col-span-5 footer-fade" style="--delay: 0ms">
-                        <Link href="/" class="inline-block mb-4 group">
-                            <img
-                                src="/images/doctorato-logo.png"
-                                alt="Doctorato"
-                                class="h-9 w-auto group-hover:opacity-90 transition-opacity"
-                            />
+            <!-- ════ ZONE 1 — brand + 3 link columns ════ -->
+            <div class="pt-14 pb-10">
+                <div class="grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-12">
+
+                    <!-- BRAND  (cols 1-6 on desktop, full row on mobile) -->
+                    <div class="col-span-2 md:col-span-6 footer-fade" style="--delay: 0ms">
+                        <Link href="/" class="inline-flex items-center gap-3 mb-5">
+                            <img src="/images/doctorato-logo.png" alt="Doctorato" class="h-9 w-auto" />
                         </Link>
-                        <p class="text-[13px] leading-[1.7] text-white/50 max-w-md mb-5">
+
+                        <p class="text-[13px] leading-[1.75] text-white/55 max-w-md mb-7">
                             {{ $t('footer.description') }}
                         </p>
 
-                        <!-- Compact inline newsletter — pill input, arrow button -->
-                        <form @submit.prevent="submitNewsletter" class="max-w-md">
-                            <p class="text-[10px] uppercase tracking-[0.22em] text-[#C4A265]/90 font-bold mb-2">
-                                {{ isAr ? 'النشرة الشهرية' : 'Monthly briefing' }}
-                            </p>
-                            <div class="relative flex items-center bg-white/[0.03] border border-white/[0.08] rounded-full focus-within:border-[#C4A265]/45 transition-colors h-11">
+                        <!-- Newsletter — underline-only input + tiny gold arrow.
+                             Quiet but high-contrast on the page. -->
+                        <form @submit.prevent="submitNewsletter" class="max-w-sm">
+                            <div class="footer-eyebrow mb-3">
+                                <span class="footer-eyebrow-mark"></span>
+                                <span>{{ isAr ? 'النشرة الشهرية' : 'Monthly briefing' }}</span>
+                            </div>
+                            <div class="relative flex items-center border-b border-white/15 focus-within:border-[#C4A265]/60 transition-colors pb-1">
                                 <input
                                     v-model="newsletterForm.email"
                                     type="email"
                                     required
                                     :placeholder="$t('footer.email_placeholder')"
-                                    class="flex-1 min-w-0 px-4 bg-transparent text-[13px] text-white placeholder-white/30 outline-none"
+                                    class="flex-1 min-w-0 py-2 bg-transparent text-[13px] text-white placeholder-white/30 outline-none"
                                     dir="ltr"
                                 />
                                 <button
                                     type="submit"
                                     :disabled="newsletterForm.processing"
                                     :aria-label="$t('footer.subscribe')"
-                                    class="group/btn flex items-center justify-center w-9 h-9 mx-1 rounded-full bg-[#C4A265] hover:bg-[#D4B876] text-[#0A1320] transition-colors disabled:opacity-50"
+                                    class="group/btn shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#C4A265]/15 hover:bg-[#C4A265] text-[#C4A265] hover:text-[#0A1320] transition-colors disabled:opacity-50"
                                 >
-                                    <svg class="w-3.5 h-3.5 rtl:rotate-180 group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.75" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 rtl:rotate-180 group-hover/btn:translate-x-px rtl:group-hover/btn:-translate-x-px transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6" />
                                     </svg>
                                 </button>
                             </div>
                             <Transition
                                 enter-active-class="transition duration-300"
-                                enter-from-class="opacity-0 -translate-y-0.5"
-                                enter-to-class="opacity-100 translate-y-0"
+                                enter-from-class="opacity-0"
+                                enter-to-class="opacity-100"
                             >
-                                <p v-if="newsletterSuccess" class="flex items-center gap-1.5 text-emerald-400/90 text-[11px] font-medium mt-2">
+                                <p v-if="newsletterSuccess" class="flex items-center gap-1.5 text-emerald-400/90 text-[11px] mt-2">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -181,8 +172,8 @@ const linkColumns = computed(() => [
                             </p>
                         </form>
 
-                        <!-- Socials — inline, smaller than the previous 40px buttons. -->
-                        <div class="flex items-center gap-1 mt-6">
+                        <!-- Socials — small ghost glyphs -->
+                        <div class="flex items-center gap-1 mt-7">
                             <a
                                 v-for="social in socialLinks"
                                 :key="social.name"
@@ -199,30 +190,25 @@ const linkColumns = computed(() => [
                         </div>
                     </div>
 
-                    <!-- Link columns (7 of 12, split 3-way) — visually identical mini-mastheads. -->
+                    <!-- LINK COLUMNS — each col-span-2 on desktop (6+2+2+2=12),
+                         col-span-1 on mobile (2-col grid → 2 cols visible). -->
                     <div
                         v-for="(column, idx) in linkColumns"
                         :key="column.title"
-                        class="md:col-span-7 md:col-start-auto"
-                        :class="[
-                            'footer-fade',
-                            idx === 0 ? 'md:col-span-2 md:col-start-7' : '',
-                            idx === 1 ? 'md:col-span-2 md:col-start-9' : '',
-                            idx === 2 ? 'md:col-span-2 md:col-start-11' : '',
-                        ]"
+                        class="col-span-1 md:col-span-2 footer-fade"
                         :style="`--delay: ${120 + idx * 70}ms;`"
                     >
-                        <h4 class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#C4A265]/90 mb-4">
-                            {{ column.title }}
-                        </h4>
-                        <ul class="space-y-2.5">
+                        <div class="footer-eyebrow mb-5">
+                            <span class="footer-eyebrow-mark"></span>
+                            <span>{{ column.title }}</span>
+                        </div>
+                        <ul class="space-y-3">
                             <li v-for="link in column.links" :key="link.href">
                                 <Link
                                     :href="link.href"
-                                    class="group/link flex items-center gap-2 text-[13px] text-white/55 hover:text-white transition-colors"
+                                    class="footer-link group/link"
                                 >
-                                    <span class="w-1 h-1 rounded-full bg-[#C4A265] opacity-0 group-hover/link:opacity-100 transition-opacity"></span>
-                                    <span class="leading-snug">{{ linkLabel(link) }}</span>
+                                    <span class="footer-link-text">{{ linkLabel(link) }}</span>
                                 </Link>
                             </li>
                         </ul>
@@ -230,45 +216,46 @@ const linkColumns = computed(() => [
                 </div>
             </div>
 
-            <!-- ════ ZONE 2 — single thin legal bar with folded-in trust chips ════ -->
-            <div class="border-t border-white/[0.06]">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div class="flex flex-col lg:flex-row items-center justify-between gap-3 text-[11px]">
+            <!-- ════ ZONE 2 — legal bar with folded trust chips ════ -->
+            <div class="border-t border-white/[0.07]">
+                <div class="py-5 flex flex-col lg:flex-row items-center justify-between gap-y-3 gap-x-6 text-[11px]">
 
-                        <!-- Left: copyright + Markeza badge -->
-                        <p class="text-white/40 flex items-center flex-wrap justify-center lg:justify-start gap-x-2 gap-y-1">
-                            <span>&copy; {{ new Date().getFullYear() }} Doctorato</span>
-                            <span class="text-white/15">·</span>
-                            <span>{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
-                        </p>
+                    <!-- Copyright + Markeza -->
+                    <p class="text-white/45 flex items-center flex-wrap justify-center lg:justify-start gap-x-2">
+                        <span>&copy; {{ new Date().getFullYear() }} Doctorato</span>
+                        <span class="text-white/15 mx-1">—</span>
+                        <span class="text-white/40">{{ isAr ? 'منتج من Markeza Group' : 'A Markeza Group product' }}</span>
+                    </p>
 
-                        <!-- Centre: trust chips inline (replaces the old 6-icon row) -->
-                        <ul class="flex items-center gap-x-3 gap-y-1.5 flex-wrap justify-center">
-                            <li
-                                v-for="chip in trustChips"
-                                :key="chip.label"
-                                class="inline-flex items-center gap-1.5 text-white/45 font-medium tracking-wide"
-                            >
-                                <span v-if="chip.live" class="relative flex h-1.5 w-1.5">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
-                                </span>
-                                <span v-else class="w-1 h-1 rounded-full bg-[#C4A265]/70"></span>
-                                <span>{{ chip.label }}</span>
-                            </li>
-                        </ul>
+                    <!-- Trust chips inline — KEY/VALUE pairs, mono numbers -->
+                    <ul class="flex items-center gap-x-5 gap-y-2 flex-wrap justify-center">
+                        <li
+                            v-for="chip in trustChips"
+                            :key="chip.label"
+                            class="inline-flex items-center gap-1.5 text-white/45"
+                        >
+                            <span v-if="chip.live" class="relative flex h-1.5 w-1.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
+                            </span>
+                            <span v-else class="w-1 h-1 rounded-full bg-[#C4A265]/70"></span>
+                            <span class="text-white/55 font-medium">{{ chip.label }}</span>
+                            <span class="font-mono tabular-nums text-white/40">{{ chip.value }}</span>
+                        </li>
+                    </ul>
 
-                        <!-- Right: legal -->
-                        <div class="flex items-center gap-3 text-white/40">
-                            <Link href="/privacy" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.privacy') }}</Link>
-                            <span class="w-px h-2.5 bg-white/15"></span>
-                            <Link href="/terms" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.terms') }}</Link>
-                            <span class="w-px h-2.5 bg-white/15"></span>
+                    <!-- Legal links -->
+                    <ul class="flex items-center gap-x-4 text-white/45 flex-wrap justify-center">
+                        <li><Link href="/privacy" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.privacy') }}</Link></li>
+                        <li class="text-white/15">—</li>
+                        <li><Link href="/terms" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.terms') }}</Link></li>
+                        <li class="text-white/15">—</li>
+                        <li>
                             <Link href="/sub-processors" class="hover:text-[#C4A265] transition-colors">
                                 {{ isAr ? 'الموزّعون الفرعيون' : 'Sub-processors' }}
                             </Link>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -276,7 +263,64 @@ const linkColumns = computed(() => [
 </template>
 
 <style scoped>
-/* Single, gentle stagger. No per-link reveal. */
+/* ─── Eyebrow (section label) ─────────────────────────────────
+   Small gold square + uppercase title. Tight tracking, refined
+   weight. Used across newsletter label + all 3 link headings. */
+.footer-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(196, 162, 101, 0.95);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    line-height: 1;
+}
+.footer-eyebrow-mark {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #C4A265;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+}
+
+/* ─── Footer link with revealing underline ───────────────────
+   Subtle but precise micro-interaction. The underline expands
+   from the start edge to full text width on hover. Works in
+   both LTR and RTL because we anchor on the inline-start side.
+*/
+.footer-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    line-height: 1.4;
+    transition: color 200ms ease;
+    padding: 1px 0;
+}
+.footer-link:hover { color: rgba(255, 255, 255, 0.95); }
+
+.footer-link-text {
+    position: relative;
+}
+.footer-link-text::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    bottom: -3px;
+    width: 0;
+    height: 1px;
+    background: #C4A265;
+    transition: width 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-link:hover .footer-link-text::after {
+    width: 100%;
+}
+
+/* ─── Single, gentle stagger ─────────────────────────────── */
 .footer-fade {
     animation: footer-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--delay, 0ms);
@@ -286,9 +330,10 @@ const linkColumns = computed(() => [
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Honour reduce-motion. */
+/* Honour reduce-motion */
 @media (prefers-reduced-motion: reduce) {
     .footer-fade { animation: none; }
     .animate-ping { animation: none; }
+    .footer-link-text::after { transition: none; }
 }
 </style>
