@@ -79,6 +79,14 @@ Schedule::command('maint:prune')
 // :00 slot). A trial ending at 14:23 gets the heads-up by 15:11.
 Schedule::command('trials:check')->cron('11 * * * *');
 
+// Auto-resume paused subscriptions — daily at 02:23 (jittered).
+// Walks subs where paused_until <= now and clears both pause cols.
+// Idempotent.
+Schedule::command('subs:auto-resume')
+    ->dailyAt('02:23')
+    ->onOneServer()
+    ->withoutOverlapping();
+
 // Queue health check — every 15 minutes. If the worker is dead or
 // the queue is backing up, exits non-zero. Pair this with an
 // external monitor (HealthChecks.io, UptimeRobot) for paging.

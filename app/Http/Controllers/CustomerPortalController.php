@@ -322,6 +322,82 @@ class CustomerPortalController extends Controller
     }
 
     /**
+     * Pause an active subscription. The customer specifies a number
+     * of days (max 90) and the sub stops auto-renewing for that
+     * window. paused_at is the "we know about this" stamp; paused_
+     * until is the auto-resume target — when the daily resume cron
+     * sees `paused_until <= now`, it clears both columns.
+     *
+     * Why a max of 90 days: longer pauses are effectively churn and
+     * should go through cancel-then-resubscribe for tax/refund
+     * cleanness.
+     */
+    public function pauseSubscription(Request $request, int $subscriptionId)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $data = $request->validate([
+            'days' => 'required|integer|min:7|max:90',
+        ]);
+
+        $sub = Subscription::where('id', $subscriptionId)
+            ->where('demo_request_id', $customer->id)
+            ->first();
+        if (!$sub) {
+            abort(404);
+        }
+        if ($sub->status !== 'active') {
+            return back()->withErrors(['subscription' => 'الاشتراك يجب أن يكون نشطاً ليتم إيقافه مؤقتاً.']);
+        }
+        if ($sub->isPaused()) {
+            return back()->withErrors(['subscription' => 'الاشتراك متوقف مؤقتاً بالفعل.']);
+        }
+
+        $sub->update([
+            'paused_at' => now(),
+            'paused_until' => now()->addDays((int) $data['days']),
+        ]);
+
+        Log::info('portal.subscription_paused', [
+            'subscription_id' => $sub->id,
+            'customer_id' => $customer->id,
+            'days' => $data['days'],
+        ]);
+
+        return back()->with('portalMessage',
+            "تم إيقاف الاشتراك مؤقتاً حتى {$sub->paused_until->format('Y-m-d')}. سيُستأنف تلقائياً.");
+    }
+
+    /**
+     * Manually resume a paused sub before paused_until is reached.
+     * Clears both pause columns. The renewal cron picks up where it
+     * left off — no penalty for resuming early.
+     */
+    public function unpauseSubscription(Request $request, int $subscriptionId)
+    {
+        $customer = $request->attributes->get('customer');
+
+        $sub = Subscription::where('id', $subscriptionId)
+            ->where('demo_request_id', $customer->id)
+            ->first();
+        if (!$sub) {
+            abort(404);
+        }
+        if (!$sub->isPaused()) {
+            return back()->withErrors(['subscription' => 'الاشتراك ليس متوقفاً.']);
+        }
+
+        $sub->update(['paused_at' => null, 'paused_until' => null]);
+
+        Log::info('portal.subscription_unpaused', [
+            'subscription_id' => $sub->id,
+            'customer_id' => $customer->id,
+        ]);
+
+        return back()->with('portalMessage', 'تم استئناف اشتراكك.');
+    }
+
+    /**
      * Profile page — bare-bones edit form for the customer's own
      * details. Email is read-only because it's the magic-link
      * identifier; changing it would lock the customer out.

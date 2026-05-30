@@ -88,7 +88,7 @@ jobs:
         # real regressions in the green suite.
         run: |
           php artisan test \
-            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest"
+            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest|SubscriptionPauseTest"
 
   lint:
     name: PHP syntax check

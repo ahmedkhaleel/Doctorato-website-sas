@@ -34,6 +34,8 @@ class Subscription extends Model
         'referral_code',
         'referred_by_subscription_id',
         'referral_credit_cents',
+        'paused_at',
+        'paused_until',
     ];
 
     protected $casts = [
@@ -43,7 +45,15 @@ class Subscription extends Model
         'cancelled_at' => 'datetime',
         'metadata' => 'array',
         'referral_credit_cents' => 'integer',
+        'paused_at' => 'datetime',
+        'paused_until' => 'datetime',
     ];
+
+    /** True iff the subscription is currently paused. */
+    public function isPaused(): bool
+    {
+        return $this->paused_at !== null;
+    }
 
     public function referredBy(): BelongsTo
     {

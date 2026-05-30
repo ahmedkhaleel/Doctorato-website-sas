@@ -100,6 +100,12 @@ class RunDunning extends Command
             }
 
             // Stage 4: subscription past_due (Day 10-29)
+            // Paused subs are deliberately not auto-renewing, so a
+            // failed renewal during pause is meaningless — skip the
+            // past-due escalation entirely until pause clears.
+            if ($sub->paused_at !== null) {
+                continue;
+            }
             if ($stage < 4 && $daysSinceFailed >= 10 && $sub->status === 'active') {
                 $this->line("→ Subscription {$sub->id}: past_due ({$daysSinceFailed}d failed)");
                 if (!$dry) {
