@@ -244,17 +244,22 @@ const linkColumns = computed(() => [
                         </li>
                     </ul>
 
-                    <!-- Legal links -->
+                    <!-- Legal links — classic Privacy + Terms only.
+                         /sub-processors and /responsible-disclosure exist
+                         at their URLs (linked from DPA + security.txt
+                         respectively) but DON'T belong in the public
+                         footer:
+                           - Sub-processors leaks infra detail to
+                             competitors and confuses non-technical
+                             buyers (Stripe / Linear / Notion all keep
+                             this behind customer-portal or DPA refs).
+                           - Responsible-disclosure is read by security
+                             scanners + researchers via security.txt;
+                             they don't need a footer hint. -->
                     <ul class="flex items-center gap-x-4 text-white/45 flex-wrap justify-center">
                         <li><Link href="/privacy" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.privacy') }}</Link></li>
                         <li class="text-white/15">—</li>
                         <li><Link href="/terms" class="hover:text-[#C4A265] transition-colors">{{ $t('footer.terms') }}</Link></li>
-                        <li class="text-white/15">—</li>
-                        <li>
-                            <Link href="/sub-processors" class="hover:text-[#C4A265] transition-colors">
-                                {{ isAr ? 'الموزّعون الفرعيون' : 'Sub-processors' }}
-                            </Link>
-                        </li>
                     </ul>
                 </div>
             </div>
