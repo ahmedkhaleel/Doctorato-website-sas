@@ -18,6 +18,7 @@ class SitemapController extends Controller
         ['path' => '/pediatrics', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/telemedicine', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/obstetrics', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/add-ons', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/solutions', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/technology', 'priority' => '0.8', 'freq' => 'monthly'],
         ['path' => '/reports', 'priority' => '0.8', 'freq' => 'monthly'],

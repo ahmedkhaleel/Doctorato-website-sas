@@ -420,6 +420,76 @@ const pricingJsonLd = computed(() => ({
             </div>
         </section>
 
+        <!-- Payment Options — explains annual upfront vs 3-instalments
+             so the visitor sees the cash-flow flexibility BEFORE the
+             FAQ section. Light cream backdrop for a clean break from
+             the plan grid above. -->
+        <section class="py-16 lg:py-20 bg-[#FBFAF6]">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="text-center mb-10">
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#C4A265] mb-2">
+                        {{ locale === 'ar' ? 'خيارات الدفع' : 'Payment options' }}
+                    </p>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-[#1C2833]">
+                        {{ locale === 'ar' ? 'ادفع بالطريقة التي تناسبك' : 'Pay the way that fits' }}
+                    </h2>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-5">
+                    <!-- Monthly -->
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-[#1C2833] mb-1">{{ locale === 'ar' ? 'شهري' : 'Monthly' }}</h3>
+                        <p class="text-xs text-[#5A6C7D] leading-relaxed">
+                            {{ locale === 'ar' ? 'مرونة كاملة — ألغِ في أي وقت بدون التزام. مناسب للعيادات التي تبدأ رحلتها الرقمية.' : 'Full flexibility — cancel anytime, no commitment. Ideal for clinics starting digital.' }}
+                        </p>
+                    </div>
+
+                    <!-- Annual upfront -->
+                    <div class="relative bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] text-white rounded-3xl shadow-xl shadow-[#1B4F72]/15 p-6">
+                        <div class="absolute -top-3 inset-x-0 flex justify-center">
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white text-[10px] font-bold uppercase tracking-widest shadow">
+                                💎 {{ locale === 'ar' ? 'الأفضل قيمة' : 'Best value' }}
+                            </span>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-[#C4A265]/20 flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold mb-1">{{ locale === 'ar' ? 'سنوي Upfront' : 'Annual Upfront' }}</h3>
+                        <p class="text-xs text-white/70 leading-relaxed mb-3">
+                            {{ locale === 'ar' ? 'وفّر حتى 21% + رسوم التشغيل بخصم 50%. الأكثر اقتصاداً للعيادات الراسخة.' : 'Save up to 21% + 50% off setup. Most economical for established clinics.' }}
+                        </p>
+                        <ul class="space-y-1.5 text-xs">
+                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'خصم 21% على الاشتراك' : '21% off subscription' }}</span></li>
+                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'خصم 50% على رسوم التشغيل' : '50% off setup fee' }}</span></li>
+                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'سعر ثابت لمدة سنة' : 'Locked price for a year' }}</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- 3 installments -->
+                    <div class="bg-white rounded-3xl border-2 border-emerald-200 p-6">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-[#1C2833] mb-1">{{ locale === 'ar' ? '3 دفعات (للسنوي)' : '3 payments (annual)' }}</h3>
+                        <p class="text-xs text-[#5A6C7D] leading-relaxed mb-3">
+                            {{ locale === 'ar' ? 'نفس مزايا السنوي بدفع مقسّط على 3 دفعات بدون فوائد.' : 'Same annual benefits, split into 3 interest-free payments.' }}
+                        </p>
+                        <ul class="space-y-1.5 text-xs text-[#5A6C7D]">
+                            <li class="flex items-center justify-between"><span>{{ locale === 'ar' ? 'الدفعة 1' : 'Payment 1' }}</span> <strong class="text-[#1C2833]">40% {{ locale === 'ar' ? 'عند الاشتراك' : 'at signup' }}</strong></li>
+                            <li class="flex items-center justify-between"><span>{{ locale === 'ar' ? 'الدفعة 2' : 'Payment 2' }}</span> <strong class="text-[#1C2833]">30% — {{ locale === 'ar' ? 'بعد 4 شهور' : 'month 4' }}</strong></li>
+                            <li class="flex items-center justify-between"><span>{{ locale === 'ar' ? 'الدفعة 3' : 'Payment 3' }}</span> <strong class="text-[#1C2833]">30% — {{ locale === 'ar' ? 'بعد 8 شهور' : 'month 8' }}</strong></li>
+                        </ul>
+                        <p class="text-[10px] text-emerald-700 font-semibold mt-3">
+                            ✓ {{ locale === 'ar' ? 'بدون فوائد • تأكيد بطاقة ائتمانية' : 'No interest • credit card confirmation' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Add-ons Section -->
         <section class="py-20 lg:py-28 bg-[#F8FAFC] relative overflow-hidden">
             <div class="absolute top-0 end-0 w-96 h-96 bg-[#C4A265]/5 rounded-full blur-[120px]"></div>
@@ -461,8 +531,14 @@ const pricingJsonLd = computed(() => ({
                                 <p class="text-xs text-gray-500 leading-relaxed mb-3">
                                     {{ locale === 'ar' ? addon.description_ar : addon.description_en }}
                                 </p>
+                                <!-- Launch pricing display: strikethrough anchor + active price + rose badge -->
+                                <div v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="text-[11px] text-gray-400 line-through tabular-nums">
+                                    {{ formatLocal(addon.price_egp) }}
+                                </div>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-xl font-extrabold text-[#1B4F72]">{{ formatLocal(addon.price_egp) }}</span>
+                                    <span class="text-xl font-extrabold text-[#1B4F72]">
+                                        {{ formatLocal(addon.active_price || addon.price_egp_launch || addon.price_egp) }}
+                                    </span>
                                     <span class="text-xs text-gray-400">
                                         /
                                         <template v-if="addon.period === 'yearly'">{{ locale === 'ar' ? 'سنوياً' : 'year' }}</template>
@@ -470,14 +546,23 @@ const pricingJsonLd = computed(() => ({
                                         <template v-else>{{ locale === 'ar' ? 'شهرياً' : 'month' }}</template>
                                     </span>
                                 </div>
+                                <div v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[9px] font-bold uppercase tracking-wider">
+                                    🔥 {{ locale === 'ar' ? 'سعر الإطلاق' : 'Launch' }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <p class="text-center text-sm text-gray-400 mt-10">
-                    {{ locale === 'ar' ? '* جميع الإضافات يمكن تفعيلها أو إلغاؤها في أي وقت من لوحة التحكم' : '* All add-ons can be enabled or disabled anytime from your dashboard' }}
-                </p>
+                <div class="text-center mt-10 space-y-2">
+                    <Link href="/add-ons" class="inline-flex items-center gap-2 text-sm font-bold text-[#1B4F72] hover:text-[#0D2B45] transition">
+                        {{ locale === 'ar' ? 'استكشف كل الإضافات' : 'Explore all add-ons' }}
+                        <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </Link>
+                    <p class="text-xs text-gray-400">
+                        {{ locale === 'ar' ? '* جميع الإضافات يمكن تفعيلها أو إلغاؤها في أي وقت من لوحة التحكم' : '* All add-ons can be enabled or disabled anytime from your dashboard' }}
+                    </p>
+                </div>
             </div>
         </section>
 

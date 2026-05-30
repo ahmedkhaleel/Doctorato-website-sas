@@ -53,6 +53,7 @@ function submitNewsletter() {
 const productLinks = [
     { label: 'nav.features', href: '/features' },
     { label: 'nav.pricing', href: '/pricing' },
+    { label: '_addons', href: '/add-ons', fallback: { ar: 'الإضافات', en: 'Add-ons' } },
     { label: 'footer.link_dental', href: '/dental', fallback: { ar: 'عيادات الأسنان', en: 'Dental' } },
     { label: 'footer.link_pediatrics', href: '/pediatrics', fallback: { ar: 'طب الأطفال', en: 'Pediatrics' } },
     { label: 'footer.link_telemedicine', href: '/telemedicine', fallback: { ar: 'الاستشارات الأون لاين', en: 'Telemedicine' } },

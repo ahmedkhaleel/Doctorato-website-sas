@@ -15,16 +15,29 @@ class AddOn extends Model
     protected $fillable = [
         'name_ar', 'name_en',
         'description_ar', 'description_en',
-        'price_egp', 'period',
+        'price_egp', 'price_egp_launch', 'is_launch_active',
+        'included_in_plans',
+        'period',
         'icon', 'badge_ar', 'badge_en',
         'is_active', 'is_featured', 'display_order',
     ];
 
     protected $casts = [
         'price_egp' => 'decimal:2',
+        'price_egp_launch' => 'decimal:2',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'is_launch_active' => 'boolean',
+        'included_in_plans' => 'array',
     ];
+
+    /** Active price after the launch toggle. */
+    public function activePrice(): float
+    {
+        return $this->is_launch_active && $this->price_egp_launch !== null
+            ? (float) $this->price_egp_launch
+            : (float) $this->price_egp;
+    }
 
     public function scopeActive(Builder $q): Builder
     {

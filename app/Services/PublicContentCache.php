@@ -92,7 +92,13 @@ class PublicContentCache
     public function addons(): array
     {
         return Cache::remember('public.addons', self::TTL, function () {
-            return AddOn::active()->orderBy('display_order')->get()->all();
+            return AddOn::active()->orderBy('display_order')->get()->map(function ($a) {
+                // Surface the active price so the Vue layer reads a
+                // single column instead of branching on the toggle.
+                return array_merge($a->toArray(), [
+                    'active_price' => $a->activePrice(),
+                ]);
+            })->all();
         });
     }
 

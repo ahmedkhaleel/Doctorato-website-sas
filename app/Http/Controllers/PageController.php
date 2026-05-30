@@ -43,6 +43,17 @@ class PageController extends Controller
         return Inertia::render('Obstetrics');
     }
 
+    /**
+     * Public add-ons page. Reads the full add-on catalogue via the
+     * cache so the page stays a single DB read per 10-min window.
+     */
+    public function addOns(\App\Services\PublicContentCache $cache)
+    {
+        return Inertia::render('AddOns', [
+            'addons' => $cache->addons(),
+        ]);
+    }
+
     public function solutions()
     {
         return Inertia::render('Solutions');

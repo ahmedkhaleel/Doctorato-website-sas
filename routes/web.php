@@ -104,6 +104,7 @@ Route::get('/dermatology', [PageController::class, 'dermatology'])->name('dermat
 Route::get('/pediatrics', [PageController::class, 'pediatrics'])->name('pediatrics');
 Route::get('/telemedicine', [PageController::class, 'telemedicine'])->name('telemedicine');
 Route::get('/obstetrics', [PageController::class, 'obstetrics'])->name('obstetrics');
+Route::get('/add-ons', [PageController::class, 'addOns'])->name('add-ons');
 Route::get('/solutions', [PageController::class, 'solutions'])->name('solutions');
 Route::get('/technology', [PageController::class, 'technology'])->name('technology');
 Route::get('/reports', [PageController::class, 'reports'])->name('reports');
