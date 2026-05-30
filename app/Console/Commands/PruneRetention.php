@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Schema;
  *   failed_jobs          →  30 days (any older was clearly not investigated)
  *   sessions             →  30 days past last activity (Laravel doesn't auto-purge)
  *   customer_login_tokens → 7 days (lifetime is 15 min — anything older is dead)
+ *   webhook_events       → 180 days (forensics window covers any
+ *                          plausible chargeback or refund dispute)
  *   personal_access_tokens (if present) → expired + 30 day grace
  *
  * Why retention matters here:
@@ -51,6 +53,7 @@ class PruneRetention extends Command
         $totals['failed_jobs'] = $this->pruneFailedJobs($dry);
         $totals['sessions'] = $this->pruneSessions($dry);
         $totals['customer_login_tokens'] = $this->pruneLoginTokens($dry);
+        $totals['webhook_events'] = $this->pruneWebhookEvents($dry);
 
         $verb = $dry ? 'would prune' : 'pruned';
         foreach ($totals as $table => $count) {
@@ -105,6 +108,22 @@ class PruneRetention extends Command
         // Token lifetime is 15 min, so anything older than a week
         // is guaranteed dead — keep a 7-day buffer for forensics.
         $query = DB::table('customer_login_tokens')->where('created_at', '<', $cutoff);
+
+        return $dry ? $query->count() : $query->delete();
+    }
+
+    /**
+     * Webhook events older than 180 days. The window covers any
+     * plausible chargeback or refund dispute (Paymob's 120-day
+     * limit + 60-day buffer) — beyond that, the original
+     * transaction is closed and the row is dead weight.
+     */
+    protected function pruneWebhookEvents(bool $dry): int
+    {
+        if (!Schema::hasTable('webhook_events')) return 0;
+
+        $cutoff = now()->subDays(180);
+        $query = DB::table('webhook_events')->where('received_at', '<', $cutoff);
 
         return $dry ? $query->count() : $query->delete();
     }

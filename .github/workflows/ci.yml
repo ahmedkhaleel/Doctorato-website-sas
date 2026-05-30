@@ -74,6 +74,9 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: Check bundle size budget
+        run: node scripts/check-bundle-size.mjs
+
       - name: Run green test suite (Phase 10-15)
         env:
           DB_CONNECTION: sqlite
@@ -88,7 +91,7 @@ jobs:
         # real regressions in the green suite.
         run: |
           php artisan test \
-            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest|SubscriptionPauseTest"
+            --filter="SecurityHeadersTest|ReferralProgramTest|TrialDripTest|RetentionAndLockoutTest|GdprAndScrubberTest|RateLimiterMatrixTest|WebhookEventStoreTest|PortalAbuseDetectorTest|SubscriptionPauseTest|WebhookRetentionTest"
 
   lint:
     name: PHP syntax check

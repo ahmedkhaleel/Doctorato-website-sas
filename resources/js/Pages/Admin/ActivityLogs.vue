@@ -116,6 +116,26 @@ function clearFilters() {
     filter.value = { q: '', action: '', user: '', from: '', to: '' };
     applyFilters();
 }
+
+/**
+ * One-click "security view" chips. Each chip sets the action filter
+ * to a specific event family so the admin can answer:
+ *   - 'Has anything suspicious happened today?'      → portal.abuse_signal
+ *   - 'What was erased under GDPR this quarter?'     → gdpr_delete + gdpr_export
+ *   - 'Did anyone replay a webhook recently?'        → webhook_replay
+ * without remembering the action string.
+ */
+const securityChips = [
+    { label: 'إشارات إساءة (Portal)', action: 'portal.abuse_signal', color: 'rose' },
+    { label: 'مسح بيانات GDPR', action: 'gdpr_delete', color: 'rose' },
+    { label: 'تصدير بيانات GDPR', action: 'gdpr_export', color: 'amber' },
+    { label: 'إعادة تشغيل Webhook', action: 'webhook_replay', color: 'amber' },
+];
+
+function applyChip(action) {
+    filter.value = { q: '', action, user: '', from: '', to: '' };
+    applyFilters();
+}
 </script>
 
 <template>
@@ -140,6 +160,28 @@ function clearFilters() {
                 <p class="text-xs text-white/80">مستخدمون نشطون</p>
                 <p class="text-3xl font-bold mt-1">{{ stats.users_active }}</p>
             </div>
+        </div>
+
+        <!-- Security quick-filter chips -->
+        <div class="flex flex-wrap gap-2 mb-3">
+            <span class="text-xs text-gray-500 self-center me-1">عرض سريع:</span>
+            <button
+                v-for="chip in securityChips"
+                :key="chip.action"
+                @click="applyChip(chip.action)"
+                :class="[
+                    'px-3 py-1.5 rounded-full text-xs font-semibold transition border',
+                    filter.action === chip.action
+                        ? (chip.color === 'rose'
+                            ? 'bg-rose-600 border-rose-600 text-white'
+                            : 'bg-amber-500 border-amber-500 text-white')
+                        : (chip.color === 'rose'
+                            ? 'bg-rose-50 border-rose-200 text-rose-800 hover:bg-rose-100'
+                            : 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100'),
+                ]"
+            >
+                {{ chip.label }}
+            </button>
         </div>
 
         <!-- Filters -->
