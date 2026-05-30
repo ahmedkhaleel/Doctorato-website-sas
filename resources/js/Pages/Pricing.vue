@@ -1,6 +1,7 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
 import PricingCards from '@/Components/PricingCards.vue';
+import LaunchPricingCard from '@/Components/LaunchPricingCard.vue';
 import FaqAccordion from '@/Components/FaqAccordion.vue';
 import RoiPreview from '@/Components/RoiPreview.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
@@ -402,161 +403,16 @@ const pricingJsonLd = computed(() => ({
                     </div>
                 </div>
 
-                <!-- Cards Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-5 animate-stagger">
-                    <div
-                        v-for="(plan, planIdx) in plans"
+                <!-- Cards Grid — uses LaunchPricingCard (Phase B). -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 animate-stagger">
+                    <LaunchPricingCard
+                        v-for="plan in plans"
                         :key="plan.id"
-                        class="relative group rounded-3xl transition-all duration-500 flex flex-col"
-                        :class="{
-                            'bg-gradient-to-b from-[#1B4F72] to-[#0A1628] text-white shadow-2xl shadow-[#1B4F72]/20 scale-[1.03] z-10 ring-1 ring-white/10': plan.is_popular,
-                            'bg-white border border-gray-100 shadow-lg hover:shadow-xl hover:border-[#C4A265]/20': !plan.is_popular && !plan.is_custom,
-                            'bg-gradient-to-b from-[#C4A265]/5 to-white border-2 border-dashed border-[#C4A265]/30 shadow-lg': plan.is_custom,
-                        }"
-                    >
-                        <!-- Popular Badge -->
-                        <div v-if="plan.is_popular" class="absolute -top-4 inset-x-0 flex justify-center">
-                            <span class="inline-flex items-center gap-1.5 px-5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white shadow-lg shadow-[#C4A265]/30">
-                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                {{ t('pricing.most_popular') }}
-                            </span>
-                        </div>
-
-                        <div class="p-7 sm:p-8 flex flex-col flex-1">
-                            <!-- Plan Name -->
-                            <h3 class="text-lg font-bold mb-1" :class="plan.is_popular ? 'text-white' : 'text-[#1C2833]'">
-                                {{ localizedField(plan, 'name') }}
-                            </h3>
-                            <p class="text-sm mb-5 leading-relaxed" :class="plan.is_popular ? 'text-white/60' : 'text-gray-400'">
-                                {{ localizedField(plan, 'description') }}
-                            </p>
-
-                            <!-- Price -->
-                            <div class="mb-6">
-                                <template v-if="!plan.is_custom">
-                                    <div class="flex items-baseline gap-1 flex-wrap">
-                                        <span class="text-2xl md:text-3xl font-extrabold whitespace-nowrap" :class="plan.is_popular ? 'text-white' : 'text-[#1B4F72]'">
-                                            {{ getFormattedPrice(plan) }}
-                                        </span>
-                                        <span class="text-sm font-semibold whitespace-nowrap" :class="plan.is_popular ? 'text-white/80' : 'text-[#1B4F72]/70'">
-                                            {{ getCurrencySymbol(plan) }}
-                                        </span>
-                                        <span class="text-xs whitespace-nowrap" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">
-                                            / {{ isYearly ? t('pricing.year') : t('pricing.month') }}
-                                        </span>
-                                    </div>
-                                    <p v-if="isYearly" class="text-xs mt-1" :class="plan.is_popular ? 'text-emerald-300' : 'text-emerald-500'">
-                                        {{ t('pricing.save_20') }}
-                                    </p>
-
-                                    <!-- One-time setup fee (50% off for yearly) -->
-                                    <div
-                                        v-if="getSetupFeeFull(plan) > 0"
-                                        class="mt-3 pt-3 border-t"
-                                        :class="plan.is_popular ? 'border-white/10' : 'border-gray-100'"
-                                    >
-                                        <div class="flex items-baseline gap-1.5 flex-wrap">
-                                            <span class="text-[11px] uppercase tracking-wide font-bold" :class="plan.is_popular ? 'text-[#C4A265]' : 'text-[#C4A265]'">
-                                                + {{ t('pricing.setup_fee_label') }}
-                                            </span>
-                                            <span
-                                                v-if="isYearly"
-                                                class="text-xs line-through tabular-nums"
-                                                :class="plan.is_popular ? 'text-white/40' : 'text-gray-400'"
-                                            >
-                                                {{ localeNumber(getSetupFeeFull(plan)) }}
-                                            </span>
-                                            <span class="text-sm font-extrabold tabular-nums" :class="plan.is_popular ? 'text-white' : 'text-[#1C2833]'">
-                                                {{ localeNumber(getSetupFee(plan)) }}
-                                            </span>
-                                            <span class="text-[11px] font-semibold" :class="plan.is_popular ? 'text-white/70' : 'text-gray-500'">
-                                                {{ getCurrencySymbol(plan) }}
-                                            </span>
-                                            <span class="text-[10px]" :class="plan.is_popular ? 'text-white/40' : 'text-gray-400'">
-                                                · {{ t('pricing.setup_fee_once') }}
-                                            </span>
-                                        </div>
-                                        <p v-if="isYearly" class="text-[11px] mt-1 font-semibold text-emerald-500">
-                                            🎁 {{ t('pricing.setup_fee_yearly_note') }}
-                                        </p>
-                                        <p class="text-[10px] mt-1 leading-relaxed" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">
-                                            {{ t('pricing.setup_fee_includes') }}
-                                        </p>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <span class="text-xl md:text-2xl font-extrabold text-[#C4A265]">
-                                        {{ t('pricing.custom_quote') }}
-                                    </span>
-                                </template>
-                            </div>
-
-                            <!-- Key Specs -->
-                            <div class="grid grid-cols-2 gap-3 mb-6">
-                                <div class="rounded-xl p-3" :class="plan.is_popular ? 'bg-white/[0.06]' : 'bg-gray-50'">
-                                    <div class="text-xs mb-0.5" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">{{ t('pricing.compare_users') }}</div>
-                                    <div class="text-sm font-bold" :class="plan.is_popular ? 'text-white' : 'text-[#1C2833]'">
-                                        {{ plan.max_users ? plan.max_users : t('pricing.compare_unlimited') }}
-                                    </div>
-                                </div>
-                                <div class="rounded-xl p-3" :class="plan.is_popular ? 'bg-white/[0.06]' : 'bg-gray-50'">
-                                    <div class="text-xs mb-0.5" :class="plan.is_popular ? 'text-white/50' : 'text-gray-400'">{{ t('pricing.compare_patients') }}</div>
-                                    <div class="text-sm font-bold" :class="plan.is_popular ? 'text-white' : 'text-[#1C2833]'">
-                                        {{ plan.max_patients ? plan.max_patients : t('pricing.compare_unlimited') }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Divider -->
-                            <div class="h-px mb-6" :class="plan.is_popular ? 'bg-white/10' : 'bg-gray-100'"></div>
-
-                            <!-- Features -->
-                            <ul class="space-y-3 mb-8 flex-1">
-                                <li
-                                    v-for="(feature, idx) in (localizedField(plan, 'features') || []).slice(0, 8)"
-                                    :key="idx"
-                                    class="flex items-start gap-2.5"
-                                >
-                                    <div class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                                         :class="plan.is_popular ? 'bg-[#C4A265]/20' : 'bg-emerald-50'">
-                                        <svg class="w-3 h-3" :class="plan.is_popular ? 'text-[#C4A265]' : 'text-emerald-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <span class="text-sm leading-relaxed" :class="plan.is_popular ? 'text-white/80' : 'text-gray-600'">
-                                        {{ typeof feature === 'string' ? feature : localizedField(feature, 'text') }}
-                                    </span>
-                                </li>
-                                <li v-if="(localizedField(plan, 'features') || []).length > 8"
-                                    class="text-xs font-medium pt-1"
-                                    :class="plan.is_popular ? 'text-[#C4A265]' : 'text-[#1B4F72]'"
-                                >
-                                    + {{ (localizedField(plan, 'features') || []).length - 8 }} {{ t('pricing.more_features') }}
-                                </li>
-                            </ul>
-
-                            <!-- CTA Button -->
-                            <Link
-                                v-if="!plan.is_custom"
-                                :href="`/checkout/${plan.slug}?cycle=${billingCycle}`"
-                                class="block w-full text-center py-3.5 px-6 rounded-xl font-semibold text-sm transition-all duration-300 hover:-translate-y-0.5"
-                                :class="plan.is_popular
-                                    ? 'bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white shadow-lg shadow-[#C4A265]/25 hover:shadow-xl'
-                                    : 'border-2 border-[#1B4F72] text-[#1B4F72] hover:bg-[#1B4F72] hover:text-white'"
-                            >
-                                {{ t('pricing.get_started') }}
-                            </Link>
-                            <Link
-                                v-else
-                                href="/contact"
-                                class="block w-full text-center py-3.5 px-6 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white shadow-lg shadow-[#C4A265]/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
-                            >
-                                {{ t('pricing.contact_for_offer') }}
-                            </Link>
-                        </div>
-                    </div>
+                        :plan="plan"
+                        :is-yearly="isYearly"
+                        :format-price="formatLocal"
+                        :highlight="!!plan.is_popular"
+                    />
                 </div>
 
                 <!-- VAT Note -->
