@@ -77,6 +77,13 @@ class CustomerPortalController extends Controller
             return redirect('/portal')->withErrors(['email' => 'لم نتمكن من العثور على حسابك.']);
         }
 
+        // Record-only abuse check — flag IP mismatches between
+        // where the link was requested vs where it was clicked.
+        // Doesn't block auth (high false-positive rate from
+        // mobile→wifi handoffs) but surfaces to admin.
+        app(\App\Services\PortalAbuseDetector::class)
+            ->onTokenConsumed($row, $request->ip(), $request->userAgent());
+
         $request->session()->regenerate();
         $request->session()->put('portal.customer_id', $customer->id);
         $request->session()->put('portal.email', $customer->email);

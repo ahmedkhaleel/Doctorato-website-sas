@@ -90,6 +90,44 @@ class AdminExceptionNotifier
     }
 
     /**
+     * Email a non-exception signal (e.g. a portal abuse signal).
+     * Reuses the same signature throttling so a runaway detector
+     * can't fill the admin inbox. Skipped in non-production.
+     */
+    public function notifySignal(string $signalName, array $context = []): void
+    {
+        if (!app()->isProduction()) {
+            return;
+        }
+
+        $signature = 'sig:' . substr(sha1($signalName), 0, 10);
+        $cacheKey = 'exception_notify:' . $signature;
+        if (Cache::has($cacheKey)) {
+            Cache::increment("exception_count:{$signature}");
+            return;
+        }
+        Cache::put($cacheKey, true, self::COOLDOWN_SECONDS);
+        Cache::put("exception_count:{$signature}", 1, self::COOLDOWN_SECONDS);
+
+        try {
+            $body = "═══ Doctorato Signal ═══\n\n"
+                . "Signal: {$signalName}\n"
+                . "Time:   " . now()->toIso8601String() . "\n"
+                . "Signature: {$signature} (next email: at most one per hour)\n\n"
+                . "Context:\n" . json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+            Mail::raw($body, function ($msg) use ($signalName) {
+                $msg->to(self::TARGET_EMAIL)
+                    ->subject('[Doctorato] Signal: ' . $signalName);
+            });
+        } catch (Throwable $e) {
+            Log::error('AdminExceptionNotifier::notifySignal failed', [
+                'signal' => $signalName, 'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Deterministic identifier for this exception's "shape". Two
      * exceptions with the same class + file + line are treated as
      * the same incident for throttling purposes.
