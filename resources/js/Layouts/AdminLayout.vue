@@ -132,6 +132,8 @@ const menuGroups = computed(() => [
         items: [
             { label: 'المستخدمون والصلاحيات', icon: 'users', route: '/admin/users', perm: 'users.manage' },
             { label: 'سجل النشاط', icon: 'clock', route: '/admin/activity-logs', perm: 'dashboard.view' },
+            { label: 'أحداث Webhooks', icon: 'bolt', route: '/admin/webhooks', perm: 'webhooks.manage' },
+            { label: 'طلبات الخصوصية (GDPR)', icon: 'shield', route: '/admin/gdpr', perm: 'gdpr.manage' },
         ],
     },
 ]);
