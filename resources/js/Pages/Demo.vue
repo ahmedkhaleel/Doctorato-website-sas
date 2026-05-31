@@ -41,27 +41,27 @@ useScrollAnimation();
 // market, so the language defaults to a Gulf register (وش راح / عبّي /
 // لا) instead of Egyptian (إيه / املأ / مش).
 const agenda = computed(() => isAr.value ? [
-    { icon: '🩺', title: 'نتعرّف على عيادتك', body: 'نسألك عن تخصصك وحجم العيادة، ونرتّب العرض حسب احتياجاتك بالضبط.' },
-    { icon: '🖥️', title: 'جولة مباشرة في النظام', body: 'نشاركك الشاشة ونوريك المسارات اليومية: الحجز، السجلات، والفواتير.' },
+    { icon: '🩺', title: 'نتعرّف على عيادتك', body: 'نسألك عن تخصصك وعدد الأطباء وحجم العيادة، ونرتّب العرض حسب احتياجاتك بالضبط.' },
+    { icon: '🖥️', title: 'جولة مباشرة في النظام', body: 'نشاركك الشاشة ونوريك المسارات اليومية: الحجز، السجلات، والفواتير، والإيصال الإلكتروني.' },
     { icon: '💡', title: 'أسئلة وأجوبة', body: 'وقت مفتوح لكل استفساراتك التقنية والتجارية — على راحتك بدون استعجال.' },
-    { icon: '💰', title: 'خطة أسعار واضحة', body: 'نحدّد لك الباقة المناسبة بعملة بلدك مع الإعداد والتدريب الكامل.' },
+    { icon: '💰', title: 'خطة أسعار شفافة', body: 'نختار معاك الباقة المناسبة (Starter / Growth / Professional) + احتساب per-doctor واضح، تركيب مجاني، وتفعيل التجربة المجانية 30 يوم.' },
 ] : [
-    { icon: '🩺', title: 'Get to know your clinic', body: 'We ask about your specialty and clinic size, then tailor the demo around your real needs.' },
-    { icon: '🖥️', title: 'Live system walkthrough', body: 'We share our screen and run through the daily flows: booking, records, billing.' },
+    { icon: '🩺', title: 'Get to know your clinic', body: 'We ask about your specialty, doctor count, and clinic size, then tailor the demo around your real needs.' },
+    { icon: '🖥️', title: 'Live system walkthrough', body: 'We share our screen and run through the daily flows: booking, records, billing, and e-receipt.' },
     { icon: '💡', title: 'Q&A', body: 'Open space for every technical and business question — no rush.' },
-    { icon: '💰', title: 'Clear pricing plan', body: 'We compute the right plan for your country, with onboarding + training included.' },
+    { icon: '💰', title: 'Transparent pricing', body: 'We pick the right plan (Starter / Growth / Professional) with clear per-doctor math, free setup, and your 30-day trial activated on the call.' },
 ]);
 
 const benefits = computed(() => isAr.value ? [
-    'تجربة مجانية 14 يوم',
+    'تجربة مجانية 30 يوم',
     'بدون بطاقة ائتمان',
-    'إعداد كامل لفريقك',
-    'دعم بالعربي',
+    'تركيب وترحيل بيانات مجاني',
+    'ضمان استرداد خلال 30 يوم',
 ] : [
-    '14-day free trial',
+    '30-day free trial',
     'No credit card required',
-    'Full team onboarding',
-    'Arabic-first support',
+    'Free setup & data migration',
+    '30-day money-back guarantee',
 ]);
 
 const stats = computed(() => [
@@ -73,16 +73,18 @@ const stats = computed(() => [
 
 const faqs = computed(() => isAr.value ? [
     { q: 'كم يأخذ العرض التجريبي؟', a: 'عادة 30-45 دقيقة، حسب حجم عيادتك وعدد أسئلتك. نمشي على راحتك بدون استعجال.' },
-    { q: 'هل في التزام مالي للحجز؟', a: 'لا، العرض مجاني تمامًا وما يلزمك بأي اشتراك. وحتى التجربة المجانية بعده 14 يوم بدون بطاقة ائتمان.' },
+    { q: 'هل في التزام مالي للحجز؟', a: 'لا، العرض مجاني تمامًا وما يلزمك بأي اشتراك. وحتى التجربة المجانية بعده 30 يوم بدون بطاقة ائتمان، مع ضمان استرداد كامل خلال أول 30 يوم.' },
+    { q: 'هل في رسوم تركيب؟', a: 'باقتا Starter (1,990 ج.م/شهر) و Growth (3,990 ج.م/شهر) — تركيب وترحيل بيانات مجاني تمامًا. باقة Professional (6,990 ج.م/شهر) فيها رسوم تركيب اختيارية 7,500 ج.م مرة واحدة لخدمة White-glove. Enterprise حسب الحجم.' },
     { q: 'وش الأوقات المتاحة للموعد؟', a: 'مرونة كاملة — نحجز معاك أي يوم من السبت إلى الخميس بين 9 صباحًا و8 مساءً (بتوقيتك المحلي).' },
-    { q: 'هل يدعم النظام تخصصي؟', a: 'نخدم عيادات الأسنان، الجلدية والتجميل، طب الأطفال، النساء، العظام، القلب، أنف وأذن وحنجرة، العيون، والمتعدد التخصصات.' },
-    { q: 'كم عدد الأطباء اللي يدعمهم النظام؟', a: 'من طبيب واحد إلى أكثر من 100 طبيب. الباقات مرنة وتتوسع مع نمو عيادتك.' },
+    { q: 'هل يدعم النظام تخصصي؟', a: 'نخدم عيادات الأسنان، الجلدية والتجميل، طب الأطفال، النساء والتوليد، الباطنة العامة، والاستشارات عن بُعد (Telemedicine).' },
+    { q: 'كم عدد الأطباء اللي يدعمهم النظام؟', a: 'من طبيب واحد إلى عدد غير محدود. باقات Growth و Professional تشمل طبيب أساسي + 700-900 ج.م لكل طبيب إضافي شهريًا. Enterprise بلا حدود.' },
 ] : [
     { q: 'How long does the demo take?', a: 'Typically 30-45 minutes, depending on your clinic size and questions. We move at your pace, not ours.' },
-    { q: 'Is there any commitment to book?', a: 'None. The demo is completely free with no obligation. Even the trial after it is 14 days, no credit card required.' },
+    { q: 'Is there any commitment to book?', a: 'None. The demo is completely free with no obligation. The trial after is 30 days, no credit card required, with a 30-day money-back guarantee.' },
+    { q: 'Are there setup fees?', a: 'Starter (1,990 EGP/mo) and Growth (3,990 EGP/mo): setup and data migration are completely free. Professional (6,990 EGP/mo): optional one-time 7,500 EGP white-glove setup. Enterprise: scoped to your size.' },
     { q: 'When can we schedule it?', a: 'Full flexibility — Saturdays through Thursdays, 9 AM to 8 PM in your clinic\'s timezone.' },
-    { q: 'Does the system support my specialty?', a: 'We serve dentistry, dermatology + cosmetics, pediatrics, OB-GYN, orthopedics, cardiology, ENT, ophthalmology, and multi-specialty clinics.' },
-    { q: 'How many doctors can the system handle?', a: 'From 1 doctor to 100+ doctors. Plans are flexible and scale with your clinic\'s growth.' },
+    { q: 'Does the system support my specialty?', a: 'We serve dentistry, dermatology + cosmetics, pediatrics, OB-GYN, general medicine, and telemedicine.' },
+    { q: 'How many doctors can the system handle?', a: 'From 1 to unlimited. Growth and Professional plans include 1 doctor + 700-900 EGP per extra doctor/mo. Enterprise has no caps.' },
 ]);
 
 // FAQ open/close state — single open at a time for cleaner mobile UX.
@@ -133,8 +135,8 @@ const demoJsonLd = computed(() => [
     <SeoHead
         :title="t('demo.page_title') || (isAr ? 'احجز عرضاً تجريبياً' : 'Book a demo')"
         :description="isAr
-            ? 'احجز عرضاً توضيحياً مجانياً 30-45 دقيقة مع فريق Doctorato — تجربة مجانية 14 يوم بعده، بدون بطاقة ائتمان.'
-            : 'Book a free 30-45 minute demo with the Doctorato team — followed by a 14-day free trial, no credit card required.'"
+            ? 'احجز عرضاً توضيحياً مجانياً 30-45 دقيقة مع فريق Doctorato — تجربة مجانية 30 يوم بعده، بدون بطاقة ائتمان، تركيب وترحيل بيانات مجاني.'
+            : 'Book a free 30-45 minute demo with the Doctorato team — followed by a 30-day free trial, no credit card, free setup and data migration.'"
         :json-ld="demoJsonLd"
         :breadcrumbs="[
             { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
@@ -181,8 +183,8 @@ const demoJsonLd = computed(() => [
 
                 <p class="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed mb-5 sm:mb-7 demo-rise" style="--rise-delay: 160ms;">
                     {{ isAr
-                        ? 'عرض مباشر معاك من فريقنا — نوريك النظام كاملًا، نرد على كل استفساراتك، ونرتّب لك تجربة مجانية 14 يوم بعدها مباشرة.'
-                        : 'A live walkthrough with our team — we run through every detail, answer your questions, and set up a 14-day free trial right after.' }}
+                        ? 'عرض مباشر معاك من فريقنا — نوريك النظام كاملًا، نرد على كل استفساراتك، ونفعّل لك تجربة مجانية 30 يوم بدون بطاقة ائتمان.'
+                        : 'A live walkthrough with our team — we run through every detail, answer your questions, and activate your 30-day free trial — no credit card.' }}
                 </p>
 
                 <!-- Benefits chip row — stagger inside the row too -->
