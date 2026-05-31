@@ -20,6 +20,7 @@ class DemoRequest extends Model
         'country_code',
         'country',
         'doctors_count',
+        'facility_type',
         'specialty',
         'interested_modules',
         'referral_source',

@@ -41,15 +41,15 @@ useScrollAnimation();
 // market, so the language defaults to a Gulf register (وش راح / عبّي /
 // لا) instead of Egyptian (إيه / املأ / مش).
 const agenda = computed(() => isAr.value ? [
-    { icon: '🩺', title: 'نتعرّف على عيادتك', body: 'نسألك عن تخصصك وعدد الأطباء وحجم العيادة، ونرتّب العرض حسب احتياجاتك بالضبط.' },
-    { icon: '🖥️', title: 'جولة مباشرة في النظام', body: 'نشاركك الشاشة ونوريك المسارات اليومية: الحجز، السجلات، والفواتير، والإيصال الإلكتروني.' },
-    { icon: '💡', title: 'أسئلة وأجوبة', body: 'وقت مفتوح لكل استفساراتك التقنية والتجارية — على راحتك بدون استعجال.' },
-    { icon: '💰', title: 'خطة أسعار شفافة', body: 'نختار معاك الباقة المناسبة (Starter / Growth / Professional) + احتساب per-doctor واضح، تركيب مجاني، وتفعيل التجربة المجانية 30 يوم.' },
+    { icon: '🩺', title: 'نفهم عيادتك', body: 'نناقش معاك حجم منشأتك، التخصصات، وحجم العمليات اليومية. لو عندك نظام حالي، نفهم نقاط الألم بالظبط قبل العرض.' },
+    { icon: '🖥️', title: 'جولة Live في النظام', body: 'مشاركة شاشة مباشرة — نوريك المسارات الفعلية لعيادة بنفس حجمك: حجز، EMR، فواتير، إيصال إلكتروني، Insurance، WhatsApp.' },
+    { icon: '📊', title: 'تقدير الـ ROI بالأرقام', body: 'حساب فعلي للتوفير المتوقع في عيادتك بناءً على حجم المرضى والإيرادات الحالية — قبل ما تدفع.' },
+    { icon: '🎯', title: 'الباقة + خطة التنفيذ', body: 'نختار معاك Starter / Growth / Professional حسب حجمك، نقدم خطة الـ onboarding، ونفعّل تجربتك 30 يوم نهاية المكالمة.' },
 ] : [
-    { icon: '🩺', title: 'Get to know your clinic', body: 'We ask about your specialty, doctor count, and clinic size, then tailor the demo around your real needs.' },
-    { icon: '🖥️', title: 'Live system walkthrough', body: 'We share our screen and run through the daily flows: booking, records, billing, and e-receipt.' },
-    { icon: '💡', title: 'Q&A', body: 'Open space for every technical and business question — no rush.' },
-    { icon: '💰', title: 'Transparent pricing', body: 'We pick the right plan (Starter / Growth / Professional) with clear per-doctor math, free setup, and your 30-day trial activated on the call.' },
+    { icon: '🩺', title: 'Understand your facility', body: 'We discuss your facility size, specialties, and daily volume. If you have a current system, we get the pain points first — before any demo.' },
+    { icon: '🖥️', title: 'Live system walkthrough', body: 'Real screen share — we walk you through the actual flows of a clinic at your scale: booking, EMR, billing, e-receipt, insurance, WhatsApp.' },
+    { icon: '📊', title: 'Concrete ROI math', body: 'A real calculation of expected savings in your clinic based on current patient volume and revenue — before you spend anything.' },
+    { icon: '🎯', title: 'Plan + execution roadmap', body: 'We pick Starter / Growth / Professional with you, walk through the onboarding plan, and activate your 30-day trial by call\'s end.' },
 ]);
 
 const benefits = computed(() => isAr.value ? [
@@ -65,10 +65,10 @@ const benefits = computed(() => isAr.value ? [
 ]);
 
 const stats = computed(() => [
-    { value: '+200', label: isAr.value ? 'عيادة فعّالة' : 'Active clinics' },
-    { value: '12', label: isAr.value ? 'دولة' : 'Countries' },
-    { value: '99.9%', label: isAr.value ? 'استقرار' : 'Uptime' },
-    { value: '24/7', label: isAr.value ? 'دعم فني' : 'Support' },
+    { value: '+200', label: isAr.value ? 'عيادة بتثق فينا' : 'Clinics trust us' },
+    { value: '30', label: isAr.value ? 'يوم تجربة مجانية' : 'Days free trial' },
+    { value: '99.9%', label: isAr.value ? 'استقرار النظام' : 'Uptime' },
+    { value: '<24س', label: isAr.value ? 'وقت الرد' : 'Response time' },
 ]);
 
 const faqs = computed(() => isAr.value ? [
@@ -175,16 +175,16 @@ const demoJsonLd = computed(() => [
                      currency) — replaced with a neutral Khaleeji phrasing
                      that works across all Gulf markets. -->
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-4 demo-rise leading-tight" style="--rise-delay: 80ms;">
-                    {{ isAr ? 'شوف دكتوراتو في عيادتك،' : 'See Doctorato in your clinic,' }}
+                    {{ isAr ? 'شوف عيادتك بعد دكتوراتو،' : 'See your clinic on Doctorato,' }}
                     <span class="block text-transparent bg-clip-text bg-gradient-to-r from-[#C4A265] to-[#D4B876] demo-shimmer">
-                        {{ isAr ? 'قبل لا تدفع أي شي' : 'before you pay anything' }}
+                        {{ isAr ? 'قبل ما تدفع أي مليم' : 'before you spend a single pound' }}
                     </span>
                 </h1>
 
                 <p class="text-sm sm:text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed mb-5 sm:mb-7 demo-rise" style="--rise-delay: 160ms;">
                     {{ isAr
-                        ? 'عرض مباشر معاك من فريقنا — نوريك النظام كاملًا، نرد على كل استفساراتك، ونفعّل لك تجربة مجانية 30 يوم بدون بطاقة ائتمان.'
-                        : 'A live walkthrough with our team — we run through every detail, answer your questions, and activate your 30-day free trial — no credit card.' }}
+                        ? 'جلسة عرض خاصة (30-45 دقيقة) — بناءً على حجم منشأتك وتخصصك. نوريك بالضبط الحلول والـ ROI المتوقع، ونفعّل تجربتك المجانية 30 يوم نهاية المكالمة.'
+                        : 'A tailored 30-45 minute walkthrough based on your facility size and specialty. We show you exactly what fits, the expected ROI, and activate your 30-day trial by the end of the call.' }}
                 </p>
 
                 <!-- Benefits chip row — stagger inside the row too -->
@@ -210,7 +210,7 @@ const demoJsonLd = computed(() => [
                 >
                     <!-- Sheen sweep on hover -->
                     <span class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/30 to-transparent"></span>
-                    <span class="relative">{{ isAr ? 'عبّي النموذج في 60 ثانية' : 'Fill the form in 60 seconds' }}</span>
+                    <span class="relative">{{ isAr ? 'احجز عرضك المخصص الآن' : 'Book your tailored demo now' }}</span>
                     <svg class="relative w-4 h-4 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
@@ -272,6 +272,124 @@ const demoJsonLd = computed(() => [
                             </div>
                         </div>
                     </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── Why Doctorato? — 4 value props ────────────────────── -->
+        <section class="relative py-16 sm:py-20 bg-gradient-to-b from-white via-rose-50/20 to-amber-50/20 overflow-hidden">
+            <!-- Decorative pastel orbs -->
+            <div class="absolute top-10 -end-20 w-80 h-80 rounded-full bg-rose-100/40 blur-3xl"></div>
+            <div class="absolute bottom-10 -start-20 w-72 h-72 rounded-full bg-amber-100/40 blur-3xl"></div>
+
+            <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 sm:mb-14 animate-fade-up">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 backdrop-blur-sm ring-1 ring-[#C4A265]/20 text-[11px] font-bold uppercase tracking-widest text-[#C4A265] mb-3">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#C4A265] animate-pulse"></span>
+                        {{ isAr ? 'ليه دكتوراتو' : 'Why Doctorato' }}
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1C2833] leading-tight">
+                        {{ isAr ? 'مش مجرد نظام. شريك تشغيل كامل لعيادتك.' : "It's not just software. It's a full operations partner." }}
+                    </h2>
+                    <p class="mt-3 text-sm sm:text-base text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                        {{ isAr
+                            ? 'مصمم خصيصًا للعيادات الراقية والمراكز الطبية والمستشفيات في مصر — بمعايير عالمية وفهم للسوق المحلي.'
+                            : 'Built for premium clinics, polyclinics and hospitals in Egypt — global standards with deep local understanding.' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                    <!-- Card 1 — Pastel rose -->
+                    <article class="group relative bg-gradient-to-br from-rose-100/70 to-white rounded-3xl p-6 ring-1 ring-rose-200/50 hover:ring-rose-300 hover:-translate-y-1 transition-all duration-500 animate-fade-up shadow-sm hover:shadow-xl overflow-hidden">
+                        <div class="absolute -top-8 -end-8 w-24 h-24 bg-rose-200/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-2xl bg-white/80 ring-1 ring-rose-200 flex items-center justify-center text-2xl mb-4 group-hover:rotate-6 group-hover:scale-110 transition-transform duration-500">⚡</div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#1C2833] mb-2">
+                                {{ isAr ? 'تشغيل خلال 24 ساعة' : 'Live in 24 hours' }}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                {{ isAr
+                                    ? 'ترحيل بياناتك من Excel أو نظامك القديم مجانًا. عيادتك جاهزة قبل ما تخلص فنجان قهوتك.'
+                                    : 'Free data migration from Excel or your old system. Your clinic is ready before you finish your coffee.' }}
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Card 2 — Pastel amber -->
+                    <article class="group relative bg-gradient-to-br from-amber-100/70 to-white rounded-3xl p-6 ring-1 ring-amber-200/50 hover:ring-amber-300 hover:-translate-y-1 transition-all duration-500 animate-fade-up shadow-sm hover:shadow-xl overflow-hidden" style="animation-delay: 100ms;">
+                        <div class="absolute -top-8 -end-8 w-24 h-24 bg-amber-200/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-2xl bg-white/80 ring-1 ring-amber-200 flex items-center justify-center text-2xl mb-4 group-hover:rotate-6 group-hover:scale-110 transition-transform duration-500">🛡️</div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#1C2833] mb-2">
+                                {{ isAr ? 'متوافق مع القانون المصري' : 'Egyptian-compliant' }}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                {{ isAr
+                                    ? 'إيصال إلكتروني، فاتورة ضريبية، تقارير مصلحة الضرائب — كله جاهز ومعتمد محليًا.'
+                                    : 'E-receipt, tax invoice, Tax Authority reports — all built in and locally certified.' }}
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Card 3 — Pastel sky -->
+                    <article class="group relative bg-gradient-to-br from-sky-100/70 to-white rounded-3xl p-6 ring-1 ring-sky-200/50 hover:ring-sky-300 hover:-translate-y-1 transition-all duration-500 animate-fade-up shadow-sm hover:shadow-xl overflow-hidden" style="animation-delay: 200ms;">
+                        <div class="absolute -top-8 -end-8 w-24 h-24 bg-sky-200/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-2xl bg-white/80 ring-1 ring-sky-200 flex items-center justify-center text-2xl mb-4 group-hover:rotate-6 group-hover:scale-110 transition-transform duration-500">🌍</div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#1C2833] mb-2">
+                                {{ isAr ? 'بـ 6 تخصصات + توسعات' : '6 specialties + extensions' }}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                {{ isAr
+                                    ? 'أسنان، جلدية، أطفال، نساء وتوليد، باطنة، Telemedicine — قوالب وميزات مخصصة لكل تخصص.'
+                                    : 'Dental, derma, pediatrics, OB/GYN, internal medicine, telemedicine — purpose-built templates per specialty.' }}
+                            </p>
+                        </div>
+                    </article>
+
+                    <!-- Card 4 — Pastel emerald -->
+                    <article class="group relative bg-gradient-to-br from-emerald-100/70 to-white rounded-3xl p-6 ring-1 ring-emerald-200/50 hover:ring-emerald-300 hover:-translate-y-1 transition-all duration-500 animate-fade-up shadow-sm hover:shadow-xl overflow-hidden" style="animation-delay: 300ms;">
+                        <div class="absolute -top-8 -end-8 w-24 h-24 bg-emerald-200/40 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-2xl bg-white/80 ring-1 ring-emerald-200 flex items-center justify-center text-2xl mb-4 group-hover:rotate-6 group-hover:scale-110 transition-transform duration-500">📞</div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#1C2833] mb-2">
+                                {{ isAr ? 'دعم بشري بالعربي' : 'Human Arabic support' }}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                {{ isAr
+                                    ? 'تتكلم مع شخص حقيقي يفهم تخصصك ويرد على واتساب وتليفون خلال ساعات العمل.'
+                                    : 'Talk to a real person who understands your specialty — WhatsApp and phone reply within business hours.' }}
+                            </p>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Trust signals row -->
+                <div class="mt-12 sm:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-gray-100">
+                    <div class="text-center animate-fade-up">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#1B4F72] mb-1">+200</div>
+                        <div class="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wide">
+                            {{ isAr ? 'منشأة طبية فعّالة' : 'Active facilities' }}
+                        </div>
+                    </div>
+                    <div class="text-center animate-fade-up" style="animation-delay: 100ms;">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#1B4F72] mb-1">99.9%</div>
+                        <div class="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wide">
+                            {{ isAr ? 'استقرار النظام' : 'Uptime SLA' }}
+                        </div>
+                    </div>
+                    <div class="text-center animate-fade-up" style="animation-delay: 200ms;">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#1B4F72] mb-1">30</div>
+                        <div class="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wide">
+                            {{ isAr ? 'يوم تجربة مجانية' : 'Days free trial' }}
+                        </div>
+                    </div>
+                    <div class="text-center animate-fade-up" style="animation-delay: 300ms;">
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#1B4F72] mb-1">0 ج.م</div>
+                        <div class="text-[11px] sm:text-xs text-gray-500 uppercase tracking-wide">
+                            {{ isAr ? 'رسوم تركيب' : 'Setup fee' }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

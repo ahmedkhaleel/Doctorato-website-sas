@@ -51,6 +51,8 @@ class StoreDemoRequest extends FormRequest
             // Qualifying — optional, but each one improves the call.
             'country'             => 'nullable|string|max:100',
             'doctors_count'       => 'nullable|string|max:50',
+            // Facility type — solo / clinic / polyclinic / hospital
+            'facility_type'       => 'nullable|string|max:32',
             'specialty'           => 'nullable|string|max:100',
             'interested_modules'  => 'nullable|array',
             'interested_modules.*' => 'string|max:50',
