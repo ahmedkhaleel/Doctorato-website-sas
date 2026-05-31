@@ -14,7 +14,7 @@ const form = useForm({ email: '' });
 
 function submitNewsletter() {
     showError.value = false;
-    form.post(route('newsletter.store'), {
+    form.post('/newsletter', {
         preserveScroll: true,
         onSuccess: () => {
             showSuccess.value = true;

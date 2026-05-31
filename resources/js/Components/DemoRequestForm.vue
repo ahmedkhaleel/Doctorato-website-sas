@@ -91,7 +91,10 @@ async function submitForm() {
         form.recaptcha_token = '';
     }
 
-    form.post(route('demo.store'), {
+    // Hardcoded URL instead of route('demo.store') — Ziggy's route() helper
+    // is not exposed as a global symbol in <script setup>, so using the
+    // helper inside a script causes ReferenceError on production.
+    form.post('/demo-request', {
         preserveScroll: true,
         onSuccess: () => {
             track.lead({ form: 'demo_request', clinic: form.clinic_name });

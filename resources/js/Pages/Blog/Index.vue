@@ -23,14 +23,14 @@ const selectedCategory = ref(props.currentCategory);
 const searchInput = ref(props.searchQuery);
 
 watch(selectedCategory, (val) => {
-    router.get(route('blog.index'), { category: val || undefined, q: searchInput.value || undefined }, {
+    router.get('/blog', { category: val || undefined, q: searchInput.value || undefined }, {
         preserveState: true,
         preserveScroll: true,
     });
 });
 
 function submitSearch() {
-    router.get(route('blog.index'), {
+    router.get('/blog', {
         q: searchInput.value || undefined,
         category: selectedCategory.value || undefined,
     }, {

@@ -40,7 +40,7 @@ function linkLabel(link) {
 const newsletterForm = useForm({ email: '' });
 const newsletterSuccess = ref(false);
 function submitNewsletter() {
-    newsletterForm.post(route('newsletter.store'), {
+    newsletterForm.post('/newsletter', {
         preserveScroll: true,
         onSuccess: () => {
             newsletterSuccess.value = true;

@@ -33,7 +33,7 @@ const seatColor = computed(() => {
 });
 
 function submit() {
-    form.put(route('admin.settings.launch.update'), {
+    form.put('/admin/settings/launch', {
         preserveScroll: true,
         onSuccess: () => { form.recaptcha_secret_key = ''; },
     });

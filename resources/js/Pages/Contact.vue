@@ -152,7 +152,7 @@ async function submitForm() {
     // submissions with a missing token, which was the cause of
     // "تعذر التحقق من الرسالة" on otherwise-valid hand-typed forms.
     form.recaptcha_token = (await captcha.execute('contact')) || '';
-    form.post(route('contact.store'), {
+    form.post('/contact', {
         onSuccess: () => {
             track.lead({ form: 'contact' });
             showSuccess.value = true;
