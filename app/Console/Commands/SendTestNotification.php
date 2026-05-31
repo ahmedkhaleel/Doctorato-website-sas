@@ -40,8 +40,11 @@ class SendTestNotification extends Command
         $this->info("From address: " . config('mail.from.address'));
 
         if ($type === 'demo') {
-            $to = $override ?: config('notifications.demo_email', 'demo@doctorato.com');
-            $this->info("Sending DEMO test → {$to}");
+            $recipients = $override
+                ? [$override]
+                : config('notifications.demo_recipients', ['info@doctorato.com', 'demo@doctorato.com']);
+
+            $this->info("Sending DEMO test → " . implode(', ', $recipients));
 
             // Build an in-memory model without saving it — so we don't pollute the DB.
             $fake = new DemoRequest([
@@ -59,19 +62,25 @@ class SendTestNotification extends Command
             $fake->id = 0;
             $fake->created_at = now();
 
-            try {
-                Mail::to($to)->send(new DemoAdminNotification($fake));
-                $this->info("✓ Sent demo notification to {$to}");
-                return self::SUCCESS;
-            } catch (\Throwable $e) {
-                $this->error("✗ Send failed: " . $e->getMessage());
-                return self::FAILURE;
+            $allOk = true;
+            foreach ($recipients as $to) {
+                try {
+                    Mail::to($to)->send(new DemoAdminNotification($fake));
+                    $this->info("  ✓ {$to}");
+                } catch (\Throwable $e) {
+                    $this->error("  ✗ {$to} — " . $e->getMessage());
+                    $allOk = false;
+                }
             }
+            return $allOk ? self::SUCCESS : self::FAILURE;
         }
 
         // contact
-        $to = $override ?: config('notifications.contact_email', 'info@doctorato.com');
-        $this->info("Sending CONTACT test → {$to}");
+        $recipients = $override
+            ? [$override]
+            : config('notifications.contact_recipients', ['info@doctorato.com', 'demo@doctorato.com']);
+
+        $this->info("Sending CONTACT test → " . implode(', ', $recipients));
 
         $fake = new ContactMessage([
             'name' => 'Diagnostic User',
@@ -83,13 +92,16 @@ class SendTestNotification extends Command
         $fake->id = 0;
         $fake->created_at = now();
 
-        try {
-            Mail::to($to)->send(new ContactAdminNotification($fake));
-            $this->info("✓ Sent contact notification to {$to}");
-            return self::SUCCESS;
-        } catch (\Throwable $e) {
-            $this->error("✗ Send failed: " . $e->getMessage());
-            return self::FAILURE;
+        $allOk = true;
+        foreach ($recipients as $to) {
+            try {
+                Mail::to($to)->send(new ContactAdminNotification($fake));
+                $this->info("  ✓ {$to}");
+            } catch (\Throwable $e) {
+                $this->error("  ✗ {$to} — " . $e->getMessage());
+                $allOk = false;
+            }
         }
+        return $allOk ? self::SUCCESS : self::FAILURE;
     }
 }

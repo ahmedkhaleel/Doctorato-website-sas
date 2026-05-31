@@ -67,18 +67,22 @@ class ContactController extends Controller
             ]);
         }
 
-        // Contact notifications go to info@doctorato.com by default — override
-        // via NOTIFY_CONTACT_EMAIL in .env without redeploy.
-        $adminEmail = config('notifications.contact_email', 'info@doctorato.com');
-        try {
-            Mail::to($adminEmail)->send(new ContactAdminNotification($contact));
-            Log::info('Contact: admin notification sent', ['to' => $adminEmail, 'contact_id' => $contact->id]);
-        } catch (\Throwable $e) {
-            Log::warning('Contact: admin notification email failed', [
-                'error' => $e->getMessage(),
-                'to' => $adminEmail,
-                'contact_id' => $contact->id,
-            ]);
+        // Contact notifications go to every address in notifications.contact_recipients.
+        // Each address gets a separate visible TO message (not BCC) so admins
+        // can reply directly from whichever inbox picked it up. Failures on
+        // one address don't block the others.
+        $recipients = config('notifications.contact_recipients', ['info@doctorato.com', 'demo@doctorato.com']);
+        foreach ($recipients as $to) {
+            try {
+                Mail::to($to)->send(new ContactAdminNotification($contact));
+                Log::info('Contact: admin notification sent', ['to' => $to, 'contact_id' => $contact->id]);
+            } catch (\Throwable $e) {
+                Log::warning('Contact: admin notification email failed', [
+                    'error' => $e->getMessage(),
+                    'to' => $to,
+                    'contact_id' => $contact->id,
+                ]);
+            }
         }
     }
 }
