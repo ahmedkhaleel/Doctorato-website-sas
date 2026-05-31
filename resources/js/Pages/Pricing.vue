@@ -757,7 +757,7 @@ const pricingJsonLd = computed(() => ({
                                 v-else
                                 class="shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#1B4F72] to-[#0A1628] flex items-center justify-center text-white font-bold text-base ring-2 ring-[#C4A265]/20"
                             >
-                                {{ (locale === 'ar' ? t.client_name_ar : (t.client_name_en || t.client_name_ar) || '?').trim().split(' ').pop().charAt(0) }}
+                                {{ ((locale === 'ar' ? (t.client_name_ar || t.client_name_en) : (t.client_name_en || t.client_name_ar)) || '?').trim().split(' ').pop().charAt(0) }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-bold text-[#1C2833] truncate">
