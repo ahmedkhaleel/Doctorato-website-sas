@@ -6,388 +6,346 @@ use App\Models\PricingPlan;
 use Illuminate\Database\Seeder;
 
 /**
- * Doctorato launch pricing — May 2026.
+ * Doctorato pricing — May 2026 RESET (competitive market positioning).
  *
- * 4 paid tiers + 1 Custom (contact-us). Targeted at Egyptian
- * middle-to-upper-tier clinics: established practitioners who
- * value quality positioning over the cheapest option.
+ * Strategy commit (based on competitor research — Cliniko, SimplePractice,
+ * Jane, ClinicGateway, Clinicea):
  *
- * Strategy commits documented per row:
- *   monthly_price            = the regular anchor (strikethrough on site)
- *   monthly_price_launch     = what customers actually pay now
- *   yearly_price_launch      = annual upfront; ~20% saving vs 12 × monthly_launch
- *   setup_fee                = one-time implementation fee (regular)
- *   setup_fee_launch         = setup fee under the launch offer
- *   yearly_setup_discount_pct= additional 50% off setup for annual subscribers
- *   supports_installments    = false on launch (instalments disabled
- *                              by product decision — column kept so
- *                              we can flip it back without a migration
- *                              if we re-enable later)
- *   installment_split        = [40, 30, 30] — kept for the future
+ *   1. No more dual anchor/launch prices. One real price per plan.
+ *   2. Annual = "2 months free" (~17% saving) — the SaaS standard.
+ *      Replaces the 50% blanket discount that looked like a souk markdown.
+ *   3. Setup fee dropped to zero on Starter + Growth. Optional 7,500 EGP
+ *      white-glove migration on Professional only. Matches the dominant
+ *      Egyptian local-vendor norm ("no setup fee").
+ *   4. Per-doctor pricing on Growth + Professional — 1 doctor included,
+ *      each extra doctor adds a transparent per-seat amount. This is the
+ *      Cliniko / Jane pattern and lets solo doctors enter cheap while the
+ *      math for multi-doctor clinics is fair and visible.
+ *   5. Enterprise is "Contact Sales" — no public price. Universal SaaS
+ *      pattern; removes the credibility hit of a 5-figure number on a
+ *      public page next to a "50% off" badge.
+ *   6. 30-day free trial, no credit card. Trust signal every credible
+ *      competitor publishes.
  *
- * Each tier steps up on five clean dimensions:
- *   - Specialties (1 → 3 → all → all + early access)
- *   - Patients (750 → 3000 → unlimited → unlimited)
- *   - Doctors (1 → 3 → 7 → unlimited)
- *   - Storage (10 → 40 → 150 → 500 GB)
- *   - Support response (24h → 8h → 4h → 1h 24/7)
- *
- * Launch offer runs through 2026-12-31 — the countdown banner reads
- * launch_offer_ends_at to drive urgency. Set is_launch_offer_active
- * to false in the admin to revert to the regular prices instantly.
+ * Each tier steps up on clean dimensions:
+ *   - Doctors included (1 → 1+per-seat → 1+per-seat → custom)
+ *   - Specialties (1 → 1 → 3 → all)
+ *   - Branches (1 → 1 → 1 → custom)
+ *   - Storage (5 → 10 → 20 → custom)
+ *   - Support (email → priority email → priority + phone → dedicated)
  */
 class PricingPlanSeeder extends Seeder
 {
     public function run(): void
     {
-        $launchEndsAt = '2026-12-31 23:59:59';
-        $installmentSplit = [40, 30, 30];
-
         $plans = [
-            // ───── 1. STARTER — Solo high-end practitioner ─────
+            // ───── 1. STARTER — Solo doctor, single clinic ─────
             [
                 'name_ar' => 'المبتدئ',
                 'name_en' => 'Starter',
                 'slug' => 'starter',
-                'description_ar' => 'مثالي للطبيب الفردي وعيادة بدء التشغيل',
-                'description_en' => 'For solo practitioners and clinics starting digital',
-                'monthly_price' => 3590,
-                'monthly_price_launch' => 1790,
-                'yearly_price' => 35900,
-                'yearly_price_launch' => 17900,
-                'setup_fee' => 5990,
-                'setup_fee_launch' => 2390,
-                'yearly_setup_discount_pct' => 50,
-                'is_launch_offer_active' => true,
-                'launch_offer_ends_at' => $launchEndsAt,
+                'description_ar' => 'للطبيب الفرد الذي يبدأ تحوّله الرقمي',
+                'description_en' => 'For solo doctors going digital',
+
+                'monthly_price' => 1990,
+                'yearly_price' => 19900,           // 2 months free
+                'setup_fee' => 0,                  // FREE setup
+                'yearly_setup_discount_pct' => 0,
+
+                'monthly_price_launch' => null,
+                'yearly_price_launch' => null,
+                'setup_fee_launch' => null,
+                'is_launch_offer_active' => false,
+                'launch_offer_ends_at' => null,
                 'supports_installments' => false,
-                'installment_count' => 3,
-                'installment_split' => $installmentSplit,
+                'installment_count' => null,
+                'installment_split' => null,
+
+                'included_doctors' => 1,
+                'per_extra_doctor_price' => null,  // not extensible — upgrade to Growth
+                'is_contact_sales' => false,
+                'trial_days' => 30,
+
                 'included_specialties_count' => 'one',
-                'included_specialties_pool' => [
-                    'general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine',
-                ],
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+
                 'currency' => 'EGP',
                 'is_popular' => false,
                 'is_custom' => false,
                 'features_ar' => [
+                    'طبيب واحد + موظف استقبال',
                     'تخصص طبي واحد (تختار من 6 تخصصات)',
-                    'EMR + قوالب التخصص',
-                    'مواعيد وحجز أونلاين 24/7',
-                    'فواتير ومدفوعات أساسية',
-                    'تذكيرات WhatsApp و SMS',
-                    'بوابة المريض الأساسية',
-                    'تقارير أساسية',
+                    'حتى 500 ملف مريض',
+                    'حجوزات وجدول المواعيد',
+                    'الملف الطبي الإلكتروني (EMR) الأساسي',
+                    'الوصفات وروشتات الأدوية',
+                    'فواتير وإيصالات ضريبية مصرية',
+                    'بوابة المرضى عبر الجوال',
+                    'دعم بريد إلكتروني',
+                    'تجربة مجانية 30 يوم بدون بطاقة ائتمان',
+                    'تركيب وترحيل بيانات مجاني',
                 ],
                 'features_en' => [
+                    '1 doctor + 1 receptionist',
                     '1 medical specialty (pick from 6)',
-                    'EMR with specialty templates',
-                    'Appointments and online booking 24/7',
-                    'Basic invoicing and payments',
-                    'WhatsApp + SMS reminders',
-                    'Basic patient portal',
-                    'Basic reports',
+                    'Up to 500 patient records',
+                    'Appointments & calendar',
+                    'Basic EMR / patient charting',
+                    'Prescriptions',
+                    'Egyptian e-receipt & invoicing',
+                    'Patient mobile portal',
+                    'Email support',
+                    '30-day free trial, no credit card',
+                    'Free setup & data migration',
                 ],
-                'modules_included' => [
-                    'patients', 'bookings', 'invoices', 'payments',
-                    'website', 'notifications', 'prescriptions',
-                ],
-                'max_users' => 3,
+                'modules_included' => ['scheduling', 'emr_basic', 'billing', 'patient_portal'],
+                'max_users' => 2,
+                'max_patients' => 500,
                 'max_doctors' => 1,
-                'max_staff' => 2,
-                'max_patients' => 750,
+                'max_staff' => 1,
                 'max_branches' => 1,
                 'storage_gb' => 5,
                 'support_level' => 'email',
-                'support_response_hours' => 24,
+                'support_response_hours' => 48,
                 'display_order' => 1,
+                'is_active' => true,
             ],
 
-            // ───── 2. GROWTH — Established 2-3 doctor clinic ─────
+            // ───── 2. GROWTH — Small clinic (most popular) ─────
             [
                 'name_ar' => 'النمو',
                 'name_en' => 'Growth',
                 'slug' => 'growth',
-                'description_ar' => 'للعيادات الراسخة بـ 2-3 أطباء',
-                'description_en' => 'For established 2-3 doctor clinics',
-                'monthly_price' => 5490,
-                'monthly_price_launch' => 2750,
-                'yearly_price' => 54900,
-                'yearly_price_launch' => 27500,
-                'setup_fee' => 9590,
-                'setup_fee_launch' => 4790,
-                'yearly_setup_discount_pct' => 50,
-                'is_launch_offer_active' => true,
-                'launch_offer_ends_at' => $launchEndsAt,
+                'description_ar' => 'العيادة الصغيرة بفريق محدود — مع نمو مرن',
+                'description_en' => 'Small clinics with a tight team — scale doctors as you grow',
+
+                'monthly_price' => 3990,
+                'yearly_price' => 39900,
+                'setup_fee' => 0,                  // FREE setup
+                'yearly_setup_discount_pct' => 0,
+
+                'monthly_price_launch' => null,
+                'yearly_price_launch' => null,
+                'setup_fee_launch' => null,
+                'is_launch_offer_active' => false,
+                'launch_offer_ends_at' => null,
                 'supports_installments' => false,
-                'installment_count' => 3,
-                'installment_split' => $installmentSplit,
+                'installment_count' => null,
+                'installment_split' => null,
+
+                'included_doctors' => 1,
+                'per_extra_doctor_price' => 700,   // per extra doctor/month
+                'is_contact_sales' => false,
+                'trial_days' => 30,
+
                 'included_specialties_count' => 'one',
-                'included_specialties_pool' => [
-                    'general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine',
-                ],
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+
                 'currency' => 'EGP',
-                'is_popular' => false,
+                'is_popular' => true,              // ⭐ Most popular
                 'is_custom' => false,
                 'features_ar' => [
+                    'طبيب مشمول + 700 ج.م لكل طبيب إضافي',
+                    'حتى 3 موظفين (استقبال / محاسب / مساعد)',
                     'تخصص طبي واحد (تختار من 6 تخصصات)',
-                    'كل ما في Starter +',
-                    'WhatsApp Business API مدمج',
-                    'CRM طبي وحملات تسويقية',
-                    'Insurance integration أساسي (Bupa, GIG)',
-                    'مخزون وتنبيهات نفاذ',
-                    'محفظة المريض ونقاط ولاء',
-                    'تقييم رضا المريض (NPS)',
-                    'تقارير وتحليلات متقدمة',
+                    'حتى 2,000 ملف مريض',
+                    'EMR كامل + قوالب التخصص',
+                    'تقارير مالية ولوحات أداء',
+                    'تذكير المواعيد بـ SMS (Add-on)',
+                    'تكامل WhatsApp Business (Add-on)',
+                    'نظام الصلاحيات بالأدوار',
+                    'دعم بريد إلكتروني ذو أولوية',
+                    'تجربة مجانية 30 يوم بدون بطاقة ائتمان',
+                    'تركيب وترحيل بيانات مجاني',
                 ],
                 'features_en' => [
+                    '1 doctor included + 700 EGP per extra doctor',
+                    'Up to 3 staff (receptionist / accountant / assistant)',
                     '1 medical specialty (pick from 6)',
-                    'Everything in Starter +',
-                    'WhatsApp Business API integrated',
-                    'Medical CRM and marketing campaigns',
-                    'Basic insurance integration (Bupa, GIG)',
-                    'Inventory with stock alerts',
-                    'Patient wallet and loyalty points',
-                    'Patient satisfaction (NPS)',
-                    'Advanced reports and analytics',
+                    'Up to 2,000 patient records',
+                    'Full EMR + specialty templates',
+                    'Financial reports & dashboards',
+                    'SMS appointment reminders (add-on)',
+                    'WhatsApp Business integration (add-on)',
+                    'Role-based access control',
+                    'Priority email support',
+                    '30-day free trial, no credit card',
+                    'Free setup & data migration',
                 ],
-                'modules_included' => [
-                    'patients', 'bookings', 'invoices', 'payments', 'website',
-                    'crm', 'wallet', 'discounts', 'chat', 'notifications',
-                    'prescriptions', 'satisfaction', 'expenses',
-                ],
-                'max_users' => 9,
-                'max_doctors' => 3,
-                'max_staff' => 6,
-                'max_patients' => 3000,
+                'modules_included' => ['scheduling', 'emr_full', 'billing', 'patient_portal', 'reports', 'roles'],
+                'max_users' => 4,
+                'max_patients' => 2000,
+                'max_doctors' => 5,
+                'max_staff' => 3,
                 'max_branches' => 1,
                 'storage_gb' => 10,
-                'support_level' => 'chat',
-                'support_response_hours' => 8,
+                'support_level' => 'priority_email',
+                'support_response_hours' => 24,
                 'display_order' => 2,
+                'is_active' => true,
             ],
 
-            // ───── 3. PROFESSIONAL — Most popular ⭐ ─────
+            // ───── 3. PROFESSIONAL — Multi-specialty clinic ─────
             [
                 'name_ar' => 'الاحترافي',
                 'name_en' => 'Professional',
                 'slug' => 'professional',
-                'description_ar' => 'للمراكز الطبية متعددة التخصصات (الأكثر طلباً)',
-                'description_en' => 'For multi-specialty medical centres (most popular)',
-                'monthly_price' => 8390,
-                'monthly_price_launch' => 4190,
-                'yearly_price' => 83900,
-                'yearly_price_launch' => 41900,
-                'setup_fee' => 14390,
-                'setup_fee_launch' => 7190,
-                'yearly_setup_discount_pct' => 50,
-                'is_launch_offer_active' => true,
-                'launch_offer_ends_at' => $launchEndsAt,
-                'supports_installments' => false,
-                'installment_count' => 3,
-                'installment_split' => $installmentSplit,
-                'included_specialties_count' => 'three',
-                'included_specialties_pool' => [
-                    'general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine',
-                ],
-                'currency' => 'EGP',
-                'is_popular' => true,
-                'is_custom' => false,
-                'features_ar' => [
-                    '3 تخصصات طبية (تختار من 6)',
-                    'كل ما في Growth +',
-                    'HR والرواتب كامل',
-                    'Insurance integration كامل (Bupa, GIG, ELAJI, AXA, MetLife)',
-                    'المحاسبة المالية الكاملة وتقارير ضريبية',
-                    'PACS أساسي وتصوير 3D/4D',
-                    'Premium Analytics مع AI insights',
-                    '6 بوابات كاملة',
-                    'Account Manager مخصص',
-                    '2 جلسة تدريب حضورية + 4 أونلاين',
-                ],
-                'features_en' => [
-                    '3 medical specialties (pick from 6)',
-                    'Everything in Growth +',
-                    'Full HR and payroll',
-                    'Full insurance integration (Bupa, GIG, ELAJI, AXA, MetLife)',
-                    'Full financial accounting and tax reports',
-                    'Basic PACS with 3D/4D imaging',
-                    'Premium analytics with AI insights',
-                    'All 6 portals',
-                    'Dedicated account manager',
-                    '2 in-person + 4 online training sessions',
-                ],
-                'modules_included' => [
-                    'patients', 'bookings', 'invoices', 'payments', 'website',
-                    'crm', 'wallet', 'discounts', 'chat', 'notifications',
-                    'prescriptions', 'satisfaction', 'expenses',
-                    'dental', 'dermatology', 'pediatrics', 'obstetrics', 'telemedicine',
-                    'hr', 'insurance', 'inventory', 'analytics',
-                ],
-                'max_users' => 22,
-                'max_doctors' => 7,
-                'max_staff' => 15,
-                'max_patients' => null,    // unlimited
-                'max_branches' => 1,
-                'storage_gb' => 20,
-                'support_level' => 'phone',
-                'support_response_hours' => 4,
-                'display_order' => 3,
-            ],
+                'description_ar' => 'العيادة متعددة التخصصات بفريق كامل',
+                'description_en' => 'Multi-specialty clinic with full team',
 
-            // ───── 4. ENTERPRISE — Networks / hospitals ─────
-            [
-                'name_ar' => 'المؤسّسي',
-                'name_en' => 'Enterprise',
-                'slug' => 'enterprise',
-                'description_ar' => 'للشبكات والمستشفيات والمجموعات الطبية',
-                'description_en' => 'For networks, hospitals, and medical groups',
-                'monthly_price' => 16790,
-                'monthly_price_launch' => 8390,
-                'yearly_price' => 167900,
-                'yearly_price_launch' => 83900,
-                'setup_fee' => 23990,
-                'setup_fee_launch' => 11990,
-                'yearly_setup_discount_pct' => 50,
-                'is_launch_offer_active' => true,
-                'launch_offer_ends_at' => $launchEndsAt,
-                'supports_installments' => false,
-                'installment_count' => 3,
-                'installment_split' => $installmentSplit,
-                'included_specialties_count' => 'all',
-                'included_specialties_pool' => [
-                    'general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine',
-                ],
-                'currency' => 'EGP',
-                'is_popular' => false,
-                'is_custom' => false,
-                'features_ar' => [
-                    'كل التخصصات الطبية (6 تخصصات)',
-                    'كل ما في Professional +',
-                    'مرضى بلا حدود + دعم تشغيل كامل',
-                    'PACS متقدم مع AI imaging',
-                    'API + Webhooks + Custom Integrations',
-                    'White-label (تطبيق بشعارك)',
-                    'Multi-currency invoicing',
-                    'RBAC متقدم + Audit Log 3 سنوات',
-                    'SLA 99.9% مكتوب وموقّع',
-                    'Backup ساعي',
-                    'Dedicated Success Manager',
-                    'Priority support 1 ساعة (24/7)',
-                    '5 أيام Onboarding حضوري',
-                    'جلسات تدريب شهرية',
-                ],
-                'features_en' => [
-                    'All medical specialties (6)',
-                    'Everything in Professional +',
-                    'Unlimited patients + full implementation support',
-                    'Advanced PACS with AI imaging',
-                    'API + Webhooks + custom integrations',
-                    'White-label (app with your branding)',
-                    'Multi-currency invoicing',
-                    'Advanced RBAC + 3-year audit log',
-                    'Signed 99.9% SLA',
-                    'Hourly backup',
-                    'Dedicated success manager',
-                    'Priority 1-hour 24/7 support',
-                    '5-day in-person onboarding',
-                    'Monthly training sessions',
-                ],
-                'modules_included' => [
-                    'patients', 'bookings', 'invoices', 'payments', 'website',
-                    'crm', 'wallet', 'discounts', 'chat', 'notifications',
-                    'prescriptions', 'satisfaction', 'expenses',
-                    'dental', 'dermatology', 'pediatrics', 'obstetrics', 'telemedicine',
-                    'hr', 'insurance', 'inventory', 'analytics',
-                    'webmaster', 'rbac', 'audit', 'api', 'whitelabel',
-                ],
-                'max_users' => null,
-                'max_doctors' => null,
-                'max_staff' => null,
-                'max_patients' => null,
-                'max_branches' => 1,
-                'storage_gb' => 30,
-                'support_level' => 'priority',
-                'support_response_hours' => 1,
-                'display_order' => 4,
-            ],
+                'monthly_price' => 6990,
+                'yearly_price' => 69900,
+                'setup_fee' => 7500,               // Optional white-glove
+                'yearly_setup_discount_pct' => 0,  // Setup price flat — no discount needed
 
-            // ───── 5. CUSTOM — Contact-us (no public price) ─────
-            [
-                'name_ar' => 'مخصص',
-                'name_en' => 'Custom',
-                'slug' => 'custom',
-                'description_ar' => 'للشبكات الكبرى والمستشفيات بأكثر من 50 فرع',
-                'description_en' => 'For large networks and hospitals with 50+ branches',
-                'monthly_price' => 0,
-                'monthly_price_launch' => 0,
-                'yearly_price' => 0,
-                'yearly_price_launch' => 0,
-                'setup_fee' => 0,
-                'setup_fee_launch' => 0,
-                'yearly_setup_discount_pct' => 0,
+                'monthly_price_launch' => null,
+                'yearly_price_launch' => null,
+                'setup_fee_launch' => null,
                 'is_launch_offer_active' => false,
                 'launch_offer_ends_at' => null,
                 'supports_installments' => false,
-                'installment_count' => 0,
+                'installment_count' => null,
                 'installment_split' => null,
-                'included_specialties_count' => 'all_plus_early',
-                'included_specialties_pool' => null,
+
+                'included_doctors' => 1,
+                'per_extra_doctor_price' => 900,   // per extra doctor/month
+                'is_contact_sales' => false,
+                'trial_days' => 30,
+
+                'included_specialties_count' => 'three',
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+
                 'currency' => 'EGP',
                 'is_popular' => false,
-                'is_custom' => true,
+                'is_custom' => false,
                 'features_ar' => [
-                    'كل ما في Enterprise +',
-                    'On-premise option',
-                    'Dedicated infrastructure',
-                    'DPA / BAA على الطلب',
-                    'SLA مخصصة',
-                    'Custom development',
-                    'استشارات تقنية مجانية',
+                    'طبيب مشمول + 900 ج.م لكل طبيب إضافي',
+                    'موظفون بلا حدود (استقبال / محاسبة / تمريض)',
+                    '3 تخصصات طبية (تختار من 6)',
+                    'حتى 10,000 ملف مريض',
+                    'كل مزايا الـ EMR + قوالب متعددة التخصصات',
+                    'تكاملات WhatsApp / Telemedicine / Lab مجانية',
+                    'إدارة المخزون والأدوية',
+                    'وحدة الموارد البشرية والرواتب',
+                    'تكامل التأمين الطبي',
+                    'تقارير تحليلية متقدمة + Custom Reports',
+                    'API للتكاملات الخارجية',
+                    'دعم أولوية: بريد + هاتف',
+                    'تجربة مجانية 30 يوم بدون بطاقة ائتمان',
+                    'White-glove setup اختياري (7,500 ج.م — مرة واحدة)',
                 ],
                 'features_en' => [
-                    'Everything in Enterprise +',
-                    'On-premise option',
-                    'Dedicated infrastructure',
-                    'DPA / BAA on request',
-                    'Custom SLA',
-                    'Custom development',
-                    'Free technical consultations',
+                    '1 doctor included + 900 EGP per extra doctor',
+                    'Unlimited staff (reception / accounting / nursing)',
+                    '3 medical specialties (pick from 6)',
+                    'Up to 10,000 patient records',
+                    'All EMR features + multi-specialty templates',
+                    'WhatsApp / Telemedicine / Lab integrations FREE',
+                    'Inventory & pharmacy management',
+                    'HR & payroll module',
+                    'Insurance module',
+                    'Advanced analytics + custom reports',
+                    'API access for external integrations',
+                    'Priority support: email + phone',
+                    '30-day free trial, no credit card',
+                    'Optional white-glove setup (7,500 EGP one-time)',
                 ],
-                'modules_included' => ['all'],
+                'modules_included' => [
+                    'scheduling', 'emr_full', 'billing', 'patient_portal',
+                    'reports_advanced', 'roles', 'inventory', 'hr_payroll',
+                    'insurance', 'api', 'whatsapp', 'telemedicine', 'lab',
+                ],
+                'max_users' => null,               // unlimited staff
+                'max_patients' => 10000,
+                'max_doctors' => 15,
+                'max_staff' => null,
+                'max_branches' => 1,
+                'storage_gb' => 20,
+                'support_level' => 'priority_phone',
+                'support_response_hours' => 8,
+                'display_order' => 3,
+                'is_active' => true,
+            ],
+
+            // ───── 4. ENTERPRISE — Contact Sales (no public price) ─────
+            [
+                'name_ar' => 'المؤسسات',
+                'name_en' => 'Enterprise',
+                'slug' => 'enterprise',
+                'description_ar' => 'شبكات العيادات والمستشفيات — مفصّل لك بالكامل',
+                'description_en' => 'Clinic networks & hospitals — fully tailored',
+
+                'monthly_price' => 0,              // hidden — use is_contact_sales
+                'yearly_price' => 0,
+                'setup_fee' => 0,
+                'yearly_setup_discount_pct' => 0,
+
+                'monthly_price_launch' => null,
+                'yearly_price_launch' => null,
+                'setup_fee_launch' => null,
+                'is_launch_offer_active' => false,
+                'launch_offer_ends_at' => null,
+                'supports_installments' => false,
+                'installment_count' => null,
+                'installment_split' => null,
+
+                'included_doctors' => 0,
+                'per_extra_doctor_price' => null,
+                'is_contact_sales' => true,        // ← key flag
+                'trial_days' => 30,
+
+                'included_specialties_count' => 'all',
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+
+                'currency' => 'EGP',
+                'is_popular' => false,
+                'is_custom' => false,
+                'features_ar' => [
+                    'كل مزايا الاحترافي + ',
+                    'فروع وأطباء بلا حدود',
+                    'كل التخصصات الطبية الستة',
+                    'تخزين ودعم تشغيل بلا حدود',
+                    'SLA مخصص + مدير حساب مخصص',
+                    'تكامل HL7 / FHIR للمستشفيات',
+                    'White-label وعلامة تجارية خاصة',
+                    'نشر داخل البنية التحتية الخاصة بك (On-prem) — اختياري',
+                    'تدريب موسّع للفرق الطبية والإدارية',
+                    'دعم 24/7 وهاتف مباشر',
+                ],
+                'features_en' => [
+                    'Everything in Professional, plus:',
+                    'Unlimited branches & doctors',
+                    'All 6 medical specialties',
+                    'Unlimited storage & implementation support',
+                    'Custom SLA + dedicated account manager',
+                    'HL7 / FHIR integration for hospitals',
+                    'White-label and custom branding',
+                    'On-premise deployment (optional)',
+                    'Extended training for clinical & admin teams',
+                    '24/7 support with direct phone line',
+                ],
+                'modules_included' => ['*'],
                 'max_users' => null,
+                'max_patients' => null,
                 'max_doctors' => null,
                 'max_staff' => null,
-                'max_patients' => null,
                 'max_branches' => null,
                 'storage_gb' => null,
-                'support_level' => 'dedicated',
-                'support_response_hours' => null,
-                'display_order' => 5,
+                'support_level' => 'dedicated_24_7',
+                'support_response_hours' => 1,
+                'display_order' => 4,
+                'is_active' => true,
             ],
         ];
 
-        // Upsert the new lineup
-        $newSlugs = collect($plans)->pluck('slug')->all();
+        $newSlugs = [];
         foreach ($plans as $plan) {
-            PricingPlan::updateOrCreate(
-                ['slug' => $plan['slug']],
-                $plan
-            );
+            $slug = $plan['slug'];
+            $newSlugs[] = $slug;
+            PricingPlan::updateOrCreate(['slug' => $slug], $plan);
         }
 
-        // Clean-up: deactivate any plan whose slug is NOT in the new
-        // catalogue. Common case after this seeder runs over a v1
-        // database: the legacy 'basic' row stays orphaned because
-        // updateOrCreate keys on slug and doesn't touch rows that
-        // weren't in the new list. Soft-deactivating (rather than
-        // hard-deleting) preserves the foreign keys from subscriptions
-        // and invoices that may still reference the old plan id.
-        //
-        // If a customer is still on a deactivated plan, their
-        // subscription keeps working — the cache layer just stops
-        // surfacing the plan on the public pricing page (it filters
-        // on is_active = true).
+        // Deactivate any legacy plans (old basic/premium/custom slugs from previous strategies)
         PricingPlan::query()
             ->whereNotIn('slug', $newSlugs)
             ->update(['is_active' => false]);

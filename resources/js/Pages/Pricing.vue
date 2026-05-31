@@ -1,7 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
-import PricingCards from '@/Components/PricingCards.vue';
-import LaunchPricingCard from '@/Components/LaunchPricingCard.vue';
+import PricingCardV2 from '@/Components/PricingCardV2.vue';
 import FaqAccordion from '@/Components/FaqAccordion.vue';
 import RoiPreview from '@/Components/RoiPreview.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
@@ -12,11 +11,6 @@ import SeoHead from '@/Components/SeoHead.vue';
 import { ref, computed } from 'vue';
 
 const page = usePage();
-// Read the launch-offer snapshot from shared props. Null-safe fallback
-// so the page still renders if the service is unavailable for any
-// reason (e.g. cache outage).
-const launchOffer = computed(() => page.props.launchOffer || { is_active: false, is_sold_out: false, remaining_slots: 0, total_slots: 50, used_slots: 0, progress_percent: 0 });
-
 const { t, locale } = useI18n();
 const { localizedField } = useLocale();
 useScrollAnimation();
@@ -123,66 +117,66 @@ const comparisonCategories = computed(() => [
     {
         name: locale.value === 'ar' ? 'العيادة والإكلينيكي' : 'Clinical',
         features: [
-            { label: locale.value === 'ar' ? 'ملفات المرضى الإلكترونية (EMR)' : 'Patient EMR', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'المواعيد والحجز أونلاين' : 'Appointments + online booking', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'الوصفات الإلكترونية' : 'E-prescriptions', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'تكامل صيدليات' : 'Pharmacy integration', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'تصوير وأرشيف طبي (PACS)' : 'Medical imaging (PACS)', values: [false, false, true, true, true] },
-            { label: locale.value === 'ar' ? 'تكامل المختبرات' : 'Lab integration', values: ['add-on', 'add-on', 'add-on', true, true] },
+            { label: locale.value === 'ar' ? 'ملفات المرضى الإلكترونية (EMR)' : 'Patient EMR', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'المواعيد والحجز أونلاين' : 'Appointments + online booking', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'الوصفات الإلكترونية' : 'E-prescriptions', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تكامل صيدليات' : 'Pharmacy integration', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'تصوير وأرشيف طبي (PACS)' : 'Medical imaging (PACS)', values: [false, false, true, true] },
+            { label: locale.value === 'ar' ? 'تكامل المختبرات' : 'Lab integration', values: ['add-on', 'add-on', true, true] },
         ]
     },
     {
         name: locale.value === 'ar' ? 'الإدارة والمالية' : 'Operations & finance',
         features: [
-            { label: locale.value === 'ar' ? 'الفواتير والمدفوعات' : 'Invoicing + payments', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'المحفظة ونقاط الولاء' : 'Wallet + loyalty', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'مخزون ومنتجات' : 'Inventory', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'المحاسبة المالية' : 'Financial accounting', values: [false, 'basic', true, true, true] },
-            { label: locale.value === 'ar' ? 'الموارد البشرية والرواتب' : 'HR + payroll', values: [false, false, true, true, true] },
-            { label: locale.value === 'ar' ? 'تكامل التأمين (Bupa, GIG, ELAJI)' : 'Insurance integration', values: [false, 'basic', 'basic', true, true] },
+            { label: locale.value === 'ar' ? 'الفواتير والمدفوعات' : 'Invoicing + payments', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'المحفظة ونقاط الولاء' : 'Wallet + loyalty', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'مخزون ومنتجات' : 'Inventory', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'المحاسبة المالية' : 'Financial accounting', values: [false, 'basic', true, true] },
+            { label: locale.value === 'ar' ? 'الموارد البشرية والرواتب' : 'HR + payroll', values: [false, false, true, true] },
+            { label: locale.value === 'ar' ? 'تكامل التأمين (Bupa, GIG, ELAJI)' : 'Insurance integration', values: [false, 'basic', true, true] },
         ]
     },
     {
         name: locale.value === 'ar' ? 'التواصل والمشاركة' : 'Engagement & communication',
         features: [
-            { label: locale.value === 'ar' ? 'تذكيرات SMS' : 'SMS reminders', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'تذكيرات WhatsApp' : 'WhatsApp reminders', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'WhatsApp Business API كامل' : 'WhatsApp Business API (full)', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'CRM طبي' : 'Medical CRM', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'تقييم رضا المريض (NPS)' : 'Patient satisfaction (NPS)', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'بوابة المريض' : 'Patient portal', values: ['basic', true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تذكيرات SMS' : 'SMS reminders', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'تذكيرات WhatsApp' : 'WhatsApp reminders', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'WhatsApp Business API كامل' : 'WhatsApp Business API (full)', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'CRM طبي' : 'Medical CRM', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'تقييم رضا المريض (NPS)' : 'Patient satisfaction (NPS)', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'بوابة المريض' : 'Patient portal', values: ['basic', true, true, true] },
         ]
     },
     {
         name: locale.value === 'ar' ? 'التحليل والذكاء' : 'Analytics & insights',
         features: [
-            { label: locale.value === 'ar' ? 'تقارير أساسية' : 'Basic reports', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'Analytics متقدمة' : 'Advanced analytics', values: [false, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'AI insights' : 'AI insights', values: [false, false, true, true, true] },
-            { label: locale.value === 'ar' ? 'تقارير ضريبية' : 'Tax reports', values: [false, false, true, true, true] },
+            { label: locale.value === 'ar' ? 'تقارير أساسية' : 'Basic reports', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'Analytics متقدمة' : 'Advanced analytics', values: [false, true, true, true] },
+            { label: locale.value === 'ar' ? 'AI insights' : 'AI insights', values: [false, false, true, true] },
+            { label: locale.value === 'ar' ? 'تقارير ضريبية' : 'Tax reports', values: [false, false, true, true] },
         ]
     },
     {
         name: locale.value === 'ar' ? 'الأمان والإدارة الإدارية' : 'Security & admin',
         features: [
-            { label: locale.value === 'ar' ? '6 بوابات منفصلة' : '6 separate portals', values: ['3', '5', true, true, true] },
-            { label: locale.value === 'ar' ? 'RBAC (80+ صلاحية)' : 'RBAC (80+ permissions)', values: ['basic', 'basic', true, true, true] },
-            { label: locale.value === 'ar' ? 'Audit Log' : 'Audit log', values: [false, false, true, true, true] },
-            { label: locale.value === 'ar' ? '2FA للأدمن' : '2FA admin', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'GDPR / PDPL متوافق' : 'GDPR / PDPL', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'SLA 99.9% مكتوب' : 'Signed 99.9% SLA', values: [false, false, false, true, true] },
-            { label: locale.value === 'ar' ? 'Backup' : 'Backup', values: ['يومي', 'يومي', 'يومي', 'ساعي', 'مخصّص'] },
+            { label: locale.value === 'ar' ? '6 بوابات منفصلة' : '6 separate portals', values: ['3', '5', true, true] },
+            { label: locale.value === 'ar' ? 'RBAC (80+ صلاحية)' : 'RBAC (80+ permissions)', values: ['basic', 'basic', true, true] },
+            { label: locale.value === 'ar' ? 'Audit Log' : 'Audit log', values: [false, false, true, true] },
+            { label: locale.value === 'ar' ? '2FA للأدمن' : '2FA admin', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'GDPR / PDPL متوافق' : 'GDPR / PDPL', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'SLA 99.9% مكتوب' : 'Signed 99.9% SLA', values: [false, false, false, true] },
+            { label: locale.value === 'ar' ? 'Backup' : 'Backup', values: ['يومي', 'يومي', 'ساعي', 'مخصّص'] },
         ]
     },
     {
         name: locale.value === 'ar' ? 'API و White-label' : 'API & White-label',
         features: [
-            { label: locale.value === 'ar' ? 'موقع عيادتك' : 'Clinic website', values: [true, true, true, true, true] },
-            { label: locale.value === 'ar' ? 'Webmaster Mode' : 'Webmaster mode', values: [false, false, false, true, true] },
-            { label: locale.value === 'ar' ? 'API + Webhooks' : 'API + Webhooks', values: [false, false, false, true, true] },
-            { label: locale.value === 'ar' ? 'Custom integrations' : 'Custom integrations', values: [false, false, false, true, true] },
-            { label: locale.value === 'ar' ? 'White-label (تطبيق بشعارك)' : 'White-label (your branding)', values: [false, false, 'add-on', true, true] },
-            { label: locale.value === 'ar' ? 'On-premise' : 'On-premise', values: [false, false, false, false, true] },
+            { label: locale.value === 'ar' ? 'موقع عيادتك' : 'Clinic website', values: [true, true, true, true] },
+            { label: locale.value === 'ar' ? 'Webmaster Mode' : 'Webmaster mode', values: [false, false, false, true] },
+            { label: locale.value === 'ar' ? 'API + Webhooks' : 'API + Webhooks', values: [false, false, false, true] },
+            { label: locale.value === 'ar' ? 'Custom integrations' : 'Custom integrations', values: [false, false, false, true] },
+            { label: locale.value === 'ar' ? 'White-label (تطبيق بشعارك)' : 'White-label (your branding)', values: [false, false, 'add-on', true] },
+            { label: locale.value === 'ar' ? 'On-premise' : 'On-premise', values: [false, false, false, true] },
         ]
     },
 ]);
@@ -196,35 +190,39 @@ function getCompareValues(field) {
                 all: locale.value === 'ar' ? 'الكل (6)' : 'All (6)',
                 all_plus_early: locale.value === 'ar' ? 'الكل + Early access' : 'All + early access',
             };
-            return map[plan.included_specialties_count] || (plan.is_custom ? '—' : '—');
+            return map[plan.included_specialties_count] || '—';
         }
         if (field === 'max_doctors') {
-            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            if (plan.is_contact_sales) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
             return plan.max_doctors ? String(plan.max_doctors) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'max_staff') {
-            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            if (plan.is_contact_sales) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
             return plan.max_staff ? String(plan.max_staff) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'max_patients') {
-            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            if (plan.is_contact_sales) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
             return plan.max_patients ? new Intl.NumberFormat(locale.value === 'ar' ? 'ar-EG' : 'en-US').format(plan.max_patients) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'max_branches') {
-            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            if (plan.is_contact_sales) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
             return plan.max_branches ? String(plan.max_branches) : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'storage_gb') {
-            if (plan.is_custom) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
+            if (plan.is_contact_sales) return locale.value === 'ar' ? 'مخصّص' : 'Custom';
             return plan.storage_gb ? `${plan.storage_gb} GB` : (locale.value === 'ar' ? 'بلا حدود' : 'Unlimited');
         }
         if (field === 'support_level') {
             const levels = {
-                email:      locale.value === 'ar' ? 'Email 24س'   : 'Email 24h',
-                chat:       locale.value === 'ar' ? 'Email+Chat 8س' : 'Email+Chat 8h',
-                phone:      locale.value === 'ar' ? 'Phone 4س'    : 'Phone 4h',
-                priority:   locale.value === 'ar' ? 'Priority 1س 24/7' : 'Priority 1h 24/7',
-                dedicated:  locale.value === 'ar' ? 'مخصص'        : 'Dedicated',
+                email:          locale.value === 'ar' ? 'بريد إلكتروني'      : 'Email',
+                priority_email: locale.value === 'ar' ? 'بريد بأولوية'        : 'Priority email',
+                priority_phone: locale.value === 'ar' ? 'بريد + هاتف بأولوية' : 'Email + phone',
+                dedicated_24_7: locale.value === 'ar' ? 'دعم مخصص 24/7'       : 'Dedicated 24/7',
+                // legacy fallback keys (kept in case any old plan still uses them)
+                chat:           locale.value === 'ar' ? 'دردشة'              : 'Chat',
+                phone:          locale.value === 'ar' ? 'هاتف'               : 'Phone',
+                priority:       locale.value === 'ar' ? 'أولوية'             : 'Priority',
+                dedicated:      locale.value === 'ar' ? 'مخصص'               : 'Dedicated',
             };
             return levels[plan.support_level] || plan.support_level;
         }
@@ -373,107 +371,13 @@ const pricingJsonLd = computed(() => ({
                     {{ t('pricing.approximate_note') }}
                 </p>
 
-                <!-- Launch Offer Banner — shows live remaining-seats counter -->
-                <div v-if="launchOffer.is_active || launchOffer.is_sold_out" class="max-w-4xl mx-auto mb-10 animate-fade-up">
-                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#C4A265] via-[#D4B876] to-[#C4A265] p-[1.5px] shadow-xl shadow-[#C4A265]/20">
-                        <div class="relative rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#1B4F72] to-[#0A1628] px-6 py-5 md:px-8 md:py-6 overflow-hidden">
-                            <!-- Decorative glows -->
-                            <div class="absolute -top-10 end-0 w-40 h-40 bg-[#C4A265]/20 rounded-full blur-3xl"></div>
-                            <div class="absolute -bottom-10 start-0 w-40 h-40 bg-[#2471A3]/20 rounded-full blur-3xl"></div>
-
-                            <div class="relative flex flex-col md:flex-row items-center gap-5 md:gap-6">
-                                <!-- Fire icon (pulses only when slots are running low) -->
-                                <div
-                                    class="shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C4A265] to-[#D4B876] flex items-center justify-center shadow-lg shadow-[#C4A265]/30"
-                                    :class="{ 'animate-pulse': launchOffer.remaining_slots <= 10 && launchOffer.is_active }"
-                                >
-                                    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
-                                    </svg>
-                                </div>
-
-                                <!-- Text -->
-                                <div class="flex-1 text-center md:text-start">
-                                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1 flex-wrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#C4A265] text-white uppercase tracking-wide">{{ locale === 'ar' ? 'عرض الإطلاق' : 'Launch Offer' }}</span>
-                                        <!-- Live seats badge: green > 20, amber 10-20, red <= 10 -->
-                                        <span
-                                            v-if="launchOffer.is_active"
-                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide"
-                                            :class="{
-                                                'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40': launchOffer.remaining_slots > 20,
-                                                'bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/40': launchOffer.remaining_slots > 10 && launchOffer.remaining_slots <= 20,
-                                                'bg-red-500/20 text-red-300 ring-1 ring-red-400/40 animate-pulse': launchOffer.remaining_slots <= 10,
-                                            }"
-                                        >
-                                            <span class="w-1.5 h-1.5 rounded-full" :class="launchOffer.remaining_slots <= 10 ? 'bg-red-400' : launchOffer.remaining_slots <= 20 ? 'bg-amber-400' : 'bg-emerald-400'"></span>
-                                            {{ locale === 'ar'
-                                                ? `باقي ${launchOffer.remaining_slots} من ${launchOffer.total_slots}`
-                                                : `${launchOffer.remaining_slots} of ${launchOffer.total_slots} left` }}
-                                        </span>
-                                        <span
-                                            v-else-if="launchOffer.is_sold_out"
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-500/30 text-gray-300 uppercase tracking-wide"
-                                        >
-                                            {{ locale === 'ar' ? 'نفذت الكمية' : 'Sold out' }}
-                                        </span>
-                                    </div>
-                                    <h3 class="text-lg md:text-xl font-extrabold text-white mb-1">
-                                        <template v-if="launchOffer.is_sold_out">
-                                            {{ locale === 'ar' ? 'انتهى عرض الإطلاق — شكراً لثقتكم!' : 'Launch offer ended — thank you!' }}
-                                        </template>
-                                        <template v-else>
-                                            {{ locale === 'ar' ? 'خصم 30% + رسوم إعداد مجانية لأول 50 عيادة' : '30% off + free setup for the first 50 clinics' }}
-                                        </template>
-                                    </h3>
-                                    <p class="text-sm text-white/60 leading-relaxed mb-3">
-                                        <template v-if="launchOffer.is_sold_out">
-                                            {{ locale === 'ar' ? 'كل المقاعد اتحجزت. تواصل معنا للاطلاع على العروض الحالية.' : 'All seats are taken. Contact us for current offers.' }}
-                                        </template>
-                                        <template v-else>
-                                            {{ locale === 'ar' ? 'اشترك الآن واحصل على خصم 30% لمدة 6 أشهر + تجهيز ونقل بيانات مجاني + تدريب كامل لفريقك' : 'Subscribe now, get 30% off for 6 months + free onboarding, data migration & team training' }}
-                                        </template>
-                                    </p>
-
-                                    <!-- Progress bar — reinforces scarcity visually -->
-                                    <div v-if="launchOffer.is_active" class="relative h-1.5 bg-white/10 rounded-full overflow-hidden max-w-md mx-auto md:mx-0">
-                                        <div
-                                            class="absolute inset-y-0 start-0 rounded-full transition-all duration-700 ease-out"
-                                            :class="launchOffer.remaining_slots <= 10 ? 'bg-gradient-to-r from-red-400 to-orange-400' : 'bg-gradient-to-r from-[#C4A265] to-[#D4B876]'"
-                                            :style="{ width: launchOffer.progress_percent + '%' }"
-                                        ></div>
-                                    </div>
-                                </div>
-
-                                <!-- CTA -->
-                                <Link
-                                    :href="launchOffer.is_sold_out ? '/contact' : '/demo'"
-                                    class="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm bg-white text-[#1B4F72] hover:bg-[#C4A265] hover:text-white transition-all duration-300 shadow-lg hover:-translate-y-0.5"
-                                >
-                                    <template v-if="launchOffer.is_sold_out">
-                                        {{ locale === 'ar' ? 'تواصل معنا' : 'Contact us' }}
-                                    </template>
-                                    <template v-else>
-                                        {{ locale === 'ar' ? 'احجز مقعدك' : 'Claim your seat' }}
-                                    </template>
-                                    <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                                    </svg>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cards Grid — uses LaunchPricingCard (Phase B). -->
+                <!-- Cards Grid — clean post-reset PricingCardV2 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 animate-stagger">
-                    <LaunchPricingCard
+                    <PricingCardV2
                         v-for="plan in plans"
                         :key="plan.id"
                         :plan="plan"
                         :is-yearly="isYearly"
-                        :format-price="formatLocal"
-                        :highlight="!!plan.is_popular"
                     />
                 </div>
 
@@ -513,20 +417,20 @@ const pricingJsonLd = computed(() => ({
                     <div class="relative bg-gradient-to-br from-[#1B4F72] to-[#0D2B45] text-white rounded-3xl shadow-xl shadow-[#1B4F72]/15 p-6">
                         <div class="absolute -top-3 inset-x-0 flex justify-center">
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white text-[10px] font-bold uppercase tracking-widest shadow">
-                                💎 {{ locale === 'ar' ? 'الأفضل قيمة' : 'Best value' }}
+                                {{ locale === 'ar' ? 'الأفضل قيمة' : 'Best value' }}
                             </span>
                         </div>
                         <div class="w-12 h-12 rounded-2xl bg-[#C4A265]/20 flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 text-[#C4A265]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
-                        <h3 class="text-base font-bold mb-1">{{ locale === 'ar' ? 'سنوي Upfront' : 'Annual Upfront' }}</h3>
+                        <h3 class="text-base font-bold mb-1">{{ locale === 'ar' ? 'سنوي مقدمًا' : 'Annual Upfront' }}</h3>
                         <p class="text-xs text-white/70 leading-relaxed mb-3">
-                            {{ locale === 'ar' ? 'وفّر حتى 21% + رسوم التشغيل بخصم 50%. الأكثر اقتصاداً للعيادات الراسخة.' : 'Save up to 21% + 50% off setup. Most economical for established clinics.' }}
+                            {{ locale === 'ar' ? 'ادفع 10 شهور بدل 12 — شهران مجانًا. الأكثر اقتصاداً للعيادات الراسخة.' : 'Pay 10 months, get 12 — 2 months on us. Most economical for established clinics.' }}
                         </p>
                         <ul class="space-y-1.5 text-xs">
-                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'خصم 21% على الاشتراك' : '21% off subscription' }}</span></li>
-                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'خصم 50% على رسوم التشغيل' : '50% off setup fee' }}</span></li>
+                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'وفّر شهرين كاملين' : 'Save 2 full months' }}</span></li>
                             <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'سعر ثابت لمدة سنة' : 'Locked price for a year' }}</span></li>
+                            <li class="flex items-center gap-2"><span class="text-[#C4A265]">✓</span> <span>{{ locale === 'ar' ? 'ضمان استرداد خلال 30 يوم' : '30-day money-back guarantee' }}</span></li>
                         </ul>
                     </div>
                 </div>
@@ -574,13 +478,9 @@ const pricingJsonLd = computed(() => ({
                                 <p class="text-xs text-gray-500 leading-relaxed mb-3">
                                     {{ locale === 'ar' ? addon.description_ar : addon.description_en }}
                                 </p>
-                                <!-- Launch pricing display: strikethrough anchor + active price + rose badge -->
-                                <div v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="text-[11px] text-gray-400 line-through tabular-nums">
-                                    {{ formatLocal(addon.price_egp) }}
-                                </div>
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-xl font-extrabold text-[#1B4F72]">
-                                        {{ formatLocal(addon.active_price || addon.price_egp_launch || addon.price_egp) }}
+                                        {{ formatLocal(addon.active_price || addon.price_egp) }}
                                     </span>
                                     <span class="text-xs text-gray-400">
                                         /
@@ -589,8 +489,8 @@ const pricingJsonLd = computed(() => ({
                                         <template v-else>{{ locale === 'ar' ? 'شهرياً' : 'month' }}</template>
                                     </span>
                                 </div>
-                                <div v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="mt-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[9px] font-bold uppercase tracking-wider">
-                                    🔥 {{ locale === 'ar' ? 'سعر الإطلاق' : 'Launch' }}
+                                <div v-if="Array.isArray(addon.included_in_plans) && addon.included_in_plans.length" class="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
+                                    {{ locale === 'ar' ? 'مجاني مع ' + addon.included_in_plans.join('/') : 'Free with ' + addon.included_in_plans.join('/') }}
                                 </div>
                             </div>
                         </div>
@@ -663,8 +563,11 @@ const pricingJsonLd = computed(() => ({
                                         <div class="text-sm font-bold mb-1" :class="plan.is_popular ? 'text-[#1B4F72]' : 'text-[#1C2833]'">
                                             {{ localizedField(plan, 'name') }}
                                         </div>
-                                        <div v-if="!plan.is_custom" class="text-xs text-gray-400">
+                                        <div v-if="!plan.is_contact_sales" class="text-xs text-gray-400">
                                             {{ getFormattedPrice(plan) }} {{ getCurrencySymbol(plan) }} / {{ isYearly ? t('pricing.year') : t('pricing.month') }}
+                                        </div>
+                                        <div v-else class="text-xs text-gray-400">
+                                            {{ locale === 'ar' ? 'تسعير مخصص' : 'Custom' }}
                                         </div>
                                         <span v-if="plan.is_popular" class="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#C4A265] text-white">
                                             {{ t('pricing.most_popular') }}
@@ -734,13 +637,13 @@ const pricingJsonLd = computed(() => ({
                                     <td class="p-5"></td>
                                     <td v-for="plan in plans" :key="plan.id" class="p-5 text-center" :class="{ 'bg-[#1B4F72]/[0.02]': plan.is_popular }">
                                         <Link
-                                            :href="plan.is_custom ? '/contact' : `/checkout/${plan.slug}?cycle=${billingCycle}`"
+                                            :href="plan.is_contact_sales ? '/contact?topic=enterprise' : `/demo?plan=${plan.slug}&cycle=${billingCycle}`"
                                             class="inline-block px-5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 hover:-translate-y-0.5"
                                             :class="plan.is_popular
                                                 ? 'bg-gradient-to-r from-[#C4A265] to-[#D4B876] text-white shadow-md hover:shadow-lg'
                                                 : 'border border-[#1B4F72]/20 text-[#1B4F72] hover:bg-[#1B4F72] hover:text-white hover:border-[#1B4F72]'"
                                         >
-                                            {{ plan.is_custom ? t('pricing.contact_for_offer') : t('pricing.get_started') }}
+                                            {{ plan.is_contact_sales ? (locale === 'ar' ? 'تواصل مع المبيعات' : 'Contact sales') : (locale === 'ar' ? 'ابدأ التجربة' : 'Start trial') }}
                                         </Link>
                                     </td>
                                 </tr>

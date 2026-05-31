@@ -156,15 +156,12 @@ const addonsJsonLd = computed(() => ({
 
                         <!-- Pricing -->
                         <div class="border-t border-gray-100 pt-4">
-                            <div v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="text-xs text-gray-400 line-through tabular-nums">
-                                {{ fmtMoney(addon.price_egp) }} ج.م
-                            </div>
                             <div class="flex items-baseline gap-1">
                                 <span class="text-2xl font-black text-[#1B4F72] tabular-nums">{{ fmtMoney(addon.active_price ?? addon.price_egp) }}</span>
                                 <span class="text-xs text-[#5A6C7D]">ج.م {{ periodLabel(addon.period) }}</span>
                             </div>
-                            <div v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[10px] font-bold uppercase tracking-wider border border-rose-100">
-                                🔥 {{ tr('سعر الإطلاق', 'Launch price') }}
+                            <div v-if="Array.isArray(addon.included_in_plans) && addon.included_in_plans.length" class="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-100">
+                                {{ tr('مجاني مع ' + addon.included_in_plans.join('/'), 'Free with ' + addon.included_in_plans.join('/')) }}
                             </div>
                         </div>
                     </article>
@@ -205,9 +202,6 @@ const addonsJsonLd = computed(() => ({
                                 </div>
                                 <p class="text-xs text-[#5A6C7D] leading-relaxed mb-3">{{ isAr ? addon.description_ar : addon.description_en }}</p>
                                 <div class="flex items-baseline gap-1.5">
-                                    <span v-if="addon.is_launch_active && addon.price_egp_launch < addon.price_egp" class="text-xs text-gray-400 line-through tabular-nums">
-                                        {{ fmtMoney(addon.price_egp) }}
-                                    </span>
                                     <span class="text-base font-extrabold text-[#1B4F72] tabular-nums">{{ fmtMoney(addon.active_price ?? addon.price_egp) }}</span>
                                     <span class="text-[10px] text-[#5A6C7D]">ج.م {{ periodLabel(addon.period) }}</span>
                                 </div>

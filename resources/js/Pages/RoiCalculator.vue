@@ -120,9 +120,9 @@ const ASSUMPTIONS = computed(() => ({
     no_show_reduction_whatsapp_pct: 0.65,
     online_booking_lift_pct: 0.08,
     retention_uplift_pct: currentSpecialty.value.defaults.retention_uplift,
-    // Anchored to the Professional plan, launch annual rate
-    // (41,900 / 12 = 3,492 EGP/month equivalent). +20% pricing.
-    monthly_cost_egp: 3492,
+    // Anchored to the Growth plan monthly rate — the typical clinic baseline
+    // post-pricing-reset (May 2026). Use 3,990 EGP/month.
+    monthly_cost_egp: 3990,
 }));
 
 // ─── Computed metrics ─────────────────────────────────────

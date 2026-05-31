@@ -50,21 +50,26 @@ class PublicContentCache
                     return array_merge($plan->toArray(), [
                         'monthly_price' => $price['monthly'],
                         'yearly_price' => $price['yearly'],
-                        'monthly_price_launch' => $launchActive
-                            ? (float) ($plan->monthly_price_launch ?? $price['monthly'])
-                            : null,
-                        'yearly_price_launch' => $launchActive
-                            ? (float) ($plan->yearly_price_launch ?? $price['yearly'])
-                            : null,
+                        // Launch fields kept for backward compat — always null
+                        // post-reset (launch pricing decommissioned May 2026).
+                        'monthly_price_launch' => null,
+                        'yearly_price_launch' => null,
                         'setup_fee' => (float) ($plan->setup_fee ?? 0),
-                        'setup_fee_launch' => $launchActive
-                            ? (float) ($plan->setup_fee_launch ?? 0)
+                        'setup_fee_launch' => null,
+                        'setup_fee_yearly' => (float) ($plan->setup_fee ?? 0),
+                        'is_launch_offer_active' => false,
+                        'launch_offer_ends_at' => null,
+                        'supports_installments' => false,
+                        'installments' => [],
+                        // New post-reset fields
+                        'included_doctors' => (int) ($plan->included_doctors ?? 1),
+                        'per_extra_doctor_price' => $plan->per_extra_doctor_price !== null
+                            ? (float) $plan->per_extra_doctor_price
                             : null,
-                        'setup_fee_yearly' => $plan->activeSetupFee('yearly'),
-                        'is_launch_offer_active' => $launchActive,
-                        'launch_offer_ends_at' => $plan->launch_offer_ends_at?->toIso8601String(),
-                        'supports_installments' => (bool) $plan->supports_installments,
-                        'installments' => $plan->yearlyInstallments(),
+                        'is_contact_sales' => (bool) ($plan->is_contact_sales ?? false),
+                        'trial_days' => (int) ($plan->trial_days ?? 30),
+                        // Pre-computed monthly-equivalent of the yearly price for "save X months" copy
+                        'yearly_monthly_equivalent' => $price['yearly'] > 0 ? round($price['yearly'] / 12, 2) : 0,
                         'currency' => $price['currency'],
                         'currency_symbol' => $price['currency_symbol'],
                         'country_code' => $price['country_code'],

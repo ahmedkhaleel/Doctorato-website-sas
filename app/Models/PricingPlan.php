@@ -24,6 +24,8 @@ class PricingPlan extends Model
         'is_popular', 'is_custom',
         'features_ar', 'features_en', 'modules_included',
         'max_users', 'max_patients', 'max_doctors', 'max_staff',
+        'included_doctors', 'per_extra_doctor_price',
+        'is_contact_sales', 'trial_days',
         'max_branches', 'storage_gb',
         'support_level', 'support_response_hours',
         'display_order', 'is_active',
@@ -46,6 +48,8 @@ class PricingPlan extends Model
         'is_active' => 'boolean',
         'is_launch_offer_active' => 'boolean',
         'supports_installments' => 'boolean',
+        'is_contact_sales' => 'boolean',
+        'per_extra_doctor_price' => 'decimal:2',
         'launch_offer_ends_at' => 'datetime',
     ];
 
