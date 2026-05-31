@@ -172,8 +172,8 @@ class PricingPlan extends Model
         return [
             'monthly' => (float) $this->monthly_price,
             'yearly' => (float) $this->yearly_price,
-            'setup_fee' => 0.0,
-            'setup_fee_yearly' => 0.0,
+            'setup_fee' => (float) ($this->setup_fee ?? 0),
+            'setup_fee_yearly' => (float) ($this->setup_fee ?? 0),
             'currency' => $this->currency ?: 'EGP',
             'currency_symbol' => 'ج.م',
             'country_code' => 'EG',

@@ -6,64 +6,74 @@ use App\Models\PlanPrice;
 use App\Models\PricingPlan;
 use Illuminate\Database\Seeder;
 
+/**
+ * Per-country prices — May 2026 RESET.
+ *
+ * IMPORTANT: EGP prices MUST equal the PricingPlanSeeder exactly,
+ * because PricingPlan::priceFor('EG') reads from this table first and
+ * a mismatch makes the public site display the wrong number (which is
+ * exactly the bug we just fixed). When you change a plan's EGP price,
+ * change it in BOTH seeders.
+ *
+ * Other-country prices are informed by purchasing power + competitive
+ * landscape, not a straight FX conversion. They're rounded to clean
+ * local-market numbers.
+ *
+ * Enterprise is contact-sales (is_contact_sales=true on the plan) — we
+ * don't seed per-country prices for it because the public card hides
+ * the number and routes to /contact.
+ *
+ * Legacy rows from previous pricing strategies (basic, premium, etc.)
+ * are auto-deactivated at the end so the cache doesn't surface them.
+ */
 class PlanPriceSeeder extends Seeder
 {
-    /**
-     * Seed per-country prices for the three commercial plans.
-     * Pricing by market is informed by purchasing power + competitive
-     * landscape, not by a straight FX conversion from EGP. Values are
-     * rounded to clean local-market numbers.
-     *
-     * Each tuple: [monthly, yearly, setup_fee, currency, symbol, flag, name_ar, name_en]
-     * setup_fee is a one-time onboarding charge; yearly subscribers get
-     * 50% off it (enforced in PricingPlan::priceFor()).
-     */
     public function run(): void
     {
+        // Per-country tuples: [monthly, yearly, setup_fee, currency, symbol, flag, name_ar, name_en]
         $prices = [
-            'basic' => [
-                'EG' => [958.80,  9204,    1500,    'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
-                'SA' => [297,     2847,    500,     'SAR', 'ر.س',  '🇸🇦', 'السعودية',   'Saudi Arabia'],
-                'AE' => [297,     2847,    500,     'AED', 'د.إ',  '🇦🇪', 'الإمارات',   'UAE'],
-                'KW' => [24,      237,     40,      'KWD', 'د.ك',  '🇰🇼', 'الكويت',     'Kuwait'],
-                'QA' => [297,     2847,    500,     'QAR', 'ر.ق',  '🇶🇦', 'قطر',         'Qatar'],
-                'BH' => [30,      285,     50,      'BHD', 'د.ب',  '🇧🇭', 'البحرين',    'Bahrain'],
-                'OM' => [30,      285,     50,      'OMR', 'ر.ع',  '🇴🇲', 'عُمان',       'Oman'],
-                'JO' => [60,      576,     100,     'JOD', 'د.أ',  '🇯🇴', 'الأردن',      'Jordan'],
-                'IQ' => [105000,  1008000, 175000,  'IQD', 'د.ع',  '🇮🇶', 'العراق',      'Iraq'],
-                'LB' => [75,      720,     125,     'USD', '$',    '🇱🇧', 'لبنان',       'Lebanon'],
-                'MA' => [747,     7170,    1250,    'MAD', 'د.م',  '🇲🇦', 'المغرب',      'Morocco'],
-                'US' => [87,      837,     150,     'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
+            // ─── STARTER — 1,990 EGP/mo, free setup ───
+            'starter' => [
+                'EG' => [1990,    19900,   0,       'EGP', 'ج.م',  '🇪🇬', 'مصر',         'Egypt'],
+                'SA' => [199,     1990,    0,       'SAR', 'ر.س',  '🇸🇦', 'السعودية',    'Saudi Arabia'],
+                'AE' => [199,     1990,    0,       'AED', 'د.إ',  '🇦🇪', 'الإمارات',    'UAE'],
+                'KW' => [16,      160,     0,       'KWD', 'د.ك',  '🇰🇼', 'الكويت',      'Kuwait'],
+                'QA' => [199,     1990,    0,       'QAR', 'ر.ق',  '🇶🇦', 'قطر',         'Qatar'],
+                'BH' => [20,      200,     0,       'BHD', 'د.ب',  '🇧🇭', 'البحرين',     'Bahrain'],
+                'OM' => [20,      200,     0,       'OMR', 'ر.ع',  '🇴🇲', 'عُمان',       'Oman'],
+                'JO' => [40,      400,     0,       'JOD', 'د.أ',  '🇯🇴', 'الأردن',      'Jordan'],
+                'US' => [49,      490,     0,       'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
             ],
+
+            // ─── GROWTH — 3,990 EGP/mo, free setup ───
+            'growth' => [
+                'EG' => [3990,    39900,   0,       'EGP', 'ج.م',  '🇪🇬', 'مصر',         'Egypt'],
+                'SA' => [399,     3990,    0,       'SAR', 'ر.س',  '🇸🇦', 'السعودية',    'Saudi Arabia'],
+                'AE' => [399,     3990,    0,       'AED', 'د.إ',  '🇦🇪', 'الإمارات',    'UAE'],
+                'KW' => [32,      320,     0,       'KWD', 'د.ك',  '🇰🇼', 'الكويت',      'Kuwait'],
+                'QA' => [399,     3990,    0,       'QAR', 'ر.ق',  '🇶🇦', 'قطر',         'Qatar'],
+                'BH' => [40,      400,     0,       'BHD', 'د.ب',  '🇧🇭', 'البحرين',     'Bahrain'],
+                'OM' => [40,      400,     0,       'OMR', 'ر.ع',  '🇴🇲', 'عُمان',       'Oman'],
+                'JO' => [80,      800,     0,       'JOD', 'د.أ',  '🇯🇴', 'الأردن',      'Jordan'],
+                'US' => [99,      990,     0,       'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
+            ],
+
+            // ─── PROFESSIONAL — 6,990 EGP/mo, 7,500 EGP optional setup ───
             'professional' => [
-                'EG' => [1918.80, 18420,   3500,    'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
-                'SA' => [597,     5730,    1000,    'SAR', 'ر.س',  '🇸🇦', 'السعودية',   'Saudi Arabia'],
-                'AE' => [597,     5730,    1000,    'AED', 'د.إ',  '🇦🇪', 'الإمارات',   'UAE'],
-                'KW' => [48,      465,     90,      'KWD', 'د.ك',  '🇰🇼', 'الكويت',     'Kuwait'],
-                'QA' => [597,     5730,    1000,    'QAR', 'ر.ق',  '🇶🇦', 'قطر',         'Qatar'],
-                'BH' => [60,      570,     100,     'BHD', 'د.ب',  '🇧🇭', 'البحرين',    'Bahrain'],
-                'OM' => [60,      570,     100,     'OMR', 'ر.ع',  '🇴🇲', 'عُمان',       'Oman'],
-                'JO' => [120,     1152,    200,     'JOD', 'د.أ',  '🇯🇴', 'الأردن',      'Jordan'],
-                'IQ' => [210000,  2016000, 350000,  'IQD', 'د.ع',  '🇮🇶', 'العراق',      'Iraq'],
-                'LB' => [147,     1410,    250,     'USD', '$',    '🇱🇧', 'لبنان',       'Lebanon'],
-                'MA' => [1497,    14370,   2500,    'MAD', 'د.م',  '🇲🇦', 'المغرب',      'Morocco'],
-                'US' => [177,     1695,    300,     'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
+                'EG' => [6990,    69900,   7500,    'EGP', 'ج.م',  '🇪🇬', 'مصر',         'Egypt'],
+                'SA' => [699,     6990,    750,     'SAR', 'ر.س',  '🇸🇦', 'السعودية',    'Saudi Arabia'],
+                'AE' => [699,     6990,    750,     'AED', 'د.إ',  '🇦🇪', 'الإمارات',    'UAE'],
+                'KW' => [56,      560,     60,      'KWD', 'د.ك',  '🇰🇼', 'الكويت',      'Kuwait'],
+                'QA' => [699,     6990,    750,     'QAR', 'ر.ق',  '🇶🇦', 'قطر',         'Qatar'],
+                'BH' => [70,      700,     75,      'BHD', 'د.ب',  '🇧🇭', 'البحرين',     'Bahrain'],
+                'OM' => [70,      700,     75,      'OMR', 'ر.ع',  '🇴🇲', 'عُمان',       'Oman'],
+                'JO' => [140,     1400,    150,     'JOD', 'د.أ',  '🇯🇴', 'الأردن',      'Jordan'],
+                'US' => [179,     1790,    195,     'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
             ],
-            'enterprise' => [
-                'EG' => [3598.80, 34548,   7500,    'EGP', 'ج.م',  '🇪🇬', 'مصر',        'Egypt'],
-                'SA' => [1197,    11490,   2000,    'SAR', 'ر.س',  '🇸🇦', 'السعودية',   'Saudi Arabia'],
-                'AE' => [1197,    11490,   2000,    'AED', 'د.إ',  '🇦🇪', 'الإمارات',   'UAE'],
-                'KW' => [99,      945,     180,     'KWD', 'د.ك',  '🇰🇼', 'الكويت',     'Kuwait'],
-                'QA' => [1197,    11490,   2000,    'QAR', 'ر.ق',  '🇶🇦', 'قطر',         'Qatar'],
-                'BH' => [120,     1152,    200,     'BHD', 'د.ب',  '🇧🇭', 'البحرين',    'Bahrain'],
-                'OM' => [120,     1152,    200,     'OMR', 'ر.ع',  '🇴🇲', 'عُمان',       'Oman'],
-                'JO' => [225,     2160,    400,     'JOD', 'د.أ',  '🇯🇴', 'الأردن',      'Jordan'],
-                'IQ' => [420000,  4032000, 700000,  'IQD', 'د.ع',  '🇮🇶', 'العراق',      'Iraq'],
-                'LB' => [297,     2850,    500,     'USD', '$',    '🇱🇧', 'لبنان',       'Lebanon'],
-                'MA' => [2997,    28770,   5000,    'MAD', 'د.م',  '🇲🇦', 'المغرب',      'Morocco'],
-                'US' => [327,     3150,    550,     'USD', '$',    '🇺🇸', 'الولايات المتحدة', 'United States'],
-            ],
+            // Enterprise: NOT seeded — is_contact_sales=true hides the number.
         ];
+
+        $seededPairs = []; // [planId, country] tuples we just wrote — used for orphan cleanup.
 
         foreach ($prices as $slug => $countries) {
             $plan = PricingPlan::where('slug', $slug)->first();
@@ -86,7 +96,20 @@ class PlanPriceSeeder extends Seeder
                         'is_active' => true,
                     ]
                 );
+
+                $seededPairs[] = $plan->id . ':' . $code;
             }
         }
+
+        // Deactivate every PlanPrice row we did NOT just touch. This kills
+        // stale rows left over from previous strategies (basic, old
+        // professional EGP=1918.80, old enterprise EGP=3598.80, etc.)
+        // without deleting history.
+        PlanPrice::query()->get()->each(function ($row) use ($seededPairs) {
+            $key = $row->pricing_plan_id . ':' . $row->country_code;
+            if (!in_array($key, $seededPairs, true) && $row->is_active) {
+                $row->update(['is_active' => false]);
+            }
+        });
     }
 }
