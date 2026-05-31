@@ -34,6 +34,14 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
+            // Flash session — used by public forms (Demo, Contact, Newsletter)
+            // to keep their success banner visible across the back() redirect
+            // that follows a successful POST. Without this, the banner flashes
+            // for ~1 frame and disappears with the page replacement.
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'message' => fn () => $request->session()->get('message'),
+            ],
             'currencies' => fn () => Currency::where('is_active', true)->orderBy('display_order')->get(),
             'currentCurrency' => fn () => session('currency', 'EGP'),
             // Active country + list of supported markets — consumed by the

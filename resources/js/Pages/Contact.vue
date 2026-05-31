@@ -153,6 +153,11 @@ async function submitForm() {
     // "تعذر التحقق من الرسالة" on otherwise-valid hand-typed forms.
     form.recaptcha_token = (await captcha.execute('contact')) || '';
     form.post('/contact', {
+        // preserveState keeps this component alive across the back()
+        // redirect so the success banner actually stays visible. Without
+        // it, Inertia replaces the page and showSuccess resets to false.
+        preserveState: true,
+        preserveScroll: true,
         onSuccess: () => {
             track.lead({ form: 'contact' });
             showSuccess.value = true;
@@ -161,6 +166,10 @@ async function submitForm() {
             // Reset the timestamp so the time-to-submit guard doesn't
             // reject a second message sent right after a successful one.
             form.form_rendered_at = Date.now();
+            // Smooth-scroll the success banner into view.
+            setTimeout(() => {
+                document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 80);
         },
     });
 }

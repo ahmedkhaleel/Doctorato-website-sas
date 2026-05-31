@@ -22,8 +22,8 @@
  *
  * Backend stays the same: POST /demo-request with all fields.
  */
-import { ref, computed, watch } from 'vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useForm, usePage, router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useTracking } from '@/composables/useTracking';
@@ -200,6 +200,11 @@ async function submitForm() {
         form.recaptcha_token = '';
     }
     form.post('/demo-request', {
+        // preserveState keeps THIS component instance alive across the
+        // back() redirect — so showSuccess stays true and the user
+        // actually sees the success banner. Without it, Inertia replaces
+        // the page after the redirect and the banner flashes for 1 frame.
+        preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             track.lead({
@@ -219,6 +224,16 @@ async function submitForm() {
         },
     });
 }
+
+// Fallback path: if the redirect arrives with a flash.success set (e.g.
+// the user navigated back to /demo via browser back button and Laravel
+// re-played the flash), surface the success banner anyway. Belt-and-
+// suspenders with the onSuccess callback above.
+onMounted(() => {
+    if (usePage().props.flash?.success) {
+        showSuccess.value = true;
+    }
+});
 </script>
 
 <template>
