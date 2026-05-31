@@ -55,11 +55,17 @@ class DemoRequestController extends Controller
             ]);
         }
 
+        // Demo notifications go to demo@doctorato.com by default — override
+        // via NOTIFY_DEMO_EMAIL in .env without redeploy.
+        $adminEmail = config('notifications.demo_email', 'demo@doctorato.com');
         try {
-            Mail::to('info@doctorato.com')->send(new DemoAdminNotification($demo));
+            Mail::to($adminEmail)->send(new DemoAdminNotification($demo));
+            Log::info('Demo: admin notification sent', ['to' => $adminEmail, 'demo_id' => $demo->id]);
         } catch (\Throwable $e) {
             Log::warning('Demo: admin notification email failed', [
                 'error' => $e->getMessage(),
+                'to' => $adminEmail,
+                'demo_id' => $demo->id,
             ]);
         }
     }
