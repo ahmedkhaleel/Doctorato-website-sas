@@ -13,6 +13,7 @@
  */
 import MainLayout from '@/Layouts/MainLayout.vue';
 import SeoHead from '@/Components/SeoHead.vue';
+import RelatedPages from '@/Components/RelatedPages.vue';
 import { Link } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
@@ -287,6 +288,9 @@ const useCaseJsonLd = computed(() => [
                 </div>
             </div>
         </section>
+
+        <!-- Related use-cases — keep visitors comparing across facility shapes -->
+        <RelatedPages section="usecase" :exclude="`/for/${scenario}`" />
 
         <!-- Final CTA -->
         <section class="py-16 sm:py-20 bg-gradient-to-br from-[#1B4F72] to-[#0A1628] text-white">

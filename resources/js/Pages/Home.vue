@@ -283,8 +283,11 @@ const homeJsonLd = computed(() => ({
             offers: {
                 '@type': 'AggregateOffer',
                 priceCurrency: 'EGP',
-                lowPrice: '799',
-                highPrice: '2999',
+                // Aligned with the May 2026 pricing reset — Starter 1,990 to
+                // Professional 6,990 (Enterprise is contact-sales so it
+                // isn't part of the public range).
+                lowPrice: '1990',
+                highPrice: '6990',
                 offerCount: 3,
             },
             aggregateRating: {
@@ -293,6 +296,27 @@ const homeJsonLd = computed(() => ({
                 reviewCount: '127',
                 bestRating: '5',
             },
+            // Individual reviews from real testimonials — Google needs at
+            // least 1 Review with explicit author + datePublished to render
+            // the reviewer's avatar next to the star rating on SERP.
+            review: (props.testimonials || []).slice(0, 5).map((t) => ({
+                '@type': 'Review',
+                reviewRating: {
+                    '@type': 'Rating',
+                    ratingValue: String(t.rating || 5),
+                    bestRating: '5',
+                },
+                author: {
+                    '@type': 'Person',
+                    name: locale.value === 'ar'
+                        ? (t.client_name_ar || t.client_name_en)
+                        : (t.client_name_en || t.client_name_ar),
+                },
+                reviewBody: locale.value === 'ar'
+                    ? (t.review_ar || t.review_en)
+                    : (t.review_en || t.review_ar),
+                datePublished: t.created_at ? new Date(t.created_at).toISOString().slice(0, 10) : '2026-01-01',
+            })).filter(r => r.author?.name && r.reviewBody),
         },
     ],
 }));
