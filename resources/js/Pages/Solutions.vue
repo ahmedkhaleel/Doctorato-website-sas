@@ -9,6 +9,45 @@ import { ref, computed } from 'vue';
 const { t, locale } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
 
+// FAQ schema for /solutions — Google rich-snippet eligible.
+// Each Q+A is also a relevance signal for the underlying keyword.
+const solutionsFaqJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'ما هي الحلول الإدارية اللي بتقدمها دكتوراتو؟' : 'What business solutions does Doctorato offer?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'دكتوراتو بيقدّم 5 حلول متكاملة: إدارة الفواتير والإيصال الإلكتروني، تكامل التأمين الطبي، CRM للمرضى، إدارة المخزون والصيدلية، وتقارير مالية متقدمة.'
+                    : 'Doctorato offers 5 integrated solutions: billing & e-receipt management, medical insurance integration, patient CRM, inventory & pharmacy management, and advanced financial reporting.',
+            },
+        },
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'هل النظام معتمد من مصلحة الضرائب المصرية؟' : 'Is the system certified by the Egyptian Tax Authority?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'نعم، دكتوراتو معتمد رسميًا من مصلحة الضرائب المصرية للإيصال الإلكتروني والفاتورة الإلكترونية. كل المعاملات تُرسل تلقائيًا للمنظومة.'
+                    : 'Yes, Doctorato is officially certified by the Egyptian Tax Authority for electronic receipts and electronic invoices. All transactions are automatically sent to the system.',
+            },
+        },
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'هل بتدعمون تكامل التأمين مع Bupa و GIG؟' : 'Do you support insurance integration with Bupa and GIG?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'نعم، نتكامل مع Bupa, GIG, ELAJI, AXA, و MetLife. إدارة كاملة للمطالبات وتتبع الموافقات.'
+                    : 'Yes, we integrate with Bupa, GIG, ELAJI, AXA, and MetLife. Full claims management and approval tracking.',
+            },
+        },
+    ],
+}));
+
 const activeModule = ref(0);
 
 const modules = computed(() => [
@@ -257,6 +296,7 @@ const currentModule = computed(() => modules.value[activeModule.value]);
         :description="isAr
             ? 'حلول دكتوراتو الكاملة لإدارة عيادتك: فواتير وإيصال إلكتروني، تأمين، CRM طبي، مخزون، تقارير مالية، وموارد بشرية — كل ما تحتاجه لإدارة عمل طبي ناجح في مصر.'
             : 'Complete Doctorato business solutions for your clinic: billing & e-receipt, insurance, medical CRM, inventory, financial reporting, and HR — everything you need to run a successful medical practice in Egypt.'"
+        :json-ld="solutionsFaqJsonLd"
         :breadcrumbs="[
             { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
             { name: isAr ? 'الحلول' : 'Solutions', url: '/solutions' },

@@ -10,6 +10,43 @@ import { computed } from 'vue';
 
 const { t, locale } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
+
+const techFaqJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'ما هي البنية التقنية لدكتوراتو؟' : 'What is Doctorato\'s tech stack?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'دكتوراتو مبني على Laravel 11+ في الـ backend و Vue 3 + Inertia.js في الـ frontend، مع قاعدة بيانات MySQL واستضافة AWS متعددة المناطق.'
+                    : 'Doctorato is built on Laravel 11+ backend, Vue 3 + Inertia.js frontend, MySQL database, and multi-region AWS hosting.',
+            },
+        },
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'هل بياناتي آمنة؟' : 'Is my data secure?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'نعم. تشفير AES-256 لكل البيانات، نسخ احتياطي يومي تلقائي، 2FA للأدمن، Audit Log كامل، ومتوافق مع GDPR والـ PDPL المصري.'
+                    : 'Yes. AES-256 encryption for all data, automatic daily backups, 2FA for admins, full Audit Log, and compliant with GDPR and Egyptian PDPL.',
+            },
+        },
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'ما نسبة استقرار النظام؟' : 'What is the uptime SLA?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'استقرار 99.9% بضمان SLA رسمي لباقات Enterprise. النظام مراقَب على مدار الساعة.'
+                    : '99.9% uptime with formal SLA guarantee for Enterprise plans. The system is monitored 24/7.',
+            },
+        },
+    ],
+}));
 useScrollAnimation();
 
 const techStack = computed(() => [
@@ -249,6 +286,7 @@ const stats = computed(() => [
         :description="isAr
             ? 'بنية تقنية حديثة وآمنة: Laravel + Vue 3 + AWS، تشفير AES-256، نسخ احتياطي تلقائي، توافق GDPR، استقرار 99.9%. كل ما تحتاجه عيادة طبية احترافية.'
             : 'Modern, secure tech stack: Laravel + Vue 3 + AWS, AES-256 encryption, automatic backups, GDPR-compliant, 99.9% uptime SLA. Everything a professional clinic needs.'"
+        :json-ld="techFaqJsonLd"
         :breadcrumbs="[
             { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
             { name: isAr ? 'التقنية' : 'Technology', url: '/technology' },

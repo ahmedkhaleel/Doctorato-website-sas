@@ -9,6 +9,33 @@ import SeoHead from '@/Components/SeoHead.vue';
 
 const { t, locale } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
+
+const portalsFaqJsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'كم بوابة في دكتوراتو؟' : 'How many portals does Doctorato have?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? '6 بوابات مستقلة: المدير، الطبيب، الاستقبال، المحاسب، التمريض، والمريض. كل بوابة لها واجهة وصلاحيات مخصصة.'
+                    : 'Six independent portals: Admin, Doctor, Receptionist, Accountant, Nursing, and Patient. Each portal has a tailored interface and permissions.',
+            },
+        },
+        {
+            '@type': 'Question',
+            name: isAr.value ? 'هل في بوابة للمريض؟' : 'Is there a patient portal?',
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: isAr.value
+                    ? 'نعم، المرضى يحجزون مواعيدهم، يشوفون نتائج التحاليل، ويحمّلون الوصفات الطبية عبر بوابة المريض الإلكترونية.'
+                    : 'Yes, patients book appointments, view lab results, and download prescriptions via the patient portal.',
+            },
+        },
+    ],
+}));
 useScrollAnimation();
 
 const portals = computed(() => [
@@ -153,6 +180,7 @@ const portals = computed(() => [
         :description="isAr
             ? 'كل دور في عيادتك له بوابته الخاصة: المدير، الطبيب، الاستقبال، المحاسب، التمريض، والمريض. تجربة مخصصة لكل مستخدم مع صلاحيات دقيقة.'
             : 'Every role in your clinic has its own portal: admin, doctor, receptionist, accountant, nursing, and patient. A tailored experience per user with granular permissions.'"
+        :json-ld="portalsFaqJsonLd"
         :breadcrumbs="[
             { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
             { name: isAr ? 'البوابات' : 'Portals', url: '/portals' },
