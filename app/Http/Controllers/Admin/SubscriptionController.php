@@ -16,8 +16,13 @@ class SubscriptionController extends Controller
     {
         $status = $request->query('status');
 
+        // Eager-load relationships WITHOUT column restriction on latestInvoice.
+        // Constrained eager loading via 'latestInvoice:id,subscription_id,...'
+        // can fail under some MySQL configurations when latestOfMany() uses
+        // a window function — and the saving from selecting fewer columns is
+        // not worth the production 500. Plain Eloquent is reliable.
         $subscriptions = Subscription::query()
-            ->with(['plan:id,name_ar,name_en,slug', 'latestInvoice:id,subscription_id,number,total,status'])
+            ->with(['plan:id,name_ar,name_en,slug', 'latestInvoice'])
             ->when($status, fn ($q) => $q->where('status', $status))
             ->when($request->query('q'), function ($q, $term) {
                 $q->where(function ($w) use ($term) {
@@ -30,18 +35,23 @@ class SubscriptionController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        // Stats: cast every aggregate to float and coalesce nulls. A single
+        // null in any sum() result used to bubble through the addition and
+        // make MRR null, which crashed Vue's fmtMoney() on the page.
+        $monthlyAmount = (float) (Subscription::where('status', 'active')
+            ->where('billing_cycle', 'monthly')
+            ->sum('amount') ?? 0);
+        $yearlyAmount = (float) (Subscription::where('status', 'active')
+            ->where('billing_cycle', 'yearly')
+            ->sum('amount') ?? 0);
+
         $stats = [
-            'total' => Subscription::count(),
-            'active' => Subscription::where('status', 'active')->count(),
-            'pending' => Subscription::where('status', 'pending')->count(),
-            'past_due' => Subscription::where('status', 'past_due')->count(),
-            'mrr' => Subscription::where('status', 'active')
-                ->where('billing_cycle', 'monthly')
-                ->sum('amount')
-                + (Subscription::where('status', 'active')
-                    ->where('billing_cycle', 'yearly')
-                    ->sum('amount') / 12),
-            'total_revenue' => Invoice::where('status', 'paid')->sum('total'),
+            'total' => (int) Subscription::count(),
+            'active' => (int) Subscription::where('status', 'active')->count(),
+            'pending' => (int) Subscription::where('status', 'pending')->count(),
+            'past_due' => (int) Subscription::where('status', 'past_due')->count(),
+            'mrr' => round($monthlyAmount + ($yearlyAmount / 12), 2),
+            'total_revenue' => (float) (Invoice::where('status', 'paid')->sum('total') ?? 0),
         ];
 
         return Inertia::render('Admin/Subscriptions', [
