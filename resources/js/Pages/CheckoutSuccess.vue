@@ -1,5 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
@@ -25,7 +26,11 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <Head :title="t('checkout.success_title', 'تم الدفع بنجاح')" />
+    <SeoHead
+        :title="t('checkout.success_title', 'تم الدفع بنجاح')"
+        :description="t('checkout.success_message', 'شكرًا لاشتراكك في دكتوراتو')"
+        :noindex="true"
+    />
 
     <MainLayout>
         <section class="pt-32 pb-20 min-h-screen bg-gradient-to-br from-light-blue to-white">

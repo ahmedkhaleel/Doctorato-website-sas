@@ -5,8 +5,10 @@ import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import SeoHead from '@/Components/SeoHead.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
 useScrollAnimation();
 
 const portals = computed(() => [
@@ -146,7 +148,16 @@ const portals = computed(() => [
 </script>
 
 <template>
-    <Head :title="t('portals_page.page_title')" />
+    <SeoHead
+        :title="isAr ? '6 بوابات مستقلة لإدارة عيادتك | دكتوراتو' : '6 Independent Role-Based Portals | Doctorato'"
+        :description="isAr
+            ? 'كل دور في عيادتك له بوابته الخاصة: المدير، الطبيب، الاستقبال، المحاسب، التمريض، والمريض. تجربة مخصصة لكل مستخدم مع صلاحيات دقيقة.'
+            : 'Every role in your clinic has its own portal: admin, doctor, receptionist, accountant, nursing, and patient. A tailored experience per user with granular permissions.'"
+        :breadcrumbs="[
+            { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
+            { name: isAr ? 'البوابات' : 'Portals', url: '/portals' },
+        ]"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">

@@ -1,5 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import { computed, onMounted, ref } from 'vue';
@@ -136,7 +137,11 @@ function formatPrice(v) {
 </script>
 
 <template>
-    <Head :title="t('checkout.page_title', 'إتمام الاشتراك')" />
+    <SeoHead
+        :title="locale === 'ar' ? 'إتمام الاشتراك' : 'Complete checkout'"
+        :description="locale === 'ar' ? 'إتمام عملية الاشتراك في باقة دكتوراتو' : 'Complete your Doctorato subscription'"
+        :noindex="true"
+    />
 
     <MainLayout>
         <section class="pt-32 pb-20 bg-gradient-to-br from-light-blue via-white to-light-gold min-h-screen">

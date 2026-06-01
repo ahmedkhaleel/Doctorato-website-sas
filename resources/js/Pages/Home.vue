@@ -300,8 +300,12 @@ const homeJsonLd = computed(() => ({
 
 <template>
     <SeoHead
-        :title="t('home.title')"
-        :description="t('home.hero_subtitle') || t('home.title')"
+        :title="locale === 'ar'
+            ? 'دكتوراتو | نظام إدارة عيادات طبية شامل في مصر — تجربة مجانية 30 يوم'
+            : 'Doctorato | All-in-One Clinic Management System in Egypt — 30-Day Free Trial'"
+        :description="locale === 'ar'
+            ? 'نظام إدارة عيادات سحابي بالعربية: EMR، حجوزات، فواتير، إيصال إلكتروني، تأمين، WhatsApp، تليميديسن. يبدأ من 1,990 ج.م/شهر مع تركيب مجاني وتجربة 30 يوم بدون بطاقة ائتمان.'
+            : 'Cloud-based clinic management in Arabic + English: EMR, booking, billing, e-receipt, insurance, WhatsApp, telemedicine. From 1,990 EGP/month with free setup and a 30-day no-credit-card trial.'"
         :json-ld="homeJsonLd"
     />
     <MainLayout>

@@ -2,12 +2,14 @@
 import MainLayout from '@/Layouts/MainLayout.vue';
 import SectionTitle from '@/Components/SectionTitle.vue';
 import AnimatedCounter from '@/Components/AnimatedCounter.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
 useScrollAnimation();
 
 const techStack = computed(() => [
@@ -242,7 +244,16 @@ const stats = computed(() => [
 </script>
 
 <template>
-    <Head :title="t('tech_page.page_title')" />
+    <SeoHead
+        :title="isAr ? 'البنية التقنية والأمان | دكتوراتو' : 'Technology Stack & Security | Doctorato'"
+        :description="isAr
+            ? 'بنية تقنية حديثة وآمنة: Laravel + Vue 3 + AWS، تشفير AES-256، نسخ احتياطي تلقائي، توافق GDPR، استقرار 99.9%. كل ما تحتاجه عيادة طبية احترافية.'
+            : 'Modern, secure tech stack: Laravel + Vue 3 + AWS, AES-256 encryption, automatic backups, GDPR-compliant, 99.9% uptime SLA. Everything a professional clinic needs.'"
+        :breadcrumbs="[
+            { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
+            { name: isAr ? 'التقنية' : 'Technology', url: '/technology' },
+        ]"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">

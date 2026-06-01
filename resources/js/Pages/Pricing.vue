@@ -278,8 +278,12 @@ const pricingJsonLd = computed(() => ({
 
 <template>
     <SeoHead
-        :title="t('pricing.page_title') || t('pricing.title')"
-        :description="t('pricing.subtitle') || 'خطط مرنة بالجنيه المصري — ابدأ من 799 ج.م شهرياً'"
+        :title="locale === 'ar'
+            ? 'أسعار نظام إدارة عيادات | 4 باقات تنافسية بالجنيه المصري — دكتوراتو'
+            : 'Clinic Management Pricing | 4 Competitive Plans in EGP — Doctorato'"
+        :description="locale === 'ar'
+            ? 'أسعار شفافة لنظام إدارة العيادات: المبتدئ 1,990 ج.م، النمو 3,990 ج.م، الاحترافي 6,990 ج.م، Enterprise. تركيب مجاني، تجربة 30 يوم بدون بطاقة ائتمان.'
+            : 'Transparent clinic management pricing: Starter 1,990 EGP, Growth 3,990 EGP, Professional 6,990 EGP, Enterprise. Free setup, 30-day trial — no credit card required.'"
         :json-ld="pricingJsonLd"
         :breadcrumbs="[
             { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: '/' },

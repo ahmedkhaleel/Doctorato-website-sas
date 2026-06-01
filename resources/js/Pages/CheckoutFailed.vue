@@ -1,5 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 
@@ -9,7 +10,11 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <Head :title="t('checkout.failed_title', 'فشل الدفع')" />
+    <SeoHead
+        :title="t('checkout.failed_title', 'فشل الدفع')"
+        :description="t('checkout.failed_message', 'لم تكتمل عملية الدفع')"
+        :noindex="true"
+    />
 
     <MainLayout>
         <section class="pt-32 pb-20 min-h-screen bg-gradient-to-br from-red-50 to-white">

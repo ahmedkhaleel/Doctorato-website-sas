@@ -1,11 +1,13 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
 import SectionTitle from '@/Components/SectionTitle.vue';
+import SeoHead from '@/Components/SeoHead.vue';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
 
 const activeModule = ref(0);
 
@@ -250,7 +252,16 @@ const currentModule = computed(() => modules.value[activeModule.value]);
 </script>
 
 <template>
-    <Head :title="t('solutions_page.page_title')" />
+    <SeoHead
+        :title="isAr ? 'الحلول الإدارية والمالية للعيادات' : 'Clinic Business & Financial Solutions'"
+        :description="isAr
+            ? 'حلول دكتوراتو الكاملة لإدارة عيادتك: فواتير وإيصال إلكتروني، تأمين، CRM طبي، مخزون، تقارير مالية، وموارد بشرية — كل ما تحتاجه لإدارة عمل طبي ناجح في مصر.'
+            : 'Complete Doctorato business solutions for your clinic: billing & e-receipt, insurance, medical CRM, inventory, financial reporting, and HR — everything you need to run a successful medical practice in Egypt.'"
+        :breadcrumbs="[
+            { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
+            { name: isAr ? 'الحلول' : 'Solutions', url: '/solutions' },
+        ]"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">

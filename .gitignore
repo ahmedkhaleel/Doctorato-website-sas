@@ -24,3 +24,32 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 public/build.zip
+
+# Deploy artifacts — never commit zipped builds, backups, or DB dumps
+*.zip
+*.tar.gz
+*.tar
+*.bak
+*.backup
+*.orig
+*.old
+*~
+*.swp
+*.swo
+*.tmp
+
+# Database dumps + secrets — protect against accidental commits
+*.sql
+*.sql.gz
+*.dump
+*.pem
+*.key
+!storage/oauth-*.key
+credentials.*
+secrets.*
+.env.*.local
+
+# IDE + OS junk
+.idea/
+.vscode/
+.fleet/

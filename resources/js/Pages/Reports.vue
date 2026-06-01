@@ -5,8 +5,10 @@ import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useI18n } from 'vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import SeoHead from '@/Components/SeoHead.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
 useScrollAnimation();
 
 const kpiCards = computed(() => [
@@ -148,7 +150,16 @@ const dashboardWidgets = computed(() => [
 </script>
 
 <template>
-    <Head :title="t('reports_page.page_title')" />
+    <SeoHead
+        :title="isAr ? 'تقارير وتحليلات العيادة المالية والإكلينيكية | دكتوراتو' : 'Clinic Financial & Clinical Reports | Doctorato'"
+        :description="isAr
+            ? 'لوحات KPI ذكية لإدارة عيادتك: إيرادات، مصروفات، أداء الأطباء، حركة المرضى، تأمين، ومخزون — قرارات بالأرقام في ثوانٍ.'
+            : 'Smart KPI dashboards for your clinic: revenue, expenses, doctor performance, patient flow, insurance, and inventory — data-driven decisions in seconds.'"
+        :breadcrumbs="[
+            { name: isAr ? 'الرئيسية' : 'Home', url: '/' },
+            { name: isAr ? 'التقارير' : 'Reports', url: '/reports' },
+        ]"
+    />
     <MainLayout>
         <!-- Hero Section -->
         <section class="relative py-24 bg-gradient-to-br from-primary via-primary-dark to-primary overflow-hidden">
