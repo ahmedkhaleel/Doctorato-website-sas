@@ -8,6 +8,7 @@ Disallow: /admin/*
 Disallow: /checkout
 Disallow: /checkout/*
 Disallow: /webhooks/*
+Disallow: /email-signatures/
 Disallow: /deploy.php
 Disallow: /lang/*
 Disallow: /currency/*
