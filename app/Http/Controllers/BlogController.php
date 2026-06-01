@@ -151,4 +151,73 @@ class BlogController extends Controller
             'Cache-Control' => 'public, max-age=1800',
         ]);
     }
+
+    /**
+     * Category-scoped RSS — the same channel format as rss() but filtered
+     * to a single BlogCategory slug. Lets feed-readers (and Google's
+     * news/discover indexer) subscribe to a single topic stream rather
+     * than the full blog firehose.
+     *
+     * Route: /blog/category/{slug}/rss.xml
+     */
+    public function categoryRss(string $slug): Response
+    {
+        $category = \App\Models\BlogCategory::where('slug', $slug)->firstOrFail();
+        $base = rtrim(config('app.url'), '/');
+        $posts = BlogPost::with('category')
+            ->where('category_id', $category->id)
+            ->where('status', 'published')
+            ->where('published_at', '<=', now())
+            ->orderByDesc('published_at')
+            ->limit(30)
+            ->get();
+
+        $isRtl = app()->getLocale() === 'ar';
+        $titleField = $isRtl ? 'title_ar' : 'title_en';
+        $excerptField = $isRtl ? 'excerpt_ar' : 'excerpt_en';
+        $contentField = $isRtl ? 'content_ar' : 'content_en';
+        $catName = $isRtl ? ($category->name_ar ?? $category->name_en) : ($category->name_en ?? $category->name_ar);
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" ' .
+                'xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n";
+        $xml .= "  <channel>\n";
+        $xml .= '    <title>' . htmlspecialchars(($isRtl ? 'دكتوراتو — ' : 'Doctorato — ') . $catName, ENT_XML1) . "</title>\n";
+        $xml .= '    <link>' . $base . '/blog?category=' . $slug . "</link>\n";
+        $xml .= '    <atom:link href="' . $base . '/blog/category/' . $slug . '/rss.xml" rel="self" type="application/rss+xml" />' . "\n";
+        $xml .= '    <description>' . htmlspecialchars(
+            ($isRtl ? 'مقالات مدونة دكتوراتو في فئة ' : 'Doctorato blog posts in ') . $catName,
+            ENT_XML1
+        ) . "</description>\n";
+        $xml .= "    <language>" . ($isRtl ? 'ar' : 'en-us') . "</language>\n";
+        $xml .= '    <lastBuildDate>' . now()->toRssString() . "</lastBuildDate>\n";
+        $xml .= "    <ttl>60</ttl>\n";
+
+        foreach ($posts as $post) {
+            $title = $post->{$titleField} ?: ($post->title_ar ?: $post->title_en);
+            $excerpt = $post->{$excerptField} ?: ($post->excerpt_ar ?: $post->excerpt_en ?: '');
+            $body = $post->{$contentField} ?: ($post->content_ar ?: $post->content_en ?: '');
+            $link = $base . '/blog/' . $post->slug;
+            $pubDate = ($post->published_at ?? $post->created_at ?? now())->toRssString();
+
+            $xml .= "    <item>\n";
+            $xml .= '      <title>' . htmlspecialchars($title, ENT_XML1) . "</title>\n";
+            $xml .= "      <link>{$link}</link>\n";
+            $xml .= '      <guid isPermaLink="true">' . $link . "</guid>\n";
+            $xml .= "      <pubDate>{$pubDate}</pubDate>\n";
+            $xml .= '      <category>' . htmlspecialchars($catName, ENT_XML1) . "</category>\n";
+            $xml .= "      <dc:creator>Doctorato</dc:creator>\n";
+            $xml .= '      <description>' . htmlspecialchars(strip_tags($excerpt), ENT_XML1) . "</description>\n";
+            $xml .= '      <content:encoded><![CDATA[' . $body . "]]></content:encoded>\n";
+            $xml .= "    </item>\n";
+        }
+
+        $xml .= "  </channel>\n";
+        $xml .= "</rss>\n";
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/rss+xml; charset=utf-8',
+            'Cache-Control' => 'public, max-age=1800',
+        ]);
+    }
 }

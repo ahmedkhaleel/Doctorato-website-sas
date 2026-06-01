@@ -61,6 +61,13 @@ class SitemapController extends Controller
         ['path' => '/city/mansoura', 'priority' => '0.8', 'freq' => 'monthly'],
         ['path' => '/city/tanta', 'priority' => '0.8', 'freq' => 'monthly'],
         ['path' => '/city/asyut', 'priority' => '0.8', 'freq' => 'monthly'],
+        // Use-case landing pages — buyer-intent for "best system for [scenario]".
+        ['path' => '/for/solo-doctor', 'priority' => '0.85', 'freq' => 'monthly'],
+        ['path' => '/for/small-clinic', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/for/polyclinic', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/for/hospital', 'priority' => '0.85', 'freq' => 'monthly'],
+        ['path' => '/for/dental-clinic', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/for/derma-clinic', 'priority' => '0.9', 'freq' => 'monthly'],
     ];
 
     public function index(): Response

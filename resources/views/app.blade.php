@@ -124,6 +124,26 @@
                     'InternalMedicine', 'Telehealth',
                 ],
             ],
+            // Speakable spec — flags H1 + main intro as voice-assistant-readable.
+            // Google Assistant uses this to surface the page in voice search
+            // results. xpath targets the standard hero structure on every page.
+            [
+                '@type' => 'WebPage',
+                '@id' => $appUrl . '/#webpage',
+                'url' => $canonical,
+                'inLanguage' => $isAr ? 'ar-EG' : 'en-US',
+                'isPartOf' => ['@id' => $appUrl . '/#website'],
+                'about' => ['@id' => $appUrl . '/#software'],
+                'speakable' => [
+                    '@type' => 'SpeakableSpecification',
+                    'xPath' => [
+                        '/html/head/title',
+                        '/html/head/meta[@name="description"]/@content',
+                        "//h1[1]",
+                        "//*[@id='speakable-intro']",
+                    ],
+                ],
+            ],
         ],
     ];
 @endphp

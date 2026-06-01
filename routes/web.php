@@ -151,6 +151,14 @@ Route::get('/city/{city}', function (string $city) {
     return \Inertia\Inertia::render('CityLanding', ['city' => $city]);
 })->where('city', '[a-z0-9-]+')->name('city-landing');
 
+// Use-case landing pages — captures "best system for [scenario]" queries
+// where the visitor knows their facility shape but not yet the plan.
+Route::get('/for/{scenario}', function (string $scenario) {
+    $supported = ['solo-doctor', 'small-clinic', 'polyclinic', 'hospital', 'dental-clinic', 'derma-clinic'];
+    abort_unless(in_array($scenario, $supported, true), 404);
+    return \Inertia\Inertia::render('UseCase', ['scenario' => $scenario]);
+})->where('scenario', '[a-z0-9-]+')->name('use-case');
+
 // Legal pages — Inertia renders the bilingual content. Footer links here.
 Route::get('/privacy', fn () => \Inertia\Inertia::render('Privacy'))->name('privacy');
 Route::get('/terms', fn () => \Inertia\Inertia::render('Terms'))->name('terms');
@@ -167,6 +175,10 @@ Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 // Must be defined BEFORE the {slug} route or '/blog/rss.xml' would be
 // matched as a slug.
 Route::get('/blog/rss.xml', [BlogController::class, 'rss'])->name('blog.rss');
+// Category-scoped RSS — one stream per topic, easier to subscribe to.
+Route::get('/blog/category/{slug}/rss.xml', [BlogController::class, 'categoryRss'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('blog.category.rss');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Case Studies
