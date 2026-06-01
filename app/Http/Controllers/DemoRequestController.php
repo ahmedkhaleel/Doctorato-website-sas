@@ -23,6 +23,27 @@ class DemoRequestController extends Controller
 
         $validated = $request->validated();
 
+        // Server-side deduplication: if the same email + clinic submitted
+        // a demo request in the last 30 seconds, treat the second one as
+        // an idempotent re-submit (double-click, browser auto-resubmit on
+        // refresh, race against captcha). Return the success state for
+        // the original record instead of creating a duplicate row.
+        $recentDuplicate = DemoRequest::query()
+            ->where('email', $validated['email'])
+            ->where('clinic_name', $validated['clinic_name'])
+            ->where('created_at', '>=', now()->subSeconds(30))
+            ->latest()
+            ->first();
+
+        if ($recentDuplicate) {
+            Log::info('Demo: duplicate submission suppressed', [
+                'email' => $validated['email'],
+                'original_id' => $recentDuplicate->id,
+                'seconds_ago' => now()->diffInSeconds($recentDuplicate->created_at),
+            ]);
+            return back()->with('success', true);
+        }
+
         try {
             $demo = DemoRequest::create($validated);
         } catch (\Throwable $e) {

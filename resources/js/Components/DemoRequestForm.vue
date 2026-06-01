@@ -34,6 +34,10 @@ const isAr = computed(() => locale.value === 'ar');
 useScrollAnimation();
 
 const showSuccess = ref(false);
+// In-flight guard for the submit handler — see submitForm() for context.
+// Declared up here (not next to submitForm) so the `submitting` computed
+// below can reference it without a hoisting issue.
+const submitGuard = ref(false);
 const currentStep = ref(1);
 const totalSteps = 3;
 
@@ -60,7 +64,11 @@ const form = useForm({
 
 const captcha = useRecaptcha();
 const track = useTracking();
-const submitting = computed(() => form.processing);
+// Submitting state covers BOTH form.processing (Inertia request in flight)
+// AND submitGuard.value (captcha pre-flight). This way the visible
+// disabled state matches the guard so the user can't click again during
+// the captcha await window.
+const submitting = computed(() => form.processing || submitGuard.value);
 
 // Progress (1..totalSteps mapped to %)
 const progress = computed(() => Math.round(((currentStep.value - 1) / totalSteps) * 100));
@@ -193,7 +201,20 @@ function prevStep() {
 }
 
 // ─── Submit ───
+//
+// Local in-flight guard. Inertia's `form.processing` only flips to true
+// once `form.post()` actually starts firing — but our submitForm() does
+// an `await captcha.execute()` BEFORE form.post(), and during that
+// 50-500ms wait the submit button stays enabled. If the user clicks
+// twice (or hits Enter then clicks), submitForm() runs twice → two
+// form.post() calls → two DB rows with identical data, which is what
+// produced the "every demo appears twice in /admin/demos" bug.
+// The submitGuard ref is declared near the top of this <script setup>.
+
 async function submitForm() {
+    if (submitGuard.value || form.processing) return;
+    submitGuard.value = true;
+
     try {
         form.recaptcha_token = (await captcha.execute('demo_request')) || '';
     } catch (e) {
@@ -221,6 +242,12 @@ async function submitForm() {
             setTimeout(() => {
                 document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 80);
+        },
+        // Release the guard whether the request succeeded, errored, or
+        // was cancelled. Without onFinish, a failed submit would leave
+        // the guard true and the user couldn't retry without a reload.
+        onFinish: () => {
+            submitGuard.value = false;
         },
     });
 }

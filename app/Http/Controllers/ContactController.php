@@ -30,6 +30,26 @@ class ContactController extends Controller
         }
         unset($validated['country_code']);
 
+        // Server-side deduplication — same email + message text within 30
+        // seconds is treated as a re-submit (double-click, refresh after
+        // success). Returns the success state for the original record
+        // instead of inserting a duplicate row.
+        $recentDuplicate = ContactMessage::query()
+            ->where('email', $validated['email'])
+            ->where('message', $validated['message'] ?? '')
+            ->where('created_at', '>=', now()->subSeconds(30))
+            ->latest()
+            ->first();
+
+        if ($recentDuplicate) {
+            Log::info('Contact: duplicate submission suppressed', [
+                'email' => $validated['email'],
+                'original_id' => $recentDuplicate->id,
+                'seconds_ago' => now()->diffInSeconds($recentDuplicate->created_at),
+            ]);
+            return back()->with('success', true);
+        }
+
         try {
             $contact = ContactMessage::create($validated);
         } catch (\Throwable $e) {
