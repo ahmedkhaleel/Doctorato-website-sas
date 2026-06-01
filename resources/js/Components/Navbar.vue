@@ -102,7 +102,14 @@ onUnmounted(() => {
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
                 <Link href="/" class="flex items-center shrink-0">
-                    <img src="/images/doctorato-logo.png" alt="Doctorato" class="w-36 lg:w-40 h-auto" />
+                    <img
+                        src="/images/doctorato-logo.png"
+                        alt="دكتوراتو — نظام إدارة العيادات الطبية في مصر | Doctorato Clinic Management"
+                        class="w-36 lg:w-40 h-auto"
+                        width="160"
+                        height="48"
+                        fetchpriority="high"
+                    />
                 </Link>
 
                 <!-- Desktop Nav Links -->

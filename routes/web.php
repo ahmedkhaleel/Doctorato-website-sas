@@ -133,6 +133,24 @@ Route::get('/medical-crm', fn () => \Inertia\Inertia::render('MedicalCrm'))->nam
 Route::get('/glossary', fn () => \Inertia\Inertia::render('Glossary'))->name('glossary');
 Route::get('/compare', fn () => \Inertia\Inertia::render('Compare'))->name('compare');
 
+// Head-to-head versus pages — target "Doctorato vs X" commercial-intent
+// queries. Each competitor slug maps to one comparison page; the Vue
+// component reads $competitor from props and pulls the matrix from a
+// shared dataset. 404 on unknown slug (whitelist).
+Route::get('/vs/{competitor}', function (string $competitor) {
+    $supported = ['vezeeta', 'cliniko', 'clinicgateway', 'drsoft', 'practo'];
+    abort_unless(in_array($competitor, $supported, true), 404);
+    return \Inertia\Inertia::render('Versus', ['competitor' => $competitor]);
+})->where('competitor', '[a-z0-9-]+')->name('versus');
+
+// City landing pages — local SEO play. "نظام إدارة عيادات في القاهرة" etc.
+// Whitelist of supported governorates.
+Route::get('/city/{city}', function (string $city) {
+    $supported = ['cairo', 'alexandria', 'giza', 'mansoura', 'tanta', 'asyut'];
+    abort_unless(in_array($city, $supported, true), 404);
+    return \Inertia\Inertia::render('CityLanding', ['city' => $city]);
+})->where('city', '[a-z0-9-]+')->name('city-landing');
+
 // Legal pages — Inertia renders the bilingual content. Footer links here.
 Route::get('/privacy', fn () => \Inertia\Inertia::render('Privacy'))->name('privacy');
 Route::get('/terms', fn () => \Inertia\Inertia::render('Terms'))->name('terms');

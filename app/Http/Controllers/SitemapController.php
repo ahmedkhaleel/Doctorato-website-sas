@@ -48,6 +48,19 @@ class SitemapController extends Controller
         ['path' => '/qa', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/bh', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/om', 'priority' => '0.9', 'freq' => 'monthly'],
+        // Versus pages — head-to-head comparison SERPs for "Doctorato vs X" queries.
+        ['path' => '/vs/vezeeta', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/vs/cliniko', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/vs/clinicgateway', 'priority' => '0.85', 'freq' => 'monthly'],
+        ['path' => '/vs/drsoft', 'priority' => '0.8', 'freq' => 'monthly'],
+        ['path' => '/vs/practo', 'priority' => '0.8', 'freq' => 'monthly'],
+        // City landing pages — local-SEO targets for "نظام إدارة عيادات في X" queries.
+        ['path' => '/city/cairo', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/city/alexandria', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/city/giza', 'priority' => '0.85', 'freq' => 'monthly'],
+        ['path' => '/city/mansoura', 'priority' => '0.8', 'freq' => 'monthly'],
+        ['path' => '/city/tanta', 'priority' => '0.8', 'freq' => 'monthly'],
+        ['path' => '/city/asyut', 'priority' => '0.8', 'freq' => 'monthly'],
     ];
 
     public function index(): Response
