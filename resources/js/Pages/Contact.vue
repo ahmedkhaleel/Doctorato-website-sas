@@ -10,7 +10,11 @@ import { useRecaptcha } from '@/composables/useRecaptcha';
 
 const track = useTracking();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const isAr = computed(() => locale.value === 'ar');
+// Quick localizer for the inline strings on this page. Keeps both
+// translations next to each other so future edits stay in sync.
+const tr = (ar, en) => (isAr.value ? ar : en);
 useScrollAnimation();
 
 const showSuccess = ref(false);
@@ -279,22 +283,22 @@ const contactJsonLd = computed(() => ({
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                         </span>
-                        <span class="text-white/90 text-xs font-medium">متاحون الآن للرد على استفساراتك</span>
+                        <span class="text-white/90 text-xs font-medium">{{ tr('متاحون الآن للرد على استفساراتك', 'Online now — ready to answer') }}</span>
                     </div>
 
                     <h1
                         :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
                         class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 transition-all duration-700 delay-100 leading-tight"
                     >
-                        لنبدأ
+                        {{ tr('لنبدأ', "Let's start a") }}
                         <span class="relative inline-block">
-                            <span class="relative z-10 bg-gradient-to-r from-[#C4A265] via-[#D4B87A] to-[#C4A265] bg-clip-text text-transparent">محادثة</span>
+                            <span class="relative z-10 bg-gradient-to-r from-[#C4A265] via-[#D4B87A] to-[#C4A265] bg-clip-text text-transparent">{{ tr('محادثة', 'conversation') }}</span>
                             <svg class="absolute -bottom-2 left-0 w-full" height="8" viewBox="0 0 200 8" preserveAspectRatio="none">
                                 <path d="M0,4 Q50,0 100,4 T200,4" stroke="#C4A265" stroke-width="2" fill="none" stroke-linecap="round" />
                             </svg>
                         </span>
                         <br />
-                        تستحق وقتك
+                        {{ tr('تستحق وقتك', 'worth your time') }}
                     </h1>
 
                     <p
@@ -353,10 +357,10 @@ const contactJsonLd = computed(() => ({
                             <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#C4A265] to-[#D4B87A] flex items-center justify-center shadow-lg shadow-[#C4A265]/30 mb-4 group-hover:scale-105 transition-transform duration-500">
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                             </div>
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1 font-bold">{{ phone.country }} — {{ phone.countryEn }}</p>
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1 font-bold">{{ isAr ? phone.country : phone.countryEn }}</p>
                             <p class="text-lg font-bold text-white mb-4 tracking-tight" dir="ltr">{{ phone.number }}</p>
                             <div class="flex items-center justify-between pt-4 border-t border-white/10">
-                                <span class="text-xs text-white/60 font-medium">اتصل مباشرة</span>
+                                <span class="text-xs text-white/60 font-medium">{{ tr('اتصل مباشرة', 'Call directly') }}</span>
                                 <div class="w-8 h-8 rounded-full bg-[#C4A265]/20 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
                                     <svg class="w-3.5 h-3.5 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                 </div>
@@ -380,10 +384,10 @@ const contactJsonLd = computed(() => ({
                             <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1B4F72] to-[#2E86C1] flex items-center justify-center shadow-lg shadow-[#1B4F72]/25 mb-4 group-hover:scale-105 transition-transform duration-500">
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             </div>
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1 font-bold">البريد الإلكتروني</p>
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[#C4A265] mb-1 font-bold">{{ tr('البريد الإلكتروني', 'Email') }}</p>
                             <p class="text-base font-bold text-[#1C2833] mb-4 tracking-tight break-all" dir="ltr">{{ email }}</p>
                             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <span class="text-xs text-gray-500 font-medium">راسلنا الآن</span>
+                                <span class="text-xs text-gray-500 font-medium">{{ tr('راسلنا الآن', 'Email us now') }}</span>
                                 <div class="w-8 h-8 rounded-full bg-[#C4A265]/10 flex items-center justify-center group-hover:bg-[#C4A265] transition-all duration-500">
                                     <svg class="w-3.5 h-3.5 text-[#C4A265] group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                 </div>
@@ -462,9 +466,9 @@ const contactJsonLd = computed(() => ({
 
                                 <div class="relative">
                                     <div class="mb-8">
-                                        <span class="inline-block px-3 py-1 rounded-full bg-[#1B4F72]/10 text-[#1B4F72] text-xs font-bold mb-3">📨 نموذج التواصل</span>
+                                        <span class="inline-block px-3 py-1 rounded-full bg-[#1B4F72]/10 text-[#1B4F72] text-xs font-bold mb-3">📨 {{ tr('نموذج التواصل', 'Contact form') }}</span>
                                         <h2 class="text-2xl md:text-3xl font-bold text-[#1C2833] mb-2">{{ t('contact.form_title') }}</h2>
-                                        <p class="text-gray-500 text-sm">سنرد عليك خلال ساعات عمل قليلة</p>
+                                        <p class="text-gray-500 text-sm">{{ tr('سنرد عليك خلال ساعات عمل قليلة', 'We reply within a few business hours') }}</p>
                                     </div>
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -540,7 +544,7 @@ const contactJsonLd = computed(() => ({
                                                                     <input
                                                                         v-model="countrySearch"
                                                                         type="text"
-                                                                        placeholder="ابحث عن دولة..."
+                                                                        :placeholder="tr('ابحث عن دولة...', 'Search country...')"
                                                                         class="w-full ps-9 pe-3 py-2 text-sm rounded-lg bg-white border border-gray-200 focus:border-[#1B4F72] outline-none transition"
                                                                     />
                                                                 </div>
@@ -556,12 +560,12 @@ const contactJsonLd = computed(() => ({
                                                                     :class="{ 'bg-[#C4A265]/10': selectedCountry.code === c.code }"
                                                                 >
                                                                     <span class="text-xl leading-none">{{ c.flag }}</span>
-                                                                    <span class="flex-1 text-gray-700 truncate">{{ c.name_ar }}</span>
+                                                                    <span class="flex-1 text-gray-700 truncate">{{ isAr ? c.name_ar : c.name_en }}</span>
                                                                     <span class="text-gray-400 text-xs font-mono" dir="ltr">{{ c.dial }}</span>
                                                                     <svg v-if="selectedCountry.code === c.code" class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                                                 </button>
                                                                 <div v-if="!filteredCountries.length" class="px-4 py-6 text-center text-sm text-gray-400">
-                                                                    لا توجد نتائج
+                                                                    {{ tr('لا توجد نتائج', 'No results') }}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -658,17 +662,17 @@ const contactJsonLd = computed(() => ({
                                 <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-4">
                                     <svg class="w-6 h-6 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
-                                <h3 class="text-xl font-bold text-white mb-1">ساعات العمل</h3>
-                                <p class="text-white/60 text-xs mb-6">نحن هنا لخدمتك</p>
+                                <h3 class="text-xl font-bold text-white mb-1">{{ tr('ساعات العمل', 'Working hours') }}</h3>
+                                <p class="text-white/60 text-xs mb-6">{{ tr('نحن هنا لخدمتك', "We're here for you") }}</p>
 
                                 <div class="space-y-3">
                                     <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                                        <span class="text-white/80 text-sm">السبت — الخميس</span>
+                                        <span class="text-white/80 text-sm">{{ tr('السبت — الخميس', 'Sat — Thu') }}</span>
                                         <span class="text-[#C4A265] font-bold text-sm" dir="ltr">9:00 — 18:00</span>
                                     </div>
                                     <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                                        <span class="text-white/80 text-sm">الجمعة</span>
-                                        <span class="text-red-300 font-bold text-sm">مغلق</span>
+                                        <span class="text-white/80 text-sm">{{ tr('الجمعة', 'Friday') }}</span>
+                                        <span class="text-red-300 font-bold text-sm">{{ tr('مغلق', 'Closed') }}</span>
                                     </div>
                                 </div>
 
@@ -677,15 +681,15 @@ const contactJsonLd = computed(() => ({
                                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                                     </span>
-                                    <span>متاحون الآن — رد سريع</span>
+                                    <span>{{ tr('متاحون الآن — رد سريع', 'Online now — fast reply') }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Social Links -->
                         <div class="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
-                            <h3 class="text-xl font-bold text-[#1C2833] mb-2">تابعنا على</h3>
-                            <p class="text-gray-500 text-xs mb-5">آخر التحديثات والأخبار</p>
+                            <h3 class="text-xl font-bold text-[#1C2833] mb-2">{{ tr('تابعنا على', 'Follow us') }}</h3>
+                            <p class="text-gray-500 text-xs mb-5">{{ tr('آخر التحديثات والأخبار', 'Latest updates and news') }}</p>
 
                             <div class="grid grid-cols-4 gap-3">
                                 <a
@@ -707,31 +711,31 @@ const contactJsonLd = computed(() => ({
 
                         <!-- Why Choose Us -->
                         <div class="bg-gradient-to-br from-[#FFF8E7] to-white rounded-3xl p-8 shadow-xl border border-[#C4A265]/20">
-                            <h3 class="text-xl font-bold text-[#1C2833] mb-5">لماذا تتواصل معنا؟</h3>
+                            <h3 class="text-xl font-bold text-[#1C2833] mb-5">{{ tr('لماذا تتواصل معنا؟', 'Why contact us?') }}</h3>
                             <ul class="space-y-3">
                                 <li class="flex items-start gap-3 text-sm text-gray-700">
                                     <div class="w-6 h-6 rounded-lg bg-[#C4A265]/20 flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                     </div>
-                                    <span>دعم فني على مدار الساعة</span>
+                                    <span>{{ tr('دعم فني على مدار الساعة', '24/7 technical support') }}</span>
                                 </li>
                                 <li class="flex items-start gap-3 text-sm text-gray-700">
                                     <div class="w-6 h-6 rounded-lg bg-[#C4A265]/20 flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                     </div>
-                                    <span>استشارات مجانية للعملاء الجدد</span>
+                                    <span>{{ tr('استشارات مجانية للعملاء الجدد', 'Free consultations for new customers') }}</span>
                                 </li>
                                 <li class="flex items-start gap-3 text-sm text-gray-700">
                                     <div class="w-6 h-6 rounded-lg bg-[#C4A265]/20 flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                     </div>
-                                    <span>فريق متعدد اللغات (عربي / إنجليزي)</span>
+                                    <span>{{ tr('فريق متعدد اللغات (عربي / إنجليزي)', 'Bilingual team (Arabic / English)') }}</span>
                                 </li>
                                 <li class="flex items-start gap-3 text-sm text-gray-700">
                                     <div class="w-6 h-6 rounded-lg bg-[#C4A265]/20 flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-4 h-4 text-[#C4A265]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                     </div>
-                                    <span>رد سريع خلال أقل من 24 ساعة</span>
+                                    <span>{{ tr('رد سريع خلال أقل من 24 ساعة', 'Fast reply within 24 hours') }}</span>
                                 </li>
                             </ul>
                         </div>
