@@ -282,8 +282,8 @@ const pricingJsonLd = computed(() => ({
             ? 'أسعار نظام إدارة عيادات | 4 باقات تنافسية بالجنيه المصري — دكتوراتو'
             : 'Clinic Management Pricing | 4 Competitive Plans in EGP — Doctorato'"
         :description="locale === 'ar'
-            ? 'أسعار شفافة لنظام إدارة العيادات: المبتدئ 1,990 ج.م، النمو 3,990 ج.م، الاحترافي 6,990 ج.م، Enterprise. تركيب مجاني، تجربة 30 يوم بدون بطاقة ائتمان.'
-            : 'Transparent clinic management pricing: Starter 1,990 EGP, Growth 3,990 EGP, Professional 6,990 EGP, Enterprise. Free setup, 30-day trial — no credit card required.'"
+            ? 'أسعار شفافة لنظام إدارة العيادات: المبتدئ 1,990 ج.م، النمو 3,990 ج.م، الاحترافي 6,990 ج.م، Enterprise. 7 تخصصات جاهزة (شاملة الطب النفسي والعصبي)، تركيب مجاني، تجربة 30 يوم بدون بطاقة ائتمان.'
+            : 'Transparent clinic management pricing: Starter 1,990 EGP, Growth 3,990 EGP, Professional 6,990 EGP, Enterprise. 7 ready-made specialties (including psychiatry & neurology), free setup, 30-day trial — no credit card required.'"
         :json-ld="pricingJsonLd"
         :breadcrumbs="[
             { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: '/' },
@@ -331,6 +331,32 @@ const pricingJsonLd = computed(() => ({
                         <span class="text-sm text-white/80 font-medium">{{ g.text }}</span>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- What's New strip — announces the newest specialty added to all plans.
+             Keeps the offer in the visitor's view BEFORE they pick a plan,
+             so they know psychiatry/neurology is covered before counting. -->
+        <section class="bg-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
+                <Link
+                    href="/psychiatry"
+                    class="group flex items-center gap-3 sm:gap-4 px-5 py-3.5 rounded-full bg-gradient-to-r from-[#6366F1] to-[#06B6D4] text-white shadow-lg shadow-[#6366F1]/25 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+                >
+                    <span class="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-base">🧠</span>
+                    <span class="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-white/15 ring-1 ring-white/25 text-[10px] font-bold uppercase tracking-widest">
+                        {{ locale === 'ar' ? 'جديد' : 'New' }}
+                    </span>
+                    <span class="flex-1 text-xs sm:text-sm font-semibold leading-tight">
+                        {{ locale === 'ar'
+                            ? 'وحدة الطب النفسي والعصبي متاحة الآن في كل الباقات — تصبح 7 تخصصات جاهزة'
+                            : 'Psychiatry & Neurology now in every plan — 7 ready-made specialties total' }}
+                    </span>
+                    <span class="shrink-0 inline-flex items-center gap-1 text-xs font-bold opacity-90 group-hover:gap-2 transition-all">
+                        {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                        <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </span>
+                </Link>
             </div>
         </section>
 
