@@ -68,6 +68,23 @@ function initials(name) {
     if (!name) return '?';
     return name.trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 }
+
+/**
+ * Build a wa.me deep-link from a contact's phone. WhatsApp expects
+ * digits only — strip everything that isn't a digit before
+ * concatenating. Returns null if no usable phone exists so the
+ * caller can hide the button.
+ */
+function whatsappUrl(contact) {
+    if (!contact?.phone) return null;
+    const digits = String(contact.phone).replace(/\D+/g, '');
+    if (!digits) return null;
+    const firstName = (contact.name || '').trim().split(/\s+/)[0] || '';
+    const greeting = firstName
+        ? `مرحباً ${firstName}، أنا فريق دكتوراتو — متابعة لرسالتك الواردة عبر الموقع.`
+        : 'مرحباً، أنا فريق دكتوراتو — متابعة لرسالتك الواردة عبر الموقع.';
+    return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
+}
 </script>
 
 <template>
@@ -251,7 +268,22 @@ function initials(name) {
                                 <p class="text-gray-800 text-xs mt-1" dir="ltr">{{ selectedContact.email }}</p>
                             </div>
                             <div v-if="selectedContact.phone" class="bg-gray-50 p-3 rounded-xl">
-                                <p class="text-[10px] text-gray-500 uppercase">الهاتف</p>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-[10px] text-gray-500 uppercase">الهاتف</p>
+                                    <a
+                                        v-if="whatsappUrl(selectedContact)"
+                                        :href="whatsappUrl(selectedContact)"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] hover:bg-[#25D366] text-[#128C7E] hover:text-white text-[10px] font-bold uppercase tracking-wider transition-colors"
+                                        title="فتح محادثة واتساب"
+                                    >
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.307.446-.46.15-.152.198-.262.297-.435.099-.198.05-.371-.025-.52-.075-.149-.669-1.611-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.371-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.003 2C6.483 2 2 6.483 2 12.003c0 1.776.468 3.49 1.354 5.006L2 22l5.131-1.345A9.96 9.96 0 0012.003 22C17.523 22 22 17.523 22 12.003 22 6.483 17.523 2 12.003 2z"/>
+                                        </svg>
+                                        WhatsApp
+                                    </a>
+                                </div>
                                 <p class="text-gray-800 text-xs mt-1" dir="ltr">{{ selectedContact.phone }}</p>
                             </div>
                         </div>

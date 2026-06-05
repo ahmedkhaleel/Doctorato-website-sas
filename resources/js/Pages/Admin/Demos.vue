@@ -95,6 +95,27 @@ function initials(name) {
     return name.trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
 }
 
+/**
+ * Build a wa.me deep-link from a demo's country code + phone.
+ * WhatsApp expects digits only, no '+' / spaces / parentheses, so we
+ * strip everything that isn't a digit before concatenating. Returns
+ * null if the demo is missing a usable phone — caller hides the
+ * button in that case instead of opening a broken link.
+ *
+ * Includes a pre-filled greeting in Arabic with the contact's first
+ * name so the chat opens already personalized.
+ */
+function whatsappUrl(demo) {
+    if (!demo?.phone) return null;
+    const digits = String((demo.country_code || '') + demo.phone).replace(/\D+/g, '');
+    if (!digits) return null;
+    const firstName = (demo.full_name || '').trim().split(/\s+/)[0] || '';
+    const greeting = firstName
+        ? `مرحباً ${firstName}، أنا فريق دكتوراتو — متابعة لطلب التجربة التجريبية الخاص بك.`
+        : 'مرحباً، أنا فريق دكتوراتو — متابعة لطلب التجربة التجريبية الخاص بك.';
+    return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
+}
+
 function trialBadgeClass(d) {
     if (d.trial_status === 'expired') return 'bg-rose-50 text-rose-600 border-rose-200';
     if (d.is_trial_ending_soon) return 'bg-amber-50 text-amber-700 border-amber-200';
@@ -345,6 +366,19 @@ function progressColor(d) {
                                         >
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                         </button>
+                                        <a
+                                            v-if="whatsappUrl(d)"
+                                            :href="whatsappUrl(d)"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="action-btn whatsapp"
+                                            title="فتح محادثة واتساب"
+                                        >
+                                            <!-- Official WhatsApp glyph (paths from the WhatsApp brand kit, simplified) -->
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.307.446-.46.15-.152.198-.262.297-.435.099-.198.05-.371-.025-.52-.075-.149-.669-1.611-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.371-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.003 2C6.483 2 2 6.483 2 12.003c0 1.776.468 3.49 1.354 5.006L2 22l5.131-1.345A9.96 9.96 0 0012.003 22C17.523 22 22 17.523 22 12.003 22 6.483 17.523 2 12.003 2z"/>
+                                            </svg>
+                                        </a>
                                         <button @click="openDemo(d)" class="action-btn manage" title="إدارة">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         </button>
@@ -462,7 +496,22 @@ function progressColor(d) {
                                     <p class="text-gray-800 text-xs mt-1 truncate" dir="ltr">{{ selectedDemo.email }}</p>
                                 </div>
                                 <div class="bg-gray-50 p-3 rounded-xl">
-                                    <p class="text-[10px] text-gray-500 uppercase font-bold">الهاتف</p>
+                                    <div class="flex items-center justify-between gap-2">
+                                        <p class="text-[10px] text-gray-500 uppercase font-bold">الهاتف</p>
+                                        <a
+                                            v-if="whatsappUrl(selectedDemo)"
+                                            :href="whatsappUrl(selectedDemo)"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] hover:bg-[#25D366] text-[#128C7E] hover:text-white text-[10px] font-bold uppercase tracking-wider transition-colors"
+                                            title="فتح محادثة واتساب"
+                                        >
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.307.446-.46.15-.152.198-.262.297-.435.099-.198.05-.371-.025-.52-.075-.149-.669-1.611-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.371-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.003 2C6.483 2 2 6.483 2 12.003c0 1.776.468 3.49 1.354 5.006L2 22l5.131-1.345A9.96 9.96 0 0012.003 22C17.523 22 22 17.523 22 12.003 22 6.483 17.523 2 12.003 2z"/>
+                                            </svg>
+                                            WhatsApp
+                                        </a>
+                                    </div>
                                     <p class="text-gray-800 text-xs mt-1" dir="ltr">{{ selectedDemo.country_code }}{{ selectedDemo.phone }}</p>
                                 </div>
                                 <div class="bg-gray-50 p-3 rounded-xl">
@@ -592,6 +641,10 @@ function progressColor(d) {
 .action-btn.delete:hover { background: linear-gradient(135deg, #ef4444, #e11d48); color: white; }
 .action-btn.dismiss { background: #fef2f2; color: #ef4444; }
 .action-btn.dismiss:hover { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+/* WhatsApp action — idle in a soft mint tint, on hover flips to the
+   official WhatsApp green so the affordance is obvious. */
+.action-btn.whatsapp { background: #DCFCE7; color: #25D366; }
+.action-btn.whatsapp:hover { background: linear-gradient(135deg, #25D366, #128C7E); color: white; }
 
 @keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fade-down { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
