@@ -81,8 +81,8 @@ function whatsappUrl(contact) {
     if (!digits) return null;
     const firstName = (contact.name || '').trim().split(/\s+/)[0] || '';
     const greeting = firstName
-        ? `مرحباً ${firstName}، أنا فريق دكتوراتو — متابعة لرسالتك الواردة عبر الموقع.`
-        : 'مرحباً، أنا فريق دكتوراتو — متابعة لرسالتك الواردة عبر الموقع.';
+        ? `مرحباً دكتور ${firstName}، أنا فريق دكتوراتو — متابعة لرسالتك الواردة عبر الموقع.`
+        : 'مرحباً دكتور، أنا فريق دكتوراتو — متابعة لرسالتك الواردة عبر الموقع.';
     return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
 }
 </script>

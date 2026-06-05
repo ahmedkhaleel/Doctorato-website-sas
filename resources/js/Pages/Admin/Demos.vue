@@ -111,8 +111,8 @@ function whatsappUrl(demo) {
     if (!digits) return null;
     const firstName = (demo.full_name || '').trim().split(/\s+/)[0] || '';
     const greeting = firstName
-        ? `مرحباً ${firstName}، أنا فريق دكتوراتو — متابعة لطلب التجربة التجريبية الخاص بك.`
-        : 'مرحباً، أنا فريق دكتوراتو — متابعة لطلب التجربة التجريبية الخاص بك.';
+        ? `مرحباً دكتور ${firstName}، أنا فريق دكتوراتو — متابعة لطلب التجربة التجريبية الخاص بك.`
+        : 'مرحباً دكتور، أنا فريق دكتوراتو — متابعة لطلب التجربة التجريبية الخاص بك.';
     return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
 }
 
