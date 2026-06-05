@@ -28,6 +28,7 @@ import { useI18n } from 'vue-i18n';
 import { useScrollAnimation } from '@/composables/useScrollAnimation';
 import { useTracking } from '@/composables/useTracking';
 import { useRecaptcha } from '@/composables/useRecaptcha';
+import { EGYPT_GOVERNORATES, SUPPORTED_COUNTRIES } from '@/data/egypt-locations.js';
 
 const { t, locale } = useI18n();
 const isAr = computed(() => locale.value === 'ar');
@@ -39,20 +40,27 @@ const showSuccess = ref(false);
 // below can reference it without a hoisting issue.
 const submitGuard = ref(false);
 const currentStep = ref(1);
-const totalSteps = 3;
+const totalSteps = 4;
 
 const form = useForm({
-    // Step 1
+    // Step 1 — identity
     full_name: '',
     clinic_name: '',
     email: '',
     country_code: '+20',          // Egypt default
     phone: '',
-    // Step 2
+    // Step 2 — facility
     facility_type: '',
     doctors_count: '',
     specialty: '',
-    // Step 3
+    // Step 3 — location + online presence
+    country: 'EG',                // Egypt is the default — the picker
+                                  // shows it first so it's a 1-tap confirm
+    governorate: '',
+    city: '',
+    address: '',
+    website_url: '',
+    // Step 4 — priorities (optional)
     interested_modules: [],
     referral_source: '',
     // Hidden
@@ -161,7 +169,53 @@ const step2Valid = computed(() =>
     form.facility_type && form.doctors_count && form.specialty
 );
 
-// ─── Step 3 ───
+// ─── Step 3 — Location + Online presence ───
+const countries = SUPPORTED_COUNTRIES;
+
+// Cascading governorate/city lists. Egypt has the full dropdown set;
+// other countries fall back to free-typed text fields so we don't gate
+// the visitor on data we don't yet have.
+const governorates = computed(() => form.country === 'EG' ? EGYPT_GOVERNORATES : []);
+const cities = computed(() => {
+    if (form.country !== 'EG' || !form.governorate) return [];
+    const g = EGYPT_GOVERNORATES.find(x => x.ar === form.governorate || x.en === form.governorate);
+    return g ? g.cities : [];
+});
+
+// Reset cascading children when the parent changes so the user can't
+// land in an inconsistent (governorate-A city, governorate-B selected) state.
+watch(() => form.country, (val, old) => {
+    if (val !== old) {
+        form.governorate = '';
+        form.city = '';
+    }
+});
+watch(() => form.governorate, (val, old) => {
+    if (val !== old) form.city = '';
+});
+
+// Step 3 requires country + (governorate OR address text) so we still
+// get useful location data — Egyptian visitors pick from dropdowns,
+// others can free-text the rest.
+const step3Valid = computed(() => {
+    if (!form.country) return false;
+    if (form.country === 'EG') {
+        return Boolean(form.governorate && form.city);
+    }
+    return Boolean(form.address?.trim().length);
+});
+
+// Optional website/social URL is allowed empty, but if it's present
+// it must look like a URL. Basic browser-grade check; the server
+// re-validates with Laravel's `url` rule.
+const websiteUrlValid = computed(() => {
+    const v = (form.website_url || '').trim();
+    if (!v) return true;
+    try { new URL(v.startsWith('http') ? v : 'https://' + v); return true; }
+    catch { return false; }
+});
+
+// ─── Step 4 — priorities (formerly step 3) ───
 const modules = computed(() => [
     { value: 'emr',          label: isAr.value ? 'السجل الطبي الإلكتروني (EMR)' : 'EMR / patient records',     icon: '📋' },
     { value: 'booking',      label: isAr.value ? 'الحجز والمواعيد'           : 'Booking & appointments',       icon: '📅' },
@@ -195,6 +249,7 @@ function toggleModule(val) {
 function nextStep() {
     if (currentStep.value === 1 && !step1Valid.value) return;
     if (currentStep.value === 2 && !step2Valid.value) return;
+    if (currentStep.value === 3 && (!step3Valid.value || !websiteUrlValid.value)) return;
     if (currentStep.value < totalSteps) currentStep.value += 1;
 }
 function prevStep() {
@@ -238,6 +293,7 @@ async function submitForm() {
             showSuccess.value = true;
             form.reset();
             form.country_code = '+20';
+            form.country = 'EG';
             currentStep.value = 1;
             form.form_rendered_at = Date.now();
             setTimeout(() => {
@@ -494,8 +550,114 @@ onMounted(() => {
                             </div>
                         </div>
 
-                        <!-- ─── STEP 3 — Needs ────────────────────────── -->
-                        <div v-else key="step3" class="space-y-5">
+                        <!-- ─── STEP 3 — Location + Online presence ──── -->
+                        <div v-else-if="currentStep === 3" key="step3" class="space-y-5">
+                            <div class="text-center mb-1">
+                                <h3 class="text-lg font-extrabold text-[#1C2833]">
+                                    {{ isAr ? 'أين تقع عيادتك؟' : 'Where is your clinic?' }}
+                                </h3>
+                                <p class="text-xs text-gray-500 mt-0.5">
+                                    {{ isAr ? 'لتجهيز فريقنا المحلي للتواصل معك ومتابعتك' : 'So our local team can reach you and follow up' }}
+                                </p>
+                            </div>
+
+                            <!-- Country -->
+                            <div class="field-anim" style="--field-delay: 0ms">
+                                <label class="block text-sm font-semibold text-[#1C2833] mb-2">
+                                    {{ isAr ? 'الدولة' : 'Country' }} *
+                                </label>
+                                <div class="relative">
+                                    <select v-model="form.country" class="select-input w-full">
+                                        <option v-for="c in countries" :key="c.code" :value="c.code">
+                                            {{ isAr ? c.ar : c.en }}
+                                        </option>
+                                    </select>
+                                    <svg class="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Egypt path: governorate + city dropdowns -->
+                            <template v-if="form.country === 'EG'">
+                                <div class="field-anim" style="--field-delay: 80ms">
+                                    <label class="block text-sm font-semibold text-[#1C2833] mb-2">
+                                        {{ isAr ? 'المحافظة' : 'Governorate' }} *
+                                    </label>
+                                    <div class="relative">
+                                        <select v-model="form.governorate" class="select-input w-full">
+                                            <option value="">{{ isAr ? 'اختر المحافظة' : 'Select governorate' }}</option>
+                                            <option v-for="g in governorates" :key="g.en" :value="isAr ? g.ar : g.en">
+                                                {{ isAr ? g.ar : g.en }}
+                                            </option>
+                                        </select>
+                                        <svg class="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div class="field-anim" style="--field-delay: 160ms">
+                                    <label class="block text-sm font-semibold text-[#1C2833] mb-2">
+                                        {{ isAr ? 'المدينة / المنطقة' : 'City / Area' }} *
+                                    </label>
+                                    <div class="relative">
+                                        <select v-model="form.city" :disabled="!form.governorate" class="select-input w-full disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                            <option value="">
+                                                {{ !form.governorate
+                                                    ? (isAr ? 'اختر المحافظة أولاً' : 'Pick a governorate first')
+                                                    : (isAr ? 'اختر المدينة' : 'Select city') }}
+                                            </option>
+                                            <option v-for="c in cities" :key="c.en" :value="isAr ? c.ar : c.en">
+                                                {{ isAr ? c.ar : c.en }}
+                                            </option>
+                                        </select>
+                                        <svg class="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Address — free text -->
+                            <div class="field-anim" style="--field-delay: 240ms">
+                                <label class="block text-sm font-semibold text-[#1C2833] mb-2">
+                                    {{ isAr ? 'العنوان التفصيلي' : 'Address' }}
+                                    <span class="text-[11px] font-normal text-gray-400">
+                                        {{ form.country === 'EG' ? (isAr ? '(اختياري)' : '(optional)') : (isAr ? '(مطلوب)' : '(required)') }}
+                                    </span>
+                                </label>
+                                <input
+                                    v-model="form.address"
+                                    type="text"
+                                    autocomplete="street-address"
+                                    class="field-input"
+                                    :placeholder="isAr ? 'مثال: 12 شارع التحرير، الدور 3' : 'e.g. 12 Tahrir St, 3rd floor'"
+                                />
+                            </div>
+
+                            <!-- Website / Social URL — optional -->
+                            <div class="field-anim" style="--field-delay: 320ms">
+                                <label class="block text-sm font-semibold text-[#1C2833] mb-2">
+                                    {{ isAr ? 'موقع العيادة أو السوشيال ميديا' : 'Clinic website or social media' }}
+                                    <span class="text-[11px] font-normal text-gray-400">{{ isAr ? '(اختياري)' : '(optional)' }}</span>
+                                </label>
+                                <input
+                                    v-model="form.website_url"
+                                    type="url"
+                                    autocomplete="url"
+                                    inputmode="url"
+                                    class="field-input"
+                                    placeholder="https://facebook.com/yourclinic"
+                                />
+                                <p v-if="form.website_url && !websiteUrlValid" class="text-rose-600 text-xs mt-1.5">
+                                    {{ isAr ? 'يرجى إدخال رابط صحيح (يبدأ بـ https://)' : 'Please enter a valid URL (starting with https://)' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- ─── STEP 4 — Needs (was step 3) ──────────── -->
+                        <div v-else key="step4" class="space-y-5">
                             <div class="text-center mb-1">
                                 <h3 class="text-lg font-extrabold text-[#1C2833]">
                                     {{ isAr ? 'احتياجاتك (اختياري)' : 'Your priorities (optional)' }}
@@ -569,7 +731,7 @@ onMounted(() => {
                             v-if="currentStep < totalSteps"
                             type="button"
                             @click="nextStep"
-                            :disabled="(currentStep === 1 && !step1Valid) || (currentStep === 2 && !step2Valid)"
+                            :disabled="(currentStep === 1 && !step1Valid) || (currentStep === 2 && !step2Valid) || (currentStep === 3 && (!step3Valid || !websiteUrlValid))"
                             class="group flex-1 relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-white shadow-lg shadow-[#1B4F72]/20 hover:shadow-2xl hover:shadow-[#1B4F72]/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 overflow-hidden"
                             style="background: linear-gradient(135deg, #1B4F72 0%, #2E6FA1 50%, #C4A265 100%); background-size: 200% 200%; animation: gradientShift 6s ease infinite;"
                         >

@@ -524,6 +524,57 @@ function progressColor(d) {
                                 </div>
                             </div>
 
+                            <!-- Location grid -->
+                            <div v-if="selectedDemo.country || selectedDemo.governorate || selectedDemo.city || selectedDemo.address" class="grid grid-cols-2 gap-2">
+                                <div v-if="selectedDemo.country" class="bg-gray-50 p-3 rounded-xl">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold">الدولة</p>
+                                    <p class="text-gray-800 text-xs mt-1">{{ selectedDemo.country }}</p>
+                                </div>
+                                <div v-if="selectedDemo.governorate" class="bg-gray-50 p-3 rounded-xl">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold">المحافظة</p>
+                                    <p class="text-gray-800 text-xs mt-1">{{ selectedDemo.governorate }}</p>
+                                </div>
+                                <div v-if="selectedDemo.city" class="bg-gray-50 p-3 rounded-xl">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold">المدينة</p>
+                                    <p class="text-gray-800 text-xs mt-1">{{ selectedDemo.city }}</p>
+                                </div>
+                                <div v-if="selectedDemo.address" class="bg-gray-50 p-3 rounded-xl col-span-2">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold">العنوان</p>
+                                    <p class="text-gray-800 text-xs mt-1">{{ selectedDemo.address }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Website / Social URL -->
+                            <div v-if="selectedDemo.website_url" class="bg-gray-50 p-3 rounded-xl">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">الموقع / السوشيال ميديا</p>
+                                <a :href="selectedDemo.website_url" target="_blank" rel="noopener noreferrer"
+                                   class="text-[#1B4F72] hover:underline text-xs break-all" dir="ltr">
+                                    {{ selectedDemo.website_url }}
+                                </a>
+                            </div>
+
+                            <!-- Facility / Modules / Referral -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <div v-if="selectedDemo.facility_type" class="bg-gray-50 p-3 rounded-xl">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold">نوع المنشأة</p>
+                                    <p class="text-gray-800 text-xs mt-1">{{ selectedDemo.facility_type }}</p>
+                                </div>
+                                <div v-if="selectedDemo.referral_source" class="bg-gray-50 p-3 rounded-xl">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold">كيف عرفنا</p>
+                                    <p class="text-gray-800 text-xs mt-1">{{ selectedDemo.referral_source }}</p>
+                                </div>
+                            </div>
+
+                            <div v-if="selectedDemo.interested_modules && selectedDemo.interested_modules.length" class="bg-gray-50 p-3 rounded-xl">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1.5">الموديولات المطلوبة</p>
+                                <div class="flex flex-wrap gap-1">
+                                    <span v-for="m in selectedDemo.interested_modules" :key="m"
+                                        class="inline-flex items-center px-2 py-0.5 rounded-full bg-[#1B4F72]/10 text-[#1B4F72] text-[10px] font-semibold">
+                                        {{ m }}
+                                    </span>
+                                </div>
+                            </div>
+
                             <div v-if="selectedDemo.notes" class="bg-gray-50 p-3 rounded-xl">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">ملاحظات العميل</p>
                                 <p class="text-gray-700 text-xs">{{ selectedDemo.notes }}</p>
