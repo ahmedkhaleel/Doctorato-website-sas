@@ -460,7 +460,7 @@ const homeJsonLd = computed(() => ({
                         </span>
                     </div>
                     <h2 class="text-3xl md:text-5xl font-extrabold text-[#1C2833] mb-4 leading-tight">
-                        {{ locale === 'ar' ? 'نظام واحد، 4 تخصّصات جاهزة' : 'One platform, 4 ready-made specialties' }}
+                        {{ locale === 'ar' ? 'نظام واحد، 6 تخصّصات جاهزة' : 'One platform, 6 ready-made specialties' }}
                     </h2>
                     <p class="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
                         {{ locale === 'ar'
@@ -670,6 +670,49 @@ const homeJsonLd = computed(() => ({
                                     : 'WHO antenatal care, obstetric ultrasound, Pap smear, family planning, and a patient portal with WhatsApp reminders.' }}
                             </p>
                             <span class="inline-flex items-center gap-2 text-[#F8BBD0] text-sm font-bold group-hover:gap-3 transition-all">
+                                {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
+                                <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </Link>
+
+                    <!-- Psychiatry & Neurology — indigo accent for mental health + neuro -->
+                    <Link
+                        href="/psychiatry"
+                        class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A1628] via-[#1E1B4B] to-[#0A1628] text-white p-8 border border-white/10 hover:border-[#6366F1]/40 hover:-translate-y-1 transition-all duration-500 shadow-lg"
+                    >
+                        <div class="absolute -top-24 -end-24 w-64 h-64 bg-[#6366F1]/15 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                        <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="hx-psy" x="0" y="0" width="48" height="56" patternUnits="userSpaceOnUse">
+                                    <polygon points="24,2 44,14 44,42 24,54 4,42 4,14" fill="none" stroke="white" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#hx-psy)"/>
+                        </svg>
+
+                        <!-- NEW badge -->
+                        <div class="absolute top-5 end-5 px-2.5 py-1 rounded-full bg-[#6366F1]/20 border border-[#6366F1]/30 text-[#A5B4FC] text-[10px] font-bold uppercase tracking-widest">
+                            {{ locale === 'ar' ? 'جديد' : 'New' }}
+                        </div>
+
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#06B6D4] flex items-center justify-center mb-5 shadow-lg shadow-[#6366F1]/30 group-hover:rotate-6 transition-transform duration-500">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-extrabold mb-2">
+                                {{ locale === 'ar' ? 'الطب النفسي والعصبي' : 'Psychiatry & Neurology' }}
+                            </h3>
+                            <p class="text-white/60 text-sm leading-relaxed mb-5">
+                                {{ locale === 'ar'
+                                    ? 'فحص MSE، موازين PHQ-9 و GAD-7 و MoCA رقمية، سجل أدوية مراقَبة، رفع EEG/EMG، وتتبّع المزاج عبر بوابة مشفّرة.'
+                                    : 'MSE, digital PHQ-9 / GAD-7 / MoCA scales, controlled-substance log, EEG/EMG uploads, and mood tracking via an encrypted portal.' }}
+                            </p>
+                            <span class="inline-flex items-center gap-2 text-[#A5B4FC] text-sm font-bold group-hover:gap-3 transition-all">
                                 {{ locale === 'ar' ? 'تعرّف أكثر' : 'Learn more' }}
                                 <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
