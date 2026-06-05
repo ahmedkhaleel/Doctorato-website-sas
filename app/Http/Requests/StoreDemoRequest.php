@@ -50,6 +50,13 @@ class StoreDemoRequest extends FormRequest
 
             // Qualifying — optional, but each one improves the call.
             'country'             => 'nullable|string|max:100',
+            // Location — governorate, city, free-form address.
+            'governorate'         => 'nullable|string|max:64',
+            'city'                => 'nullable|string|max:64',
+            'address'             => 'nullable|string|max:500',
+            // Online presence — clinic website or any social media URL.
+            // Validated as a URL only when present so blank stays blank.
+            'website_url'         => 'nullable|string|max:500|url',
             'doctors_count'       => 'nullable|string|max:50',
             // Facility type — solo / clinic / polyclinic / hospital
             'facility_type'       => 'nullable|string|max:32',
