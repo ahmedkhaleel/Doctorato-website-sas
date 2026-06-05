@@ -187,7 +187,7 @@ function getCompareValues(field) {
             const map = {
                 one: locale.value === 'ar' ? 'تخصص واحد' : '1 specialty',
                 three: locale.value === 'ar' ? '3 تخصصات' : '3 specialties',
-                all: locale.value === 'ar' ? 'الكل (6)' : 'All (6)',
+                all: locale.value === 'ar' ? 'الكل (7)' : 'All (7)',
                 all_plus_early: locale.value === 'ar' ? 'الكل + Early access' : 'All + early access',
             };
             return map[plan.included_specialties_count] || '—';

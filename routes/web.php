@@ -104,6 +104,7 @@ Route::get('/dermatology', [PageController::class, 'dermatology'])->name('dermat
 Route::get('/pediatrics', [PageController::class, 'pediatrics'])->name('pediatrics');
 Route::get('/telemedicine', [PageController::class, 'telemedicine'])->name('telemedicine');
 Route::get('/obstetrics', [PageController::class, 'obstetrics'])->name('obstetrics');
+Route::get('/psychiatry', [PageController::class, 'psychiatry'])->name('psychiatry');
 Route::get('/add-ons', [PageController::class, 'addOns'])->name('add-ons');
 Route::get('/solutions', [PageController::class, 'solutions'])->name('solutions');
 Route::get('/technology', [PageController::class, 'technology'])->name('technology');
@@ -154,7 +155,7 @@ Route::get('/city/{city}', function (string $city) {
 // Use-case landing pages — captures "best system for [scenario]" queries
 // where the visitor knows their facility shape but not yet the plan.
 Route::get('/for/{scenario}', function (string $scenario) {
-    $supported = ['solo-doctor', 'small-clinic', 'polyclinic', 'hospital', 'dental-clinic', 'derma-clinic'];
+    $supported = ['solo-doctor', 'small-clinic', 'polyclinic', 'hospital', 'dental-clinic', 'derma-clinic', 'psychiatry-clinic'];
     abort_unless(in_array($scenario, $supported, true), 404);
     return \Inertia\Inertia::render('UseCase', ['scenario' => $scenario]);
 })->where('scenario', '[a-z0-9-]+')->name('use-case');

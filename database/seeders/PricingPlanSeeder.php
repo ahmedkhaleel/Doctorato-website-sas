@@ -67,14 +67,14 @@ class PricingPlanSeeder extends Seeder
                 'trial_days' => 30,
 
                 'included_specialties_count' => 'one',
-                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine', 'psychiatry'],
 
                 'currency' => 'EGP',
                 'is_popular' => false,
                 'is_custom' => false,
                 'features_ar' => [
                     'طبيب واحد + موظف استقبال',
-                    'تخصص طبي واحد (تختار من 6 تخصصات)',
+                    'تخصص طبي واحد (تختار من 7 تخصصات)',
                     'حتى 500 ملف مريض',
                     'حجوزات وجدول المواعيد',
                     'الملف الطبي الإلكتروني (EMR) الأساسي',
@@ -87,7 +87,7 @@ class PricingPlanSeeder extends Seeder
                 ],
                 'features_en' => [
                     '1 doctor + 1 receptionist',
-                    '1 medical specialty (pick from 6)',
+                    '1 medical specialty (pick from 7)',
                     'Up to 500 patient records',
                     'Appointments & calendar',
                     'Basic EMR / patient charting',
@@ -139,7 +139,7 @@ class PricingPlanSeeder extends Seeder
                 'trial_days' => 30,
 
                 'included_specialties_count' => 'one',
-                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine', 'psychiatry'],
 
                 'currency' => 'EGP',
                 'is_popular' => true,              // ⭐ Most popular
@@ -147,7 +147,7 @@ class PricingPlanSeeder extends Seeder
                 'features_ar' => [
                     'طبيب مشمول + 700 ج.م لكل طبيب إضافي',
                     'حتى 3 موظفين (استقبال / محاسب / مساعد)',
-                    'تخصص طبي واحد (تختار من 6 تخصصات)',
+                    'تخصص طبي واحد (تختار من 7 تخصصات)',
                     'حتى 2,000 ملف مريض',
                     'EMR كامل + قوالب التخصص',
                     'تقارير مالية ولوحات أداء',
@@ -161,7 +161,7 @@ class PricingPlanSeeder extends Seeder
                 'features_en' => [
                     '1 doctor included + 700 EGP per extra doctor',
                     'Up to 3 staff (receptionist / accountant / assistant)',
-                    '1 medical specialty (pick from 6)',
+                    '1 medical specialty (pick from 7)',
                     'Up to 2,000 patient records',
                     'Full EMR + specialty templates',
                     'Financial reports & dashboards',
@@ -213,7 +213,7 @@ class PricingPlanSeeder extends Seeder
                 'trial_days' => 30,
 
                 'included_specialties_count' => 'three',
-                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine', 'psychiatry'],
 
                 'currency' => 'EGP',
                 'is_popular' => false,
@@ -237,7 +237,7 @@ class PricingPlanSeeder extends Seeder
                 'features_en' => [
                     '1 doctor included + 900 EGP per extra doctor',
                     'Unlimited staff (reception / accounting / nursing)',
-                    '3 medical specialties (pick from 6)',
+                    '3 medical specialties (pick from 7)',
                     'Up to 10,000 patient records',
                     'All EMR features + multi-specialty templates',
                     'WhatsApp / Telemedicine / Lab integrations FREE',
@@ -295,7 +295,7 @@ class PricingPlanSeeder extends Seeder
                 'trial_days' => 30,
 
                 'included_specialties_count' => 'all',
-                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine'],
+                'included_specialties_pool' => ['general', 'dental', 'pediatrics', 'obstetrics', 'dermatology', 'telemedicine', 'psychiatry'],
 
                 'currency' => 'EGP',
                 'is_popular' => false,
@@ -315,7 +315,7 @@ class PricingPlanSeeder extends Seeder
                 'features_en' => [
                     'Everything in Professional, plus:',
                     'Unlimited branches & doctors',
-                    'All 6 medical specialties',
+                    'All 7 medical specialties',
                     'Unlimited storage & implementation support',
                     'Custom SLA + dedicated account manager',
                     'HL7 / FHIR integration for hospitals',

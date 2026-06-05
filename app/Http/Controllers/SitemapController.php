@@ -18,6 +18,7 @@ class SitemapController extends Controller
         ['path' => '/pediatrics', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/telemedicine', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/obstetrics', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/psychiatry', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/add-ons', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/solutions', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/technology', 'priority' => '0.8', 'freq' => 'monthly'],
@@ -68,6 +69,7 @@ class SitemapController extends Controller
         ['path' => '/for/hospital', 'priority' => '0.85', 'freq' => 'monthly'],
         ['path' => '/for/dental-clinic', 'priority' => '0.9', 'freq' => 'monthly'],
         ['path' => '/for/derma-clinic', 'priority' => '0.9', 'freq' => 'monthly'],
+        ['path' => '/for/psychiatry-clinic', 'priority' => '0.9', 'freq' => 'monthly'],
     ];
 
     public function index(): Response

@@ -155,6 +155,27 @@ const SCENARIOS = {
             { ar: 'نظام نقاط ولاء للمرضى', en: 'Patient loyalty points system' },
         ],
     },
+    'psychiatry-clinic': {
+        icon: '🧠',
+        h1: { ar: 'نظام إدارة عيادة الطب النفسي والعصبي في مصر', en: 'Psychiatry & Neurology Clinic System in Egypt' },
+        intro: {
+            ar: 'عيادة نفسية أو عصبية تحتاج فحص MSE، موازين رقمية، وسجل أدوية مراقَبة؟ دكتوراتو يقدم منظومة سرّية بتشفير end-to-end + بوابة مريض آمنة.',
+            en: 'A psychiatry or neurology clinic that needs MSE, digital scales, and a controlled-substance log? Doctorato provides an end-to-end-encrypted confidential workflow + secure patient portal.',
+        },
+        plan: 'Growth', price: '3,990', setup: 'مجاني',
+        painPoints: [
+            { ar: 'موازين نفسية ورقية تأخذ ساعات للتقييم', en: 'Paper scales take hours to score' },
+            { ar: 'سجل الأدوية الخاضعة للرقابة بطريقة يدوية', en: 'Controlled substances tracked manually' },
+            { ar: 'فقد الجلسات السرّية أو تسريبها', en: 'Confidential sessions lost or leaked' },
+            { ar: 'صعوبة متابعة المزاج وتطور الحالة', en: 'Hard to track mood and case progression' },
+        ],
+        wins: [
+            { ar: 'موازين PHQ-9 / GAD-7 / MMSE / MoCA رقمية', en: 'Digital PHQ-9 / GAD-7 / MMSE / MoCA' },
+            { ar: 'سجل الأدوية المراقَبة مع توقيع رقمي', en: 'Controlled-substance log with digital signature' },
+            { ar: 'قوالب SOAP وتشفير end-to-end', en: 'SOAP templates with end-to-end encryption' },
+            { ar: 'تتبّع المزاج وتنبيهات الأزمات', en: 'Mood tracking with crisis alerts' },
+        ],
+    },
 };
 
 const data = computed(() => SCENARIOS[props.scenario] || SCENARIOS['small-clinic']);

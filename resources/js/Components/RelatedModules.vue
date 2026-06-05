@@ -72,6 +72,15 @@ const ALL_MODULES = [
         body_en: 'WHO antenatal care, ultrasound, Pap smear, family planning, patient portal',
     },
     {
+        slug: 'psychiatry',
+        href: '/psychiatry',
+        icon: '🧠',
+        gradient: 'from-indigo-100/40 to-white border-indigo-200/50',
+        title_ar: 'الطب النفسي والعصبي', title_en: 'Psychiatry & Neurology',
+        body_ar: 'فحص MSE، موازين PHQ-9 و GAD-7 و MoCA، سجل الأدوية المراقَبة، EEG/EMG، تتبّع المزاج',
+        body_en: 'MSE, PHQ-9 / GAD-7 / MoCA scales, controlled-substance log, EEG/EMG, mood tracking',
+    },
+    {
         slug: 'emr',
         href: '/emr',
         icon: '📋',

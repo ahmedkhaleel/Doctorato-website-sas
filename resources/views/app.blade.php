@@ -121,7 +121,7 @@
                 ],
                 'medicalSpecialty' => [
                     'Dentistry', 'Dermatology', 'Pediatrics', 'Obstetrics',
-                    'InternalMedicine', 'Telehealth',
+                    'InternalMedicine', 'Telehealth', 'Psychiatric',
                 ],
             ],
             // Speakable spec — flags H1 + main intro as voice-assistant-readable.

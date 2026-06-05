@@ -109,7 +109,7 @@ const COMPETITORS = {
             { feat: tr('سعر منخفض', 'Low entry price'), ours: true, theirs: true, note: tr('الاتنين تنافسيين', 'Both competitive') },
             { feat: tr('باقات متعددة (4)', 'Multiple plans (4)'), ours: true, theirs: false, note: '' },
             { feat: tr('Per-doctor pricing', 'Per-doctor pricing'), ours: true, theirs: false, note: '' },
-            { feat: tr('قوالب 6 تخصصات', 'Templates for 6 specialties'), ours: true, theirs: 'basic', note: '' },
+            { feat: tr('قوالب 7 تخصصات', 'Templates for 7 specialties'), ours: true, theirs: 'basic', note: '' },
             { feat: tr('تكامل تأمين كامل', 'Full insurance integration'), ours: true, theirs: false, note: '' },
             { feat: tr('PACS للأشعة', 'PACS imaging'), ours: true, theirs: false, note: '' },
             { feat: tr('6 بوابات منفصلة', '6 role-based portals'), ours: true, theirs: false, note: '' },

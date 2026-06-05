@@ -337,7 +337,7 @@ const demoJsonLd = computed(() => [
                         <div class="relative">
                             <div class="w-12 h-12 rounded-2xl bg-white/80 ring-1 ring-sky-200 flex items-center justify-center text-2xl mb-4 group-hover:rotate-6 group-hover:scale-110 transition-transform duration-500">🌍</div>
                             <h3 class="text-base sm:text-lg font-extrabold text-[#1C2833] mb-2">
-                                {{ isAr ? 'بـ 6 تخصصات + توسعات' : '6 specialties + extensions' }}
+                                {{ isAr ? 'بـ 7 تخصصات + توسعات' : '7 specialties + extensions' }}
                             </h3>
                             <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
                                 {{ isAr

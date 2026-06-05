@@ -43,6 +43,11 @@ class PageController extends Controller
         return Inertia::render('Obstetrics');
     }
 
+    public function psychiatry()
+    {
+        return Inertia::render('Psychiatry');
+    }
+
     /**
      * Public add-ons page. Reads the full add-on catalogue via the
      * cache so the page stays a single DB read per 10-min window.

@@ -30,6 +30,7 @@ const SECTIONS = {
         { href: '/dermatology', titleAr: 'نظام عيادة جلدية وتجميل', titleEn: 'Dermatology & cosmetic system', emoji: '🧴' },
         { href: '/pediatrics', titleAr: 'نظام عيادة أطفال', titleEn: 'Pediatrics clinic system', emoji: '👶' },
         { href: '/obstetrics', titleAr: 'نظام عيادة نساء وتوليد', titleEn: 'OB-GYN clinic system', emoji: '🤰' },
+        { href: '/psychiatry', titleAr: 'نظام عيادة نفسية وعصبية', titleEn: 'Psychiatry & neurology system', emoji: '🧠' },
         { href: '/telemedicine', titleAr: 'استشارات أونلاين (Telemed)', titleEn: 'Telemedicine', emoji: '🎥' },
     ],
 
@@ -41,6 +42,7 @@ const SECTIONS = {
         { href: '/for/hospital', titleAr: 'مستشفى', titleEn: 'Hospital', emoji: '🏨' },
         { href: '/for/dental-clinic', titleAr: 'عيادة أسنان', titleEn: 'Dental clinic', emoji: '🦷' },
         { href: '/for/derma-clinic', titleAr: 'عيادة جلدية وتجميل', titleEn: 'Derma clinic', emoji: '🧴' },
+        { href: '/for/psychiatry-clinic', titleAr: 'عيادة نفسية وعصبية', titleEn: 'Psychiatry clinic', emoji: '🧠' },
     ],
 
     // City landing pages — local-SEO cluster.

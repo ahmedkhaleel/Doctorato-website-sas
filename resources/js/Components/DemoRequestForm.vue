@@ -151,6 +151,7 @@ const specialties = computed(() => [
     { value: 'cardio',     label: t('demo.specialty_cardio'),     emoji: '❤️' },
     { value: 'ent',        label: t('demo.specialty_ent'),        emoji: '👂' },
     { value: 'eye',        label: t('demo.specialty_eye'),        emoji: '👁️' },
+    { value: 'psychiatry', label: t('demo.specialty_psychiatry'), emoji: '🧠' },
     { value: 'general',    label: t('demo.specialty_general'),    emoji: '🩺' },
     { value: 'multi',      label: t('demo.specialty_multi'),      emoji: '🏥' },
     { value: 'other',      label: t('demo.specialty_other'),      emoji: '✨' },
