@@ -49,8 +49,8 @@ class PricingPlanSeeder extends Seeder
 
                 'monthly_price' => 1990,
                 'yearly_price' => 19900,           // 2 months free
-                'setup_fee' => 0,                  // FREE setup
-                'yearly_setup_discount_pct' => 0,
+                'setup_fee' => 1750,               // One-time onboarding
+                'yearly_setup_discount_pct' => 100, // FREE setup with annual plan
 
                 'monthly_price_launch' => null,
                 'yearly_price_launch' => null,
@@ -121,8 +121,8 @@ class PricingPlanSeeder extends Seeder
 
                 'monthly_price' => 3990,
                 'yearly_price' => 39900,
-                'setup_fee' => 0,                  // FREE setup
-                'yearly_setup_discount_pct' => 0,
+                'setup_fee' => 3500,               // One-time onboarding + data migration
+                'yearly_setup_discount_pct' => 100, // FREE setup with annual plan
 
                 'monthly_price_launch' => null,
                 'yearly_price_launch' => null,
@@ -195,8 +195,8 @@ class PricingPlanSeeder extends Seeder
 
                 'monthly_price' => 6990,
                 'yearly_price' => 69900,
-                'setup_fee' => 7500,               // Optional white-glove
-                'yearly_setup_discount_pct' => 0,  // Setup price flat — no discount needed
+                'setup_fee' => 5250,               // Full onboarding + team training
+                'yearly_setup_discount_pct' => 100, // FREE setup with annual plan
 
                 'monthly_price_launch' => null,
                 'yearly_price_launch' => null,
@@ -277,8 +277,8 @@ class PricingPlanSeeder extends Seeder
 
                 'monthly_price' => 0,              // hidden — use is_contact_sales
                 'yearly_price' => 0,
-                'setup_fee' => 0,
-                'yearly_setup_discount_pct' => 0,
+                'setup_fee' => 7000,               // Dedicated onboarding + integrations
+                'yearly_setup_discount_pct' => 100, // FREE setup with annual plan
 
                 'monthly_price_launch' => null,
                 'yearly_price_launch' => null,

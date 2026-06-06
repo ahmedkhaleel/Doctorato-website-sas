@@ -114,8 +114,10 @@ class CheckoutController extends Controller
         $price = $plan->priceFor($country);
 
         $subscriptionAmount = $data['cycle'] === 'yearly' ? $price['yearly'] : $price['monthly'];
-        // Yearly gets 50% off the one-time setup fee (pre-computed in
-        // PricingPlan::priceFor as setup_fee_yearly).
+        // Yearly subscribers get the per-plan setup-fee discount
+        // (yearly_setup_discount_pct on the PricingPlan), pre-computed
+        // in PricingPlan::priceFor as setup_fee_yearly. A 100% discount
+        // means setup is FREE on annual.
         $setupFee = $data['cycle'] === 'yearly' ? $price['setup_fee_yearly'] : $price['setup_fee'];
 
         // Apply coupon to the subscription portion only.

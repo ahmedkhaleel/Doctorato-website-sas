@@ -282,8 +282,8 @@ const pricingJsonLd = computed(() => ({
             ? 'أسعار نظام إدارة عيادات | 4 باقات تنافسية بالجنيه المصري — دكتوراتو'
             : 'Clinic Management Pricing | 4 Competitive Plans in EGP — Doctorato'"
         :description="locale === 'ar'
-            ? 'أسعار شفافة لنظام إدارة العيادات: المبتدئ 1,990 ج.م، النمو 3,990 ج.م، الاحترافي 6,990 ج.م، Enterprise. 7 تخصصات جاهزة (شاملة الطب النفسي والعصبي)، تركيب مجاني، تجربة 30 يوم بدون بطاقة ائتمان.'
-            : 'Transparent clinic management pricing: Starter 1,990 EGP, Growth 3,990 EGP, Professional 6,990 EGP, Enterprise. 7 ready-made specialties (including psychiatry & neurology), free setup, 30-day trial — no credit card required.'"
+            ? 'أسعار شفافة لنظام إدارة العيادات: المبتدئ 1,990 ج.م، النمو 3,990 ج.م، الاحترافي 6,990 ج.م، Enterprise. 7 تخصصات جاهزة (شاملة الطب النفسي والعصبي)، تركيب مجاني مع الاشتراك السنوي، تجربة 30 يوم بدون بطاقة ائتمان.'
+            : 'Transparent clinic management pricing: Starter 1,990 EGP, Growth 3,990 EGP, Professional 6,990 EGP, Enterprise. 7 ready-made specialties (including psychiatry & neurology), FREE setup with annual plan, 30-day trial — no credit card required.'"
         :json-ld="pricingJsonLd"
         :breadcrumbs="[
             { name: locale === 'ar' ? 'الرئيسية' : 'Home', url: '/' },

@@ -54,9 +54,10 @@ class PublicContentCache
                         // post-reset (launch pricing decommissioned May 2026).
                         'monthly_price_launch' => null,
                         'yearly_price_launch' => null,
-                        'setup_fee' => (float) ($plan->setup_fee ?? 0),
+                        'setup_fee' => (float) $price['setup_fee'],
                         'setup_fee_launch' => null,
-                        'setup_fee_yearly' => (float) ($plan->setup_fee ?? 0),
+                        'setup_fee_yearly' => (float) $price['setup_fee_yearly'],
+                        'yearly_setup_discount_pct' => (float) ($price['yearly_setup_discount_pct'] ?? 0),
                         'is_launch_offer_active' => false,
                         'launch_offer_ends_at' => null,
                         'supports_installments' => false,

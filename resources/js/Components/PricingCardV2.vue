@@ -40,6 +40,13 @@ const headlinePrice = computed(() => {
 
 const yearlyTotal = computed(() => Math.round(props.plan.yearly_price || 0));
 const setupFee = computed(() => Math.round(props.plan.setup_fee || 0));
+const setupFeeYearly = computed(() => Math.round(props.plan.setup_fee_yearly ?? props.plan.setup_fee ?? 0));
+// Yearly subscribers get FREE setup when the plan's
+// yearly_setup_discount_pct is 100. Anything else just discounts.
+const yearlySetupDiscountPct = computed(() => Number(props.plan.yearly_setup_discount_pct || 0));
+const setupFreeWithYearly = computed(() => yearlySetupDiscountPct.value >= 100 && setupFee.value > 0);
+// What the customer ACTUALLY pays right now, given the toggle state
+const effectiveSetupFee = computed(() => props.isYearly ? setupFeeYearly.value : setupFee.value);
 const perExtraDoctor = computed(() => props.plan.per_extra_doctor_price
     ? Math.round(props.plan.per_extra_doctor_price)
     : null);
@@ -115,20 +122,43 @@ const ctaLabel = computed(() => {
                 </div>
 
                 <!-- Setup fee row -->
-                <div class="mt-3 flex items-center gap-1.5 text-xs">
+                <div class="mt-3 text-xs">
+                    <!-- Case 1: No setup fee at all -->
                     <template v-if="setupFee === 0">
                         <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">
                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z"/></svg>
                             {{ isAr ? 'تركيب مجاني' : 'Free setup' }}
                         </span>
-                        <span class="text-gray-500">·</span>
-                        <span class="text-gray-600">{{ isAr ? 'ترحيل بيانات مجاني' : 'Free data migration' }}</span>
                     </template>
+
+                    <!-- Case 2: Yearly cycle + 100% discount → FREE highlight with strikethrough -->
+                    <template v-else-if="isYearly && setupFreeWithYearly">
+                        <div class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/60 px-2.5 py-1">
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z"/></svg>
+                            <span class="font-bold text-emerald-700">
+                                {{ isAr ? 'رسوم التركيب مجانية' : 'Setup FREE' }}
+                            </span>
+                            <span class="text-gray-400 line-through">{{ fmt(setupFee) }} {{ currencySymbol }}</span>
+                        </div>
+                        <p class="mt-1 text-[10px] text-gray-500">
+                            {{ isAr ? 'هدية مع الاشتراك السنوي' : 'Included with annual plan' }}
+                        </p>
+                    </template>
+
+                    <!-- Case 3: Monthly cycle with paid setup → show amount + "free with annual" nudge -->
                     <template v-else>
-                        <span class="text-gray-700">
-                            <span class="font-semibold">{{ fmt(setupFee) }} {{ currencySymbol }}</span>
-                            <span class="text-gray-500"> — {{ isAr ? 'تركيب اختياري لمرة واحدة (White-glove)' : 'optional one-time white-glove setup' }}</span>
-                        </span>
+                        <div class="flex items-baseline gap-1.5 flex-wrap">
+                            <span class="font-semibold text-gray-800">
+                                + {{ fmt(effectiveSetupFee) }} {{ currencySymbol }}
+                            </span>
+                            <span class="text-gray-500">
+                                — {{ isAr ? 'رسوم تركيب لمرة واحدة' : 'one-time setup fee' }}
+                            </span>
+                        </div>
+                        <p v-if="setupFreeWithYearly" class="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-[#1B4F72]">
+                            <svg class="w-3 h-3 text-[#C4A265]" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 00-.894.553L7.382 4H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3.382l-.724-1.447A1 1 0 0011 2H9zm1 7a3 3 0 100 6 3 3 0 000-6z"/></svg>
+                            {{ isAr ? '💡 وفّر الـ' + fmt(setupFee) + ' بالكامل عند الاشتراك السنوي' : '💡 Get it FREE with annual billing' }}
+                        </p>
                     </template>
                 </div>
             </template>
