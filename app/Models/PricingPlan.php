@@ -151,12 +151,18 @@ class PricingPlan extends Model
 
         if ($row) {
             $setupFee = (float) ($row->setup_fee ?? 0);
+            // Per-plan yearly discount on the one-time setup fee, sourced
+            // from PricingPlan.yearly_setup_discount_pct. Defaults to 0
+            // (no discount) when null. 100 means FREE setup with annual.
+            $yearlyDiscountPct = (float) ($this->yearly_setup_discount_pct ?? 0);
+            $yearlyDiscountPct = max(0, min(100, $yearlyDiscountPct));
+            $setupFeeYearly = round($setupFee * (1 - $yearlyDiscountPct / 100), 2);
             return [
                 'monthly' => (float) $row->monthly_price,
                 'yearly' => (float) $row->yearly_price,
                 'setup_fee' => $setupFee,
-                // Yearly subscribers get 50% off the one-time setup fee.
-                'setup_fee_yearly' => round($setupFee * 0.5, 2),
+                'setup_fee_yearly' => $setupFeeYearly,
+                'yearly_setup_discount_pct' => $yearlyDiscountPct,
                 'currency' => $row->currency_code,
                 'currency_symbol' => $row->currency_symbol,
                 'country_code' => $row->country_code,
@@ -169,11 +175,15 @@ class PricingPlan extends Model
 
         // Last resort — use the plan's own columns. Keeps the site working
         // even before any PlanPrice rows are seeded.
+        $setupFee = (float) ($this->setup_fee ?? 0);
+        $yearlyDiscountPct = max(0, min(100, (float) ($this->yearly_setup_discount_pct ?? 0)));
+        $setupFeeYearly = round($setupFee * (1 - $yearlyDiscountPct / 100), 2);
         return [
             'monthly' => (float) $this->monthly_price,
             'yearly' => (float) $this->yearly_price,
-            'setup_fee' => (float) ($this->setup_fee ?? 0),
-            'setup_fee_yearly' => (float) ($this->setup_fee ?? 0),
+            'setup_fee' => $setupFee,
+            'setup_fee_yearly' => $setupFeeYearly,
+            'yearly_setup_discount_pct' => $yearlyDiscountPct,
             'currency' => $this->currency ?: 'EGP',
             'currency_symbol' => 'ج.م',
             'country_code' => 'EG',

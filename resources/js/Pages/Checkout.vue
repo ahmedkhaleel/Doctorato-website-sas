@@ -85,7 +85,8 @@ const amount = computed(() =>
     cycle.value === 'yearly' ? props.plan.yearly_price : props.plan.monthly_price
 );
 
-// Setup fee due: full fee for monthly subscribers, 50% off for yearly.
+// Setup fee due: full fee for monthly subscribers, per-plan
+// yearly_setup_discount_pct applied for yearly (100% = FREE).
 const setupFeeFull = computed(() => Number(props.plan.setup_fee) || 0);
 const setupFeeDue = computed(() => {
     if (setupFeeFull.value <= 0) return 0;
@@ -322,8 +323,11 @@ function formatPrice(v) {
                                         <span class="text-xs text-gray ms-1">{{ currencyLabel }}</span>
                                     </span>
                                 </div>
-                                <p v-if="setupFeeFull > 0 && cycle === 'yearly'" class="text-[11px] text-emerald-600 font-semibold -mt-1">
-                                    🎁 {{ t('checkout.setup_yearly_discount', 'خصم 50% على رسوم الإعداد مع الاشتراك السنوي') }}
+                                <p v-if="setupFeeFull > 0 && cycle === 'yearly' && setupFeeDue === 0" class="text-[11px] text-emerald-600 font-semibold -mt-1">
+                                    🎁 {{ t('checkout.setup_free_yearly', 'رسوم الإعداد مجانية بالكامل مع الاشتراك السنوي') }}
+                                </p>
+                                <p v-else-if="setupFeeFull > 0 && cycle === 'yearly' && setupFeeDue < setupFeeFull" class="text-[11px] text-emerald-600 font-semibold -mt-1">
+                                    🎁 {{ t('checkout.setup_yearly_discount', 'خصم على رسوم الإعداد مع الاشتراك السنوي') }}
                                 </p>
                             </div>
 
