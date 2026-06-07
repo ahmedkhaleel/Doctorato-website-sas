@@ -55,8 +55,10 @@ class StoreDemoRequest extends FormRequest
             'city'                => 'nullable|string|max:64',
             'address'             => 'nullable|string|max:500',
             // Online presence — clinic website or any social media URL.
-            // Validated as a URL only when present so blank stays blank.
-            'website_url'         => 'nullable|string|max:500|url',
+            // Accepts bare domains and handles (facebook.com/x, @clinic)
+            // — we'd rather get a slightly-malformed URL into the lead
+            // record than block a real clinic over a missing https://.
+            'website_url'         => 'nullable|string|max:500',
             'doctors_count'       => 'nullable|string|max:50',
             // Facility type — solo / clinic / polyclinic / hospital
             'facility_type'       => 'nullable|string|max:32',

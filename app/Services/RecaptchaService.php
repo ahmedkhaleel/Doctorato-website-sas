@@ -52,11 +52,17 @@ class RecaptchaService
             return ['ok' => false, 'reason' => 'honeypot'];
         }
 
-        // 2. Time-to-submit — too fast = bot.
+        // 2. Time-to-submit — too fast = bot. BUT: only enforce when
+        // the elapsed time is BOTH positive AND under the threshold.
+        // A negative elapsed (server clock ahead of client) or a wildly
+        // large one (client clock days off) means we can't trust the
+        // measurement and shouldn't punish a real user for it.
         $renderedAt = (int) ($payload['form_rendered_at'] ?? 0);
         if ($renderedAt > 0) {
-            $elapsed = (time() * 1000 - $renderedAt) / 1000;
-            if ($elapsed < self::MIN_FORM_SECONDS) {
+            $elapsedSeconds = (time() * 1000 - $renderedAt) / 1000;
+            // Suspicious only when elapsed is in a normal positive
+            // range. Negative (clock skew) or > 1 hour (stale tab) = pass.
+            if ($elapsedSeconds >= 0 && $elapsedSeconds < self::MIN_FORM_SECONDS) {
                 return ['ok' => false, 'reason' => 'submitted_too_fast'];
             }
         }
