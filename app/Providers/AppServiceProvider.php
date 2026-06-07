@@ -73,8 +73,10 @@ class AppServiceProvider extends ServiceProvider
         // a real user; a bot trying to flood our sales pipeline gets
         // pruned by both this AND the honeypot/timing checks.
         RateLimiter::for('demo-submit', fn (Request $r) => [
-            Limit::perMinute(3)->by($r->ip()),
-            Limit::perHour(15)->by($r->ip()),
+            // Loose per-minute so a user retrying after a typo isn't
+            // locked out, tight per-hour to still throttle real abuse.
+            Limit::perMinute(10)->by($r->ip()),
+            Limit::perHour(30)->by($r->ip()),
         ]);
 
         // /contact — slightly higher than demo because legitimate users

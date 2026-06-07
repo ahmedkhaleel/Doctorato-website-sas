@@ -15,13 +15,36 @@ class DemoRequestController extends Controller
 {
     public function store(StoreDemoRequest $request, RecaptchaService $captcha)
     {
-        // Bot filter (honeypot + timing + optional reCAPTCHA v3).
+        // Log EVERY incoming submission so we can debug silent rejects
+        // without making the user retry. PII (email, phone) is scrubbed
+        // by PiiScrubbingProcessor before it hits the log file.
+        Log::info('Demo: request received', [
+            'ip' => $request->ip(),
+            'ua' => substr((string) $request->userAgent(), 0, 80),
+            'fields_present' => array_keys($request->all()),
+            'email' => $request->input('email'),
+            'clinic_name' => $request->input('clinic_name'),
+            'has_hp_trap' => !empty($request->input('hp_trap')),
+            'rendered_at' => $request->input('form_rendered_at'),
+            'server_time_ms' => (int) (microtime(true) * 1000),
+        ]);
+
+        // Bot filter (honeypot + timing).
         $check = $captcha->verify($request->only(['hp_trap', 'form_rendered_at', 'recaptcha_token']), 'demo_request');
         if (!$check['ok']) {
+            Log::warning('Demo: bot filter rejected submission', [
+                'reason' => $check['reason'] ?? 'unknown',
+                'ip' => $request->ip(),
+                'email' => $request->input('email'),
+            ]);
             return back()->withInput()->withErrors(['clinic_name' => 'تعذر التحقق من الطلب، حاول مرة أخرى.']);
         }
 
         $validated = $request->validated();
+        Log::info('Demo: validation passed', [
+            'email' => $validated['email'] ?? null,
+            'fields' => array_keys($validated),
+        ]);
 
         // Server-side deduplication: if the same email + clinic submitted
         // a demo request in the last 30 seconds, treat the second one as
