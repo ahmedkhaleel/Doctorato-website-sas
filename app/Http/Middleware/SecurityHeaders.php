@@ -129,8 +129,11 @@ class SecurityHeaders
             "img-src 'self' data: https:",
             "font-src 'self' data: https://fonts.gstatic.com",
             // XHR/fetch — Inertia is same-origin; analytics + reCAPTCHA
-            // hit Google domains.
-            "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com",
+            // hit Google domains. reCAPTCHA v3 specifically posts to
+            // www.google.com/recaptcha/api2/* and pulls a token from
+            // www.gstatic.com — both must be in connect-src or the
+            // demo + contact forms silently fail to submit.
+            "connect-src 'self' https://www.google.com https://www.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com https://recaptcha.net",
             // reCAPTCHA iframe + Paymob redirect.
             "frame-src 'self' https://www.google.com https://accept.paymob.com",
             "frame-ancestors 'self'",
