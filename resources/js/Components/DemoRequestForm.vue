@@ -379,9 +379,24 @@ onMounted(() => {
 
                 <!-- Form -->
                 <form v-if="!showSuccess" @submit.prevent="submitForm" class="relative">
-                    <!-- Honeypot -->
-                    <div class="absolute opacity-0 pointer-events-none -z-10" aria-hidden="true">
-                        <label>Website <input v-model="form.hp_trap" type="text" tabindex="-1" autocomplete="off" /></label>
+                    <!-- Honeypot — name + label are deliberately bland so
+                         no autofill heuristic (Safari, Edge, 1Password)
+                         maps them to a real saved value. Earlier the
+                         label was "Website" and the new social-URL field
+                         was triggering the trap via autofill. -->
+                    <div class="absolute opacity-0 pointer-events-none -z-10" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden">
+                        <label>Leave this field blank
+                            <input
+                                v-model="form.hp_trap"
+                                type="text"
+                                name="hp_trap_field"
+                                tabindex="-1"
+                                autocomplete="off"
+                                data-lpignore="true"
+                                data-1p-ignore="true"
+                                data-form-type="other"
+                            />
+                        </label>
                     </div>
 
                     <!-- Progress -->
