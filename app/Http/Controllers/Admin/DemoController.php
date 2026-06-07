@@ -62,6 +62,15 @@ class DemoController extends Controller
     public function destroy(DemoRequest $demo)
     {
         $demo->delete();
-        return back()->with('success', 'تم حذف الطلب');
+
+        // Inertia DELETE preserves the response method on the redirect
+        // target unless we explicitly send a GET. back() inherited from
+        // the Referer was hitting the same /admin/demos/{id} path on
+        // some browsers (the Referer carried the modal-open URL) and
+        // 404ing because the row was gone. An explicit named-route
+        // redirect to the index GET avoids that race entirely.
+        return redirect()
+            ->route('admin.demos.index')
+            ->with('success', 'تم حذف الطلب');
     }
 }

@@ -25,6 +25,12 @@ class ContactController extends Controller
     public function destroy(ContactMessage $contact)
     {
         $contact->delete();
-        return back()->with('success', 'تم حذف الرسالة');
+
+        // See DemoController::destroy — explicit redirect avoids the
+        // back()-from-Referer race that 404s when the modal carried a
+        // /admin/contacts/{id} URL in the Referer header.
+        return redirect()
+            ->route('admin.contacts.index')
+            ->with('success', 'تم حذف الرسالة');
     }
 }
